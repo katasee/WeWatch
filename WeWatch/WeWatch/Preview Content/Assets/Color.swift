@@ -8,9 +8,10 @@
 import SwiftUI
 
 extension Color {
-    static var fireyRed = Color("fireyRed")
-    static var blackColor = Color("blackColor")
-    static var darkGreyColor = Color("darkGreyColor")
-    static var lightGreyColor = Color("lightGreyColor")
-    static var whiteColor = Color("whiteColor")
+    
+    internal static var fireyRed = Color("fireyRed")
+    internal static var blackColor = Color("blackColor")
+    internal static var darkGreyColor = Color("darkGreyColor")
+    internal static var lightGreyColor = Color("lightGreyColor")
+    internal static var whiteColor = Color("whiteColor")
 }

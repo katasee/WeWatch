@@ -12,8 +12,8 @@ struct ContentView: View {
         VStack {
             
             Text("Hello, world!")
-                .font(Font.poppinsBold30px)
-            Image("home-active-icon")
+                .font(.poppinsBold30px)
+            Image(.homeActiveIcon)
         }
     }
 }
