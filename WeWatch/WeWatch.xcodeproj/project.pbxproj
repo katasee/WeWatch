@@ -6,12 +6,17 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6E8E31192CFA24F800B5894A /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8E31182CFA24F800B5894A /* Environment.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		6E8E31182CFA24F800B5894A /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		6ECE93CA2CF10C8300852DDD /* WeWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6EDACE432CF403C500DF3B69 /* Exceptions for "WeWatch" folder in "WeWatch" target */ = {
+		6E8E31172CFA245300B5894A /* Exceptions for "WeWatch" folder in "WeWatch" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +29,7 @@
 		6ECE93CC2CF10C8300852DDD /* WeWatch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				6EDACE432CF403C500DF3B69 /* Exceptions for "WeWatch" folder in "WeWatch" target */,
+				6E8E31172CFA245300B5894A /* Exceptions for "WeWatch" folder in "WeWatch" target */,
 			);
 			path = WeWatch;
 			sourceTree = "<group>";
@@ -45,6 +50,7 @@
 		6ECE93C12CF10C8300852DDD = {
 			isa = PBXGroup;
 			children = (
+				6E8E31182CFA24F800B5894A /* Environment.swift */,
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
 				6ECE93CB2CF10C8300852DDD /* Products */,
 			);
@@ -132,6 +138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6E8E31192CFA24F800B5894A /* Environment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +261,8 @@
 		};
 		6ECE93DA2CF10C8500852DDD /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 6ECE93CC2CF10C8300852DDD /* WeWatch */;
+			baseConfigurationReferenceRelativePath = "Preview Content/Development.xcconfig";
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -264,6 +273,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeWatch/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -292,6 +302,8 @@
 		};
 		6ECE93DB2CF10C8500852DDD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 6ECE93CC2CF10C8300852DDD /* WeWatch */;
+			baseConfigurationReferenceRelativePath = "Preview Content/Development.xcconfig";
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -302,6 +314,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeWatch/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

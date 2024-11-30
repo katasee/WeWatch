@@ -6,17 +6,33 @@
 //
 
 import SwiftUI
-
 struct ContentView: View {
+    
+    @StateObject private var loginVM = LoginViewModel()
+    
     var body: some View {
-        VStack {
-            
-            Text("Hello, world!")
-                .font(.poppinsBold30px)
-            Image(.homeActiveIcon)
+        VStack{
+            Form {
+                HStack{
+                    Spacer()
+                    Image(systemName: "lock.fill")
+                }
+                TextField("apikey", text: $loginVM.apikey)
+                SecureField("pin", text: $loginVM.pin)
+                HStack {
+                    Spacer ()
+                    Button("Login") {
+                        loginVM.login()
+                    }
+                    Button("Signout") {
+                         
+                    }
+                }
+            }
         }
     }
 }
+
 
 #Preview {
     ContentView()
