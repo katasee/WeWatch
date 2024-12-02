@@ -8,11 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		6E8E31192CFA24F800B5894A /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8E31182CFA24F800B5894A /* Environment.swift */; };
+		6EC556C12CFCCCC700A732BE /* Development.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6EC556C02CFCCCC700A732BE /* Development.xcconfig */; };
+		6ED883562CFB9232004A29AE /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED883552CFB9232004A29AE /* KeychainManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6E8E31182CFA24F800B5894A /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
+		6EC556C02CFCCCC700A732BE /* Development.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Development.xcconfig; sourceTree = "<group>"; };
 		6ECE93CA2CF10C8300852DDD /* WeWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6ED883552CFB9232004A29AE /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -20,6 +24,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				"Preview Content/Development.xcconfig",
 			);
 			target = 6ECE93C92CF10C8300852DDD /* WeWatch */;
 		};
@@ -50,7 +55,9 @@
 		6ECE93C12CF10C8300852DDD = {
 			isa = PBXGroup;
 			children = (
+				6EC556C02CFCCCC700A732BE /* Development.xcconfig */,
 				6E8E31182CFA24F800B5894A /* Environment.swift */,
+				6ED883552CFB9232004A29AE /* KeychainManager.swift */,
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
 				6ECE93CB2CF10C8300852DDD /* Products */,
 			);
@@ -128,6 +135,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6EC556C12CFCCCC700A732BE /* Development.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6E8E31192CFA24F800B5894A /* Environment.swift in Sources */,
+				6ED883562CFB9232004A29AE /* KeychainManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,8 +270,7 @@
 		};
 		6ECE93DA2CF10C8500852DDD /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 6ECE93CC2CF10C8300852DDD /* WeWatch */;
-			baseConfigurationReferenceRelativePath = "Preview Content/Development.xcconfig";
+			baseConfigurationReference = 6EC556C02CFCCCC700A732BE /* Development.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -302,8 +310,7 @@
 		};
 		6ECE93DB2CF10C8500852DDD /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 6ECE93CC2CF10C8300852DDD /* WeWatch */;
-			baseConfigurationReferenceRelativePath = "Preview Content/Development.xcconfig";
+			baseConfigurationReference = 6EC556C02CFCCCC700A732BE /* Development.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

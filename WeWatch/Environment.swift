@@ -11,6 +11,7 @@ public enum Environment {
     enum  Keys {
         static let apiKey = "API_KEY"
         static let baseUrl = "BASE_URL"
+        static let apiPin = "API_PIN"
     }
     
     private static let infoDictionary: [String:Any] = {
@@ -33,5 +34,11 @@ public enum Environment {
         }
         return apiKeyString
     }()
+    
+    static let apiPin: String = {
+        guard let apiPinKeyString = Environment.infoDictionary[Keys.apiKey] as? String else {
+            fatalError("API Key not set in plist")
+        }
+        return apiPinKeyString
+    }()
 }
-

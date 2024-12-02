@@ -4,6 +4,8 @@
 <dict>
 	<key>API_KEY</key>
 	<string>$(API_KEY)</string>
+	<key>API_PIN</key>
+	<string>$(API_PIN)</string>
 	<key>BASE_URL</key>
 	<string>$(BASE_URL)</string>
 </dict>
