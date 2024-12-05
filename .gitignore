@@ -3,3 +3,6 @@
 .DS_Store
 WeWatch/WeWatch.xcodeproj/project.xcworkspace/xcuserdata/*
 WeWatch/WeWatch.xcodeproj/project.xcworkspace/xcuserdata/katasee.xcuserdatad/UserInterfaceState.xcuserstate
+**/xcuserdata/
+WeWatch/Development.xcconfig
+WeWatch/WeWatch/Preview Content/Development.xcconfig

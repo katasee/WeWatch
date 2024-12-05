@@ -7,38 +7,25 @@
 
 import Foundation
 
-public enum Environment {
-    enum  Keys {
-        static let apiKey = "API_KEY"
-        static let baseUrl = "BASE_URL"
-        static let apiPin = "API_PIN"
+internal enum Environment {
+    enum Key: String {
+        case apiKey  = "API_KEY"
+        case baseUrl = "BASE_URL"
+        case apiPin = "API_PIN"
     }
     
-    private static let infoDictionary: [String:Any] = {
+    
+    internal static let infoDictionary: [String: Any] = {
         guard let dict = Bundle.main.infoDictionary else {
             fatalError("plist file not found")
         }
         return dict
     } ()
     
-    static let baseURL: String = {
-        guard let baseURLString = Environment.infoDictionary[Keys.baseUrl] as? String else {
-            fatalError("Base URL not set in plist")
+    static func getPlistValue(_ key: Key) -> String {
+        guard let value = Environment.infoDictionary[key.rawValue] as? String else {
+            fatalError("\(key.rawValue) not set in plist")
         }
-        return baseURLString
-    } ()
-    
-    static let apiKey: String = {
-        guard let apiKeyString = Environment.infoDictionary[Keys.apiKey] as? String else {
-            fatalError("API Key not set in plist")
-        }
-        return apiKeyString
-    }()
-    
-    static let apiPin: String = {
-        guard let apiPinKeyString = Environment.infoDictionary[Keys.apiKey] as? String else {
-            fatalError("API Key not set in plist")
-        }
-        return apiPinKeyString
-    }()
+        return value
+    }
 }

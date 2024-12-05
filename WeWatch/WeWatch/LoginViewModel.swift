@@ -8,25 +8,47 @@
 import Foundation
 
 class LoginViewModel: ObservableObject {
-    var apikey: String = ""
-    var pin: String = ""
-    @Published var isLoading: Bool = false
     
-    func login() {
+    @Published var apikey: String = ""
+    @Published var pin: String = ""
+    @Published var isLoading: Bool = false
+    @Published var token: String? = nil
+    @Published var errorMessage: String? = nil
+    
+    func call() {
         isLoading = true
-        Webservice().login(apikey: Environment.apiKey, pin: Environment.apiPin) { [weak self] result in
-            self?.isLoading = false
-            switch result {
-            case .success(let token):
-                print(token)
-                do {
-                    try KeychainManager.store(data: token, key: "token")
-                } catch {
-                    print(error)
+        
+        let apikey: String = Environment.getPlistValue(.apiKey)
+        let pin: String = Environment.getPlistValue(.apiPin)
+        let loginBody = LoginRequestBody(apikey: apikey, pin: pin)
+        
+        guard let loginData = try? JSONEncoder().encode(loginBody) else {
+            self.errorMessage = "failed to encode login data."
+            self.isLoading = false
+            return
+        }
+        
+        let loginResource = Resource<LoginResponse>(
+            url:URL.loginURL,
+            method: .post(loginData)
+        )
+        Task {
+            do {
+                let response: LoginResponse = try await Webservice().call(loginResource)
+                if let token = response.data?.token {
+                    self.token = token
+                    do {
+                        try KeychainManager.store(data: token, key: "token")
+                    } catch {
+                        self.errorMessage = "Failed to store token: \(error.localizedDescription)"
+                    }
+                } else {
+                    self.errorMessage = "Failed to retriev token"
                 }
-            case .failure(let error):
-                print(error.localizedDescription )
+            } catch {
+                self.errorMessage = "Error during login: \(error.localizedDescription)"
             }
+            isLoading = false
         }
     }
 }
