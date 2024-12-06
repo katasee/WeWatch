@@ -21,13 +21,13 @@ internal struct LoginRequestBody: Encodable {
     internal let pin: String
 }
 
-internal struct LoginResponse: Decodable {
+internal struct LoginResponse: Codable {
     
     internal let status: String
     internal let data: LoginData?
 }
 
-internal struct LoginData: Decodable {
+internal struct LoginData: Codable {
     
     internal let token: String?
 }
