@@ -6,14 +6,14 @@
 //
 
 import SwiftUI
-struct ContentView: View {
-    @StateObject private var loginViewModel = LoginViewModel()
-    @State private var status = ""
+internal struct ContentView: View {
+    @StateObject private var viewModel: LoginViewModel = .init()
+    @State private var status: String = ""
     
     var body: some View {
         Form {
             VStack {
-                if loginViewModel.isLoading {
+                if viewModel.isLoading {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .red))
                         .disabled(true)
@@ -30,21 +30,14 @@ struct ContentView: View {
         }
         
         Button("Login") {
-            loginViewModel.call()
+            viewModel.call()
         }
-        .disabled(loginViewModel.isLoading)
+        .disabled(viewModel.isLoading)
         
         Button("See current token for account") {
-            do {
-                let data = try KeychainManager.getData(key: "token")
-                status = String(
-                    decoding: data,
-                    as: UTF8.self)
-            } catch {
-                print(error)
-            }
+ 
         }
-        .disabled(loginViewModel.isLoading)
+        .disabled(viewModel.isLoading)
         
         Spacer()
         
@@ -57,7 +50,7 @@ struct ContentView: View {
                 print("error")
             }
         }
-        .disabled(loginViewModel.isLoading)
+        .disabled(viewModel.isLoading)
     }
 }
 

@@ -1,16 +1,21 @@
 import Foundation
 import Security
 
-internal class KeychainManager {
-    enum KeychainError: Error {
+internal final class KeychainManager {
+    
+    internal enum KeychainError: Error {
+         
         case duplicateItem
         case unknown(OSStatus)
         case itemNotFound
         case unexpectedDataFormat
     }
     
-    internal static func store(data: String, key: String) throws {
-        guard let data = data.data(using: .utf8) else {
+    internal static func store(
+        data: String,
+        key: String
+    ) throws {
+        guard let data: Data = data.data(using: .utf8) else {
             throw KeychainError.itemNotFound
         }
         let query: [String: Any] = [
@@ -60,7 +65,7 @@ internal class KeychainManager {
         if status == errSecItemNotFound {
             throw KeychainError.itemNotFound
         } else if status != errSecSuccess {
-            throw KeychainError.unknown(status) 
+            throw KeychainError.unknown(status)
         }
     }
 }

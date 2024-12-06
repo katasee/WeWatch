@@ -8,27 +8,32 @@
 import Foundation
 
 enum AuthenticationError: Error {
+    
     case invalidCredentials
     case invalidResponse
     case decodingError
-    case custom (errorMessage: String)
+    case custom(errorMessage: String)
 }
 
-struct LoginRequestBody: Encodable {
+internal struct LoginRequestBody: Encodable {
+    
     let apikey: String
     let pin: String
 }
 
-struct LoginResponse: Codable {
+internal struct LoginResponse: Decodable {
+    
     let status: String
     let data: LoginData?
 }
 
-struct LoginData: Codable {
+internal struct LoginData: Decodable {
+    
     let token: String?
 }
 
-enum  HttpMethod {
+internal enum  HttpMethod {
+    
     case get([URLQueryItem])
     case post(Data?)
     
@@ -42,34 +47,39 @@ enum  HttpMethod {
     }
 }
 
-struct Resource<T: Codable> {
+internal struct Resource<T: Codable> {
+    
     let url: URL
     var method: HttpMethod = .get([])
 }
 
-class Webservice {
+internal final class Webservice {
     
-    func call <T: Codable>(_ resource: Resource<T>) async throws -> T {
-        var request = URLRequest(url: resource.url)
+    internal func call <T: Codable>(_ resource: Resource<T>) async throws -> T {
+        var request: URLRequest = URLRequest(url: resource.url)
         
         switch resource.method {
         case .post(let data):
             request.httpMethod = resource.method.name
             request.httpBody = data
         case .get(let queryItems):
-            var components = URLComponents(url: resource.url, resolvingAgainstBaseURL: false)
+            var components: URLComponents? = URLComponents(
+                url: resource.url,
+                resolvingAgainstBaseURL: false
+            )
             components?.queryItems = queryItems
             guard let url = components?.url else {
                 throw AuthenticationError.invalidCredentials
             }
             request = URLRequest(url: url)
         }
-        let configuration = URLSessionConfiguration.default
+        
+        let configuration: URLSessionConfiguration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = ["Content-Type": "application/json"]
-        let session = URLSession(configuration: configuration)
+        let session: URLSession = URLSession(configuration: configuration)
         
         let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse,
+        guard let httpResponse: HTTPURLResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200
         else {
             throw AuthenticationError.invalidResponse

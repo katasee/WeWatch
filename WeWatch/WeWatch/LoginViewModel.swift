@@ -7,34 +7,45 @@
 
 import Foundation
 
-class LoginViewModel: ObservableObject {
+internal final class LoginViewModel: ObservableObject {
     
-    @Published var apikey: String = ""
-    @Published var pin: String = ""
-    @Published var isLoading: Bool = false
-    @Published var token: String? = nil
-    @Published var errorMessage: String? = nil
+    @Published internal var apikey: String = ""
+    @Published internal var pin: String = ""
+    @Published internal var isLoading: Bool = false
+    @Published internal var token: String? = nil
+    @Published internal var errorMessage: String? = nil
     
-    func call() {
+    internal func call() {
         isLoading = true
         
         let apikey: String = Environment.getPlistValue(.apiKey)
         let pin: String = Environment.getPlistValue(.apiPin)
-        let loginBody = LoginRequestBody(apikey: apikey, pin: pin)
+        let loginBody: LoginRequestBody = .init(
+            apikey: apikey,
+            pin: pin
+        )
         
-        guard let loginData = try? JSONEncoder().encode(loginBody) else {
+        var loginResource: Resource<LoginResponse>?
+        do {
+            let loginData: Data = try JSONEncoder().encode(loginBody)
+            let loginResource: Resource<LoginResponse> = Resource<LoginResponse>(
+                url: URL.loginURL,
+                method:  .post(loginData)
+            )
+        } catch {
             self.errorMessage = "failed to encode login data."
             self.isLoading = false
             return
         }
         
-        let loginResource = Resource<LoginResponse>(
-            url:URL.loginURL,
-            method: .post(loginData)
-        )
         Task {
+            guard let resource = loginResource else {
+                self.errorMessage = "The resource is not initialized."
+                isLoading = false
+                return
+            }
             do {
-                let response: LoginResponse = try await Webservice().call(loginResource)
+                let response: LoginResponse = try await Webservice().call(resource)
                 if let token = response.data?.token {
                     self.token = token
                     do {
