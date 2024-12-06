@@ -17,19 +17,19 @@ enum AuthenticationError: Error {
 
 internal struct LoginRequestBody: Encodable {
     
-    let apikey: String
-    let pin: String
+    internal let apikey: String
+    internal let pin: String
 }
 
 internal struct LoginResponse: Decodable {
     
-    let status: String
-    let data: LoginData?
+    internal let status: String
+    internal let data: LoginData?
 }
 
 internal struct LoginData: Decodable {
     
-    let token: String?
+    internal let token: String?
 }
 
 internal enum  HttpMethod {
@@ -37,7 +37,7 @@ internal enum  HttpMethod {
     case get([URLQueryItem])
     case post(Data?)
     
-    var name: String {
+    internal var name: String {
         switch self{
         case .get:
             return "GET"
@@ -49,8 +49,8 @@ internal enum  HttpMethod {
 
 internal struct Resource<T: Codable> {
     
-    let url: URL
-    var method: HttpMethod = .get([])
+    internal let url: URL
+    internal var method: HttpMethod = .get([])
 }
 
 internal final class Webservice {
