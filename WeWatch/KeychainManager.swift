@@ -4,7 +4,7 @@ import Security
 internal final class KeychainManager {
     
     internal enum KeychainError: Error {
-         
+        
         case duplicateItem
         case unknown(OSStatus)
         case itemNotFound
@@ -27,7 +27,16 @@ internal final class KeychainManager {
         
         let status = SecItemAdd(query as CFDictionary, nil)
         if status == errSecDuplicateItem {
-            throw KeychainError.duplicateItem
+            
+            do {
+                if let stringData = String(data: data, encoding: .utf8) {
+                    _ = try update(key: key, newData: stringData)
+                } else {
+                    throw KeychainError.unexpectedDataFormat
+                }
+            } catch {
+                throw KeychainError.duplicateItem
+            }
         } else if status != errSecSuccess {
             throw KeychainError.unknown(status)
         }
@@ -68,4 +77,25 @@ internal final class KeychainManager {
             throw KeychainError.unknown(status)
         }
     }
+    
+    internal static func update(key: String, newData: String) throws -> Bool {
+        guard let data = newData.data(using: .utf8) else {
+            throw KeychainError.unexpectedDataFormat
+        }
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+        ]
+        let updateQuery: [String: Any] = [
+            kSecValueData as String: data
+        ]
+        let status = SecItemUpdate(query as CFDictionary, updateQuery as CFDictionary)
+        if status == errSecItemNotFound {
+            throw KeychainError.itemNotFound
+        } else if status != errSecSuccess {
+            throw KeychainError.unknown(status)
+        }
+        return status == errSecSuccess
+    }
 }
+
