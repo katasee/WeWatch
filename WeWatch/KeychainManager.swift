@@ -29,8 +29,11 @@ internal final class KeychainManager {
         if status == errSecDuplicateItem {
             
             do {
-                if let stringData = String(data: data, encoding: .utf8) {
-                    _ = try update(key: key, newData: stringData)
+                if let stringData: String = .init(
+                    data: data,
+                    encoding: .utf8
+                ) {
+                    try update(key: key, newData: stringData)
                 } else {
                     throw KeychainError.unexpectedDataFormat
                 }
@@ -77,7 +80,7 @@ internal final class KeychainManager {
             throw KeychainError.unknown(status)
         }
     }
-    
+    @discardableResult
     internal static func update(key: String, newData: String) throws -> Bool {
         guard let data = newData.data(using: .utf8) else {
             throw KeychainError.unexpectedDataFormat

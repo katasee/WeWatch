@@ -4,41 +4,57 @@
 
 //  Created by Anton on 09/12/2024.
 
-
 import Foundation
-
 
 internal final class JWTDecoder {
     
-    internal func decode(jwtoken jwt: String) -> [String: Any] {
-        
-        let segments = jwt.components(separatedBy: ".")
-        return decodeJWTPart(segments[1]) ?? [:]
+    internal enum jwtError: Error {
+        case decodeFailure
+        case decodePartError
+        case segmentError
+        case payloadError
     }
     
-    internal func base64UrlDecode(_ value: String) -> Data? {
-        var base64 = value
+    internal func decode(jwtoken: String) throws -> [String: Any] {
+        let segments: [String] = jwtoken.components(separatedBy: ".")
+        print(segments.count)
+        if segments.count != 3 {
+            throw jwtError.segmentError
+        }
+        return try decodeJWTPart(segments[1])
+    }
+    
+    private func base64Decode(_ value: String) -> Data? {
+        var base64: String = value
             .replacingOccurrences(of: "-", with: "+")
             .replacingOccurrences(of: "_", with: "/")
-        let length = Double(base64.lengthOfBytes(using: String.Encoding.utf8))
-        let requiredLength = 4 * ceil(length / 4.0)
-        let paddingLength = requiredLength - length
+        let length: Double = Double(base64.lengthOfBytes(using: String.Encoding.utf8))
+        let requiredLength: Double = 4 * ceil(length / 4.0)
+        let paddingLength: Double = requiredLength - length
         if paddingLength > 0 {
-            let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
+            let padding: String = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
             base64 = base64 + padding
         }
         return Data(base64Encoded: base64, options: .ignoreUnknownCharacters)
     }
     
-    internal func decodeJWTPart(_ value: String) -> [String: Any]? {
-        guard let bodyData = base64UrlDecode(value),
-              let json = try? JSONSerialization.jsonObject(
+    private func decodeJWTPart(_ value: String) throws -> [String: Any] {
+        guard let bodyData: Data = base64Decode(value) else {
+            throw jwtError.decodePartError
+        }
+        do {
+            let json: Any = try JSONSerialization.jsonObject(
                 with: bodyData,
                 options: []
-              ),
-              let payload = json as? [String: Any] else {
-            return nil
+            )
+            guard let payload: [String : Any] = json as? [String: Any] else {
+                throw jwtError.payloadError
+            }
+            return payload
+            
+        } catch {
+            throw jwtError.decodeFailure
         }
-        return payload
     }
 }
+

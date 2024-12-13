@@ -6,24 +6,6 @@
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
       buildArchitectures = "Automatic">
-      <PreActions>
-         <ExecutionAction
-            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
-            <ActionContent
-               title = "Run Script"
-               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;ConfigFilePath=&quot;/Users/katasee/documents/WeWatch/WeWatch/WeWatch/Preview Content/Development.xcconfig&quot;&#10;&gt; &quot;$ConfigFilePath&quot;&#10;cat &quot;/Users/katasee/documents/WeWatch/WeWatch/WeWatch/Preview Content/Development.xcconfig&quot; &gt;&gt; &quot;$ConfigFilePath&quot;&#10;">
-               <EnvironmentBuildable>
-                  <BuildableReference
-                     BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "6ECE93C92CF10C8300852DDD"
-                     BuildableName = "WeWatch.app"
-                     BlueprintName = "WeWatch"
-                     ReferencedContainer = "container:WeWatch.xcodeproj">
-                  </BuildableReference>
-               </EnvironmentBuildable>
-            </ActionContent>
-         </ExecutionAction>
-      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"

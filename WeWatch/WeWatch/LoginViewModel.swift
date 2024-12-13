@@ -9,6 +9,12 @@ import Foundation
 
 internal final class LoginViewModel: ObservableObject {
     
+    internal enum viewJwtError: Error {
+        case typeChangeError
+        case invalidExpirationClaim
+        case dataError
+    }
+    
     @Published internal var apikey: String = ""
     @Published internal var pin: String = ""
     @Published internal var isLoading: Bool = false
@@ -22,7 +28,7 @@ internal final class LoginViewModel: ObservableObject {
             self.errorMessage = "failed to encode login data."
             return
         }
-        let loginResource: Resource<LoginResponse> = Resource<LoginResponse>(
+        let loginResource: Resource<LoginResponse> = .init(
             url: URL.loginURL,
             method: .post(loginData)
         )
@@ -47,40 +53,43 @@ internal final class LoginViewModel: ObservableObject {
         }
     }
     
-    internal func decodingJwtToken() -> [String: Any]? {
+    internal func decodingJwtToken() throws -> [String: Any] {
         guard let tokenData: Data = try? KeychainManager.getData(key: "token") else {
-            return nil
+            throw viewJwtError.typeChangeError
         }
         let token: String = String(decoding: tokenData, as: UTF8.self)
         let jwtDecoder: JWTDecoder = JWTDecoder()
-        let decodeToken: [String: Any] = jwtDecoder.decode(jwtoken: token)
+        let decodeToken: [String: Any] = try jwtDecoder.decode(jwtoken: token)
         return decodeToken
     }
     
-    internal func expiredTime() -> Int {
-        let decodeToken: [String: Any]? = decodingJwtToken()
-        let claim: String = "exp"
-        guard let experienceClaim: Int = decodeToken?[claim] as? Int else {
-            return 0
+    internal func getJWTTokenExpirationTime() -> Date? {
+        do {
+            let decodeToken: [String: Any] = try decodingJwtToken()
+            let claim: String = "exp"
+            guard let experedClaim: Any = decodeToken[claim],
+                  let timeInterval: TimeInterval = experedClaim as? TimeInterval else {
+                throw viewJwtError.invalidExpirationClaim
+            }
+            return Date(timeIntervalSince1970: timeInterval)
+        } catch {
+            print(error)
+            return nil
         }
-        return experienceClaim
     }
     
-    internal func validToken() {
-        let claim: String = "exp"
-        let decodeToken: [String : Any]? = decodingJwtToken()
-        guard let experienceClaim: Any = decodeToken?[claim] else {
-            return
-        }
-        guard let intExperienceClaim = experienceClaim as? Int else {
-            return
-        }
-        if intExperienceClaim > 0 {
-            print("token valid")
-        } else {
-            print ("you need refresh token")
+    internal func isValidToken() -> Bool {
+        do {
+            if let date: Date = getJWTTokenExpirationTime() {
+                return date > .now
+            } else {
+                throw viewJwtError.dataError
+            }
+        } catch {
+            return false
         }
     }
+    
     private func prepareLoginRequest () -> Data? {
         do {
             let apikey: String = Environment.getPlistValue(.apiKey)

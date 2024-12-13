@@ -9,8 +9,8 @@ import SwiftUI
 internal struct ContentView: View {
     @StateObject private var viewModel: LoginViewModel = .init()
     @State private var status: String = ""
-    @State private var expireTime: Int = 0
-    @State private var validToken: Int = 0
+    @State private var expireTime: Date = Date()
+    @State private var validToken: Bool = false
     
     var body: some View {
         Form {
@@ -28,14 +28,13 @@ internal struct ContentView: View {
                 Text(status)
                     .font(.poppinsRegular16px)
                     .foregroundStyle(.green)
+                
                 Text(viewModel.errorMessage ?? "")
-                let date = Date(timeIntervalSince1970: TimeInterval(expireTime))
-                if date > Date() {
-                    
-                    Text("Result: \(date)")
+                if validToken {
+                    Text("Result: \(expireTime)")
                         .foregroundColor(.green)
                 } else {
-                    Text("Valid time: \(date)")
+                    Text("Token is expired: \(expireTime)")
                         .foregroundColor(.red)
                 }
             }
@@ -69,11 +68,11 @@ internal struct ContentView: View {
         }
         
         Button("Experience Time") {
-            expireTime = viewModel.expiredTime()
+            expireTime = LoginViewModel().getJWTTokenExpirationTime() ?? Date()
         }
         
         Button("Check Token Status") {
-            LoginViewModel().validToken()
+            validToken = viewModel.isValidToken()
         }
         
         Button("Clear") {
