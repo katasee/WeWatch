@@ -80,6 +80,7 @@ internal final class KeychainManager {
             throw KeychainError.unknown(status)
         }
     }
+    
     @discardableResult
     internal static func update(key: String, newData: String) throws -> Bool {
         guard let data = newData.data(using: .utf8) else {

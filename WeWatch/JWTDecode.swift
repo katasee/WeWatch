@@ -17,7 +17,6 @@ internal final class JWTDecoder {
     
     internal func decode(jwtoken: String) throws -> [String: Any] {
         let segments: [String] = jwtoken.components(separatedBy: ".")
-        print(segments.count)
         if segments.count != 3 {
             throw jwtError.segmentError
         }

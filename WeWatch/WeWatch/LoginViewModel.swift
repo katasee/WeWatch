@@ -73,7 +73,6 @@ internal final class LoginViewModel: ObservableObject {
             }
             return Date(timeIntervalSince1970: timeInterval)
         } catch {
-            print(error)
             return nil
         }
     }

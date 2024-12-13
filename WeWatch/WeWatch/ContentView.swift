@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 internal struct ContentView: View {
     @StateObject private var viewModel: LoginViewModel = .init()
     @State private var status: String = ""
