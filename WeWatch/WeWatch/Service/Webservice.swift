@@ -62,6 +62,7 @@ internal final class Webservice {
         case .post(let data):
             request.httpMethod = resource.method.name
             request.httpBody = data
+
         case .get(let queryItems):
             var components: URLComponents? = URLComponents(
                 url: resource.url,
