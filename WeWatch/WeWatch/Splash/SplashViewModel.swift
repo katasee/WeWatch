@@ -1,13 +1,14 @@
+////
+////  SplashView.swift
+////  WeWatch
+////
+////  Created by Anton on 18/12/2024.
+////
 //
-//  LoginViewModel.swift
-//  WeWatch
-//
-//  Created by Anton on 30/11/2024.
-//
-
 import Foundation
 
-internal final class LoginViewModel: ObservableObject {
+@MainActor
+class SplashViewModel: ObservableObject {
     
     internal enum viewJwtError: Error {
         case typeChangeError
@@ -15,24 +16,23 @@ internal final class LoginViewModel: ObservableObject {
         case dataError
     }
     
-    @Published internal var apikey: String = ""
-    @Published internal var pin: String = ""
     @Published internal var isLoading: Bool = false
     @Published internal var token: String? = nil
     @Published internal var errorMessage: String? = nil
+    @Published var showMainView: Bool = false
     
-    @MainActor
-    internal func call() async {
-        isLoading = true
-        guard let loginData: Data = prepareLoginRequest() else {
-            self.errorMessage = "failed to encode login data."
-            return
-        }
-        let loginResource: Resource<LoginResponse> = .init(
-            url: URL.loginURL,
-            method: .post(loginData)
-        )
-        
+    func loginToSplashView() async {
+        if isValidToken() {
+            self.showMainView = true
+        } else {
+            guard let loginData: Data = prepareLoginRequest() else {
+                self.errorMessage = "failed to encode login data."
+                return
+            }
+            let loginResource: Resource<LoginResponse> = .init(
+                url: URL.loginURL,
+                method: .post(loginData)
+            )
             do {
                 let response: LoginResponse = try await Webservice().call(loginResource)
                 if let token: String = response.data?.token {
@@ -48,7 +48,7 @@ internal final class LoginViewModel: ObservableObject {
             } catch {
                 self.errorMessage = "Error during login: \(error.localizedDescription)"
             }
-            isLoading = false
+        }
     }
     
     internal func decodingJwtToken() throws -> [String: Any] {
@@ -74,8 +74,8 @@ internal final class LoginViewModel: ObservableObject {
             return nil
         }
     }
-    @MainActor
-    internal func isValidToken() async -> Bool {
+    
+    internal func isValidToken() -> Bool {
         do {
             if let date: Date = getJWTTokenExpirationTime() {
                 return date > .now

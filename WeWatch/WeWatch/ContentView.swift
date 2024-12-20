@@ -41,11 +41,6 @@ internal struct ContentView: View {
             }
         }
         
-        Button("Login") {
-            viewModel.call()
-        }
-        .disabled(viewModel.isLoading)
-        
         Button("See current token") {
             do {
                 let data = try KeychainManager.getData(key: "token")
@@ -70,10 +65,6 @@ internal struct ContentView: View {
         
         Button("Experience Time") {
             expireTime = LoginViewModel().getJWTTokenExpirationTime() ?? Date()
-        }
-        
-        Button("Check Token Status") {
-            validToken = viewModel.isValidToken()
         }
         
         Button("Clear") {
