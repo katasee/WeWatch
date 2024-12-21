@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-extension Image {
-    static let splashScreenIcon = Image("splash.screen.icon")
-}
-
 struct SplashView: View {
     
     @StateObject var viewModel = SplashViewModel()
@@ -45,7 +41,7 @@ struct SplashView: View {
         }
     }
     
-    var body: some View {
+    internal var body: some View {
         if viewModel.showMainView {
             ContentView()
         } else {

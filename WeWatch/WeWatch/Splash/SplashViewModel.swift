@@ -23,12 +23,12 @@ internal final class SplashViewModel: ObservableObject {
         static let expiration = "exp"
     }
     
-    @Published private var token: String?
-    @Published private var errorMessage: String?
+     private var token: String?
+     private var errorMessage: String?
     @Published internal var showMainView: Bool = false
     
     @MainActor
-    func loginToSplashView() async {
+    internal func loginToSplashView() async {
         if isValidToken() {
             self.showMainView = true
         } else {
