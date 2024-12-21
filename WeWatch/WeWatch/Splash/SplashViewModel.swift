@@ -1,26 +1,33 @@
-////
-////  SplashView.swift
-////  WeWatch
-////
-////  Created by Anton on 18/12/2024.
-////
 //
+//  SplashViewModel.swift
+//  WeWatch
+//
+//  Created by Anton on 18/12/2024.
+//
+
 import Foundation
 
-@MainActor
-class SplashViewModel: ObservableObject {
+internal final class SplashViewModel: ObservableObject {
     
-    internal enum viewJwtError: Error {
+    internal enum JwtViewError: Error {
         case typeChangeError
         case invalidExpirationClaim
         case dataError
     }
     
-    @Published internal var isLoading: Bool = false
-    @Published internal var token: String? = nil
-    @Published internal var errorMessage: String? = nil
-    @Published var showMainView: Bool = false
+    internal enum KeychainKey {
+        static let token: String = "token"
+    }
     
+    internal enum JWTClaim {
+        static let expiration = "exp"
+    }
+    
+    @Published private var token: String?
+    @Published private var errorMessage: String?
+    @Published internal var showMainView: Bool = false
+    
+    @MainActor
     func loginToSplashView() async {
         if isValidToken() {
             self.showMainView = true
@@ -52,22 +59,19 @@ class SplashViewModel: ObservableObject {
     }
     
     internal func decodingJwtToken() throws -> [String: Any] {
-        guard let tokenData: Data = try? KeychainManager.getData(key: "token") else {
-            throw viewJwtError.typeChangeError
-        }
-        let token: String = String(decoding: tokenData, as: UTF8.self)
-        let jwtDecoder: JWTDecoder = JWTDecoder()
+        let tokenData: Data? = try KeychainManager.getData(key: KeychainKey.token)
+        let token: String = .init(decoding: tokenData ?? Data(), as: UTF8.self)
+        let jwtDecoder: JWTDecoder = .init()
         let decodeToken: [String: Any] = try jwtDecoder.decode(jwtoken: token)
         return decodeToken
     }
     
-    internal func getJWTTokenExpirationTime() -> Date? {
+    internal func jwtExpiryDate() -> Date? {
         do {
             let decodeToken: [String: Any] = try decodingJwtToken()
-            let claim: String = "exp"
-            guard let experedClaim: Any = decodeToken[claim],
-                  let timeInterval: TimeInterval = experedClaim as? TimeInterval else {
-                throw viewJwtError.invalidExpirationClaim
+            guard let expiredClaim: Any = decodeToken[JWTClaim.expiration],
+                  let timeInterval: TimeInterval = expiredClaim as? TimeInterval else {
+                throw JwtViewError.invalidExpirationClaim
             }
             return Date(timeIntervalSince1970: timeInterval)
         } catch {
@@ -77,17 +81,17 @@ class SplashViewModel: ObservableObject {
     
     internal func isValidToken() -> Bool {
         do {
-            if let date: Date = getJWTTokenExpirationTime() {
+            if let date: Date = jwtExpiryDate() {
                 return date > .now
             } else {
-                throw viewJwtError.dataError
+                throw JwtViewError.dataError
             }
         } catch {
             return false
         }
     }
     
-    private func prepareLoginRequest () -> Data? {
+    private func prepareLoginRequest() -> Data? {
         do {
             let apikey: String = Environment.getPlistValue(.apiKey)
             let pin: String = Environment.getPlistValue(.apiPin)
@@ -99,7 +103,6 @@ class SplashViewModel: ObservableObject {
             return loginData
         } catch {
             self.errorMessage = "failed to encode login data."
-            self.isLoading = false
             return nil
         }
     }

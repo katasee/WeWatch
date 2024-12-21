@@ -10,6 +10,7 @@ import Foundation
 internal final class LoginViewModel: ObservableObject {
     
     internal enum viewJwtError: Error {
+        
         case typeChangeError
         case invalidExpirationClaim
         case dataError
@@ -55,8 +56,8 @@ internal final class LoginViewModel: ObservableObject {
         guard let tokenData: Data = try? KeychainManager.getData(key: "token") else {
             throw viewJwtError.typeChangeError
         }
-        let token: String = String(decoding: tokenData, as: UTF8.self)
-        let jwtDecoder: JWTDecoder = JWTDecoder()
+        let token: String = .init(decoding: tokenData, as: UTF8.self)
+        let jwtDecoder: JWTDecoder = .init()
         let decodeToken: [String: Any] = try jwtDecoder.decode(jwtoken: token)
         return decodeToken
     }
@@ -65,8 +66,8 @@ internal final class LoginViewModel: ObservableObject {
         do {
             let decodeToken: [String: Any] = try decodingJwtToken()
             let claim: String = "exp"
-            guard let experedClaim: Any = decodeToken[claim],
-                  let timeInterval: TimeInterval = experedClaim as? TimeInterval else {
+            guard let expiredClaim: Any = decodeToken[claim],
+                  let timeInterval: TimeInterval = expiredClaim as? TimeInterval else {
                 throw viewJwtError.invalidExpirationClaim
             }
             return Date(timeIntervalSince1970: timeInterval)
@@ -87,7 +88,7 @@ internal final class LoginViewModel: ObservableObject {
         }
     }
     
-    private func prepareLoginRequest () -> Data? {
+    private func prepareLoginRequest() -> Data? {
         do {
             let apikey: String = Environment.getPlistValue(.apiKey)
             let pin: String = Environment.getPlistValue(.apiPin)
