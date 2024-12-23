@@ -8,7 +8,7 @@
 import SwiftUI
 
 internal struct ContentView: View {
-    @StateObject private var viewModel: LoginViewModel = .init()
+    @StateObject private var viewModel: SplashViewModel = .init()
     @State private var status: String = ""
     @State private var expireTime: Date = Date()
     @State private var validToken: Bool = false
@@ -25,14 +25,14 @@ internal struct ContentView: View {
                         .font(.poppinsRegular16px)
                         .foregroundStyle(.green)
                     
-                    Text(viewModel.errorMessage ?? "")
-                    if validToken {
-                        Text("Result: \(expireTime)")
-                            .foregroundColor(.green)
-                    } else {
-                        Text("Token is expired: \(expireTime)")
-                            .foregroundColor(.red)
-                    }
+//                    Text(viewModel.errorMessage ?? "")
+//                    if validToken {
+//                        Text("Result: \(expireTime)")
+//                            .foregroundColor(.green)
+//                    } else {
+//                        Text("Token is expired: \(expireTime)")
+//                            .foregroundColor(.red)
+//                    }
                 }
             }
         
@@ -47,7 +47,6 @@ internal struct ContentView: View {
                 print(error)
             }
         }
-        .disabled(viewModel.isLoading)
         
         Button("Update token") {
             do {
@@ -58,21 +57,20 @@ internal struct ContentView: View {
             }
         }
         
-        Button("Experience Time") {
-            expireTime = LoginViewModel().getJWTTokenExpirationTime() ?? Date()
-        }
+//        Button("Experience Time") {
+//            expireTime = LoginViewModel().getJWTTokenExpirationTime() ?? Date()
+//        }
         
-        Button("Clear") {
-            viewModel.errorMessage = nil
-            status = ""
-            do {
-                try KeychainManager.remove(key: "token")
-                print("Password deleted successfully.")
-            } catch {
-                print("error")
-            }
-        }
-        .disabled(viewModel.isLoading)
+//        Button("Clear") {
+//            viewModel.errorMessage = nil
+//            status = ""
+//            do {
+//                try KeychainManager.remove(key: "token")
+//                print("Password deleted successfully.")
+//            } catch {
+//                print("error")
+//            }
+//        }
     }
 }
 

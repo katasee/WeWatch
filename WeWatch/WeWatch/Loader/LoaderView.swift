@@ -10,20 +10,19 @@ import Lottie
 
 extension View {
     
-    internal func loader(isLoading: Binding<Bool>) -> some View {
+    internal func loader(isLoading: Bool) -> some View {
         ZStack {
-            self
-                .blur(radius: 5)
             VStack{
                 LottieView(animation: .named("loader"))
                     .playbackMode(.playing(.toProgress(1, loopMode: .loop)))
-                Text("Loading...")
+                Text("loader.label.title")
                 Spacer(minLength: 20)
             }
-            .frame(maxWidth: 343, maxHeight: 142)
-            .foregroundStyle(.white)
+            .padding(.horizontal, 24)
+            .frame(maxWidth: .infinity, maxHeight: 142)
+            .foregroundColor(.whiteColor)
             .font(.poppinsRegular16px)
-            .background(.ultraThinMaterial,in: RoundedRectangle(cornerRadius: 16.0))
+            .background(RoundedRectangle(cornerRadius: 12.0).fill(Color.darkGreyColor))
         }
     }
 }
