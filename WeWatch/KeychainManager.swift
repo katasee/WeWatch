@@ -34,13 +34,17 @@ internal final class KeychainManager {
                     encoding: .utf8
                 ) {
                     try update(key: key, newData: stringData)
+                    print("token update")
                 } else {
+                    print("token unexpectedDataFormat")
                     throw KeychainError.unexpectedDataFormat
                 }
             } catch {
+                print("token duplicateItem")
                 throw KeychainError.duplicateItem
             }
         } else if status != errSecSuccess {
+            print("token error")
             throw KeychainError.unknown(status)
         }
     }

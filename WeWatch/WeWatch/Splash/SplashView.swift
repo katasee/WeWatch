@@ -9,10 +9,10 @@ import SwiftUI
 
 struct SplashView: View {
     
-    @StateObject var viewModel = SplashViewModel()
+    @StateObject private var viewModel: SplashViewModel = .init()
     
     private var splashViewContent: some View {
-        ZStack{
+        ZStack {
             Color(.black)
                 .ignoresSafeArea()
             VStack{
@@ -38,6 +38,7 @@ struct SplashView: View {
                 }
                 .font(.poppinsBold24px)
             }
+            .loader(isLoading: $viewModel.isLoading)
         }
     }
     

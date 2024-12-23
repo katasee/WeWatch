@@ -23,15 +23,18 @@ internal final class SplashViewModel: ObservableObject {
         static let expiration = "exp"
     }
     
-     private var token: String?
-     private var errorMessage: String?
+    private var token: String?
+    private var errorMessage: String?
     @Published internal var showMainView: Bool = false
+    @Published internal var isLoading: Bool = false
     
     @MainActor
     internal func loginToSplashView() async {
         if isValidToken() {
+            isLoading = false
             self.showMainView = true
         } else {
+            isLoading = true
             guard let loginData: Data = prepareLoginRequest() else {
                 self.errorMessage = "failed to encode login data."
                 return
@@ -46,6 +49,7 @@ internal final class SplashViewModel: ObservableObject {
                     self.token = token
                     do {
                         try KeychainManager.store(data: token, key: "token")
+                        self.showMainView = true
                     } catch {
                         self.errorMessage = "Failed to store token: \(error.localizedDescription)"
                     }

@@ -24,7 +24,6 @@ internal final class LoginViewModel: ObservableObject {
     
     @MainActor
     internal func call() async {
-        isLoading = true
         guard let loginData: Data = prepareLoginRequest() else {
             self.errorMessage = "failed to encode login data."
             return
@@ -36,7 +35,9 @@ internal final class LoginViewModel: ObservableObject {
         
             do {
                 let response: LoginResponse = try await Webservice().call(loginResource)
+                print(response)
                 if let token: String = response.data?.token {
+                    print(token)
                     self.token = token
                     do {
                         try KeychainManager.store(data: token, key: "token")
@@ -49,7 +50,6 @@ internal final class LoginViewModel: ObservableObject {
             } catch {
                 self.errorMessage = "Error during login: \(error.localizedDescription)"
             }
-            isLoading = false
     }
     
     internal func decodingJwtToken() throws -> [String: Any] {
@@ -100,7 +100,6 @@ internal final class LoginViewModel: ObservableObject {
             return loginData
         } catch {
             self.errorMessage = "failed to encode login data."
-            self.isLoading = false
             return nil
         }
     }

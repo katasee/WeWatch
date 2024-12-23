@@ -14,32 +14,27 @@ internal struct ContentView: View {
     @State private var validToken: Bool = false
     
     var body: some View {
-        Form {
-            VStack {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .red))
-                        .disabled(true)
-                }
-                HStack {
-                    Spacer()
-                    Image(systemName: "lock.fill")
-                    Spacer()
-                }
-                Text(status)
-                    .font(.poppinsRegular16px)
-                    .foregroundStyle(.green)
-                
-                Text(viewModel.errorMessage ?? "")
-                if validToken {
-                    Text("Result: \(expireTime)")
-                        .foregroundColor(.green)
-                } else {
-                    Text("Token is expired: \(expireTime)")
-                        .foregroundColor(.red)
+            Form {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Image(systemName: "lock.fill")
+                        Spacer()
+                    }
+                    Text(status)
+                        .font(.poppinsRegular16px)
+                        .foregroundStyle(.green)
+                    
+                    Text(viewModel.errorMessage ?? "")
+                    if validToken {
+                        Text("Result: \(expireTime)")
+                            .foregroundColor(.green)
+                    } else {
+                        Text("Token is expired: \(expireTime)")
+                            .foregroundColor(.red)
+                    }
                 }
             }
-        }
         
         Button("See current token") {
             do {
