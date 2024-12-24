@@ -7,33 +7,33 @@
 
 import SwiftUI
 
-struct SplashView: View {
+internal struct SplashView: View {
     
-    @StateObject var viewModel = SplashViewModel()
+    @StateObject private var viewModel: SplashViewModel = .init()
     
     private var splashViewContent: some View {
-        ZStack{
+        ZStack {
             Color(.black)
                 .ignoresSafeArea()
             VStack{
                 HStack(spacing: 0) {
-                    Text("We")
+                    Text("splashView.title.first.part")
                         .foregroundColor(.whiteColor)
-                    Text("Watch.")
+                    Text("splashView.title.second.part")
                         .foregroundColor(.fieryRed)
                 }
                 .font(.poppinsBold30px)
                 Image.splashScreenIcon
                 Group {
-                    Text("Discover")
+                    Text("splash.view.description.first.part.title")
                         .foregroundColor(.whiteColor)
                     + Text(". ")
                         .foregroundColor(.fieryRed)
-                    + Text("Track")
+                    + Text("splash.view.description.second.part.title")
                         .foregroundColor(.whiteColor)
                     + Text(". ")
                         .foregroundColor(.fieryRed)
-                    + Text("Enjoy")
+                    + Text("splash.view.description.third.part.title")
                         .foregroundColor(.whiteColor)
                 }
                 .font(.poppinsBold24px)

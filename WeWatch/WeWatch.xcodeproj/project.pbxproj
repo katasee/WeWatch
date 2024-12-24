@@ -7,15 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6E33D0CD2D184B45004C376C /* Development.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E33D0CC2D184B45004C376C /* Development.xcconfig */; };
+		6E33D0D02D184B8A004C376C /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 6E33D0CF2D184B8A004C376C /* Lottie */; };
 		6E39E6002D06ED8600516C00 /* JWTDecode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E39E5FF2D06ED8600516C00 /* JWTDecode.swift */; };
-		6E8352802D0A5FC000B36AC8 /* Development.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E83527F2D0A5FC000B36AC8 /* Development.xcconfig */; };
 		6E8E31192CFA24F800B5894A /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8E31182CFA24F800B5894A /* Environment.swift */; };
 		6ED883562CFB9232004A29AE /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED883552CFB9232004A29AE /* KeychainManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6E33D0CC2D184B45004C376C /* Development.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Development.xcconfig; sourceTree = "<group>"; };
 		6E39E5FF2D06ED8600516C00 /* JWTDecode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWTDecode.swift; sourceTree = "<group>"; };
-		6E83527F2D0A5FC000B36AC8 /* Development.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Development.xcconfig; sourceTree = "<group>"; };
 		6E8E31182CFA24F800B5894A /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		6ECE93CA2CF10C8300852DDD /* WeWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ED883552CFB9232004A29AE /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
@@ -47,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6E33D0D02D184B8A004C376C /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,7 +58,7 @@
 		6ECE93C12CF10C8300852DDD = {
 			isa = PBXGroup;
 			children = (
-				6E83527F2D0A5FC000B36AC8 /* Development.xcconfig */,
+				6E33D0CC2D184B45004C376C /* Development.xcconfig */,
 				6E8E31182CFA24F800B5894A /* Environment.swift */,
 				6ED883552CFB9232004A29AE /* KeychainManager.swift */,
 				6E39E5FF2D06ED8600516C00 /* JWTDecode.swift */,
@@ -93,6 +95,7 @@
 			);
 			name = WeWatch;
 			packageProductDependencies = (
+				6E33D0CF2D184B8A004C376C /* Lottie */,
 			);
 			productName = WeWatch;
 			productReference = 6ECE93CA2CF10C8300852DDD /* WeWatch.app */;
@@ -123,6 +126,9 @@
 			);
 			mainGroup = 6ECE93C12CF10C8300852DDD;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6E33D0CE2D184B8A004C376C /* XCRemoteSwiftPackageReference "lottie-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6ECE93CB2CF10C8300852DDD /* Products */;
 			projectDirPath = "";
@@ -138,7 +144,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E8352802D0A5FC000B36AC8 /* Development.xcconfig in Resources */,
+				6E33D0CD2D184B45004C376C /* Development.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,7 +282,7 @@
 		};
 		6ECE93DA2CF10C8500852DDD /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6E83527F2D0A5FC000B36AC8 /* Development.xcconfig */;
+			baseConfigurationReference = 6E33D0CC2D184B45004C376C /* Development.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -328,7 +334,7 @@
 		};
 		6ECE93DB2CF10C8500852DDD /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6E83527F2D0A5FC000B36AC8 /* Development.xcconfig */;
+			baseConfigurationReference = 6E33D0CC2D184B45004C376C /* Development.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -400,6 +406,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6E33D0CE2D184B8A004C376C /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6E33D0CF2D184B8A004C376C /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6E33D0CE2D184B8A004C376C /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6ECE93C22CF10C8300852DDD /* Project object */;
 }

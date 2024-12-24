@@ -23,8 +23,8 @@ internal final class SplashViewModel: ObservableObject {
         static let expiration = "exp"
     }
     
-     private var token: String?
-     private var errorMessage: String?
+    private var token: String?
+    private var errorMessage: String?
     @Published internal var showMainView: Bool = false
     
     @MainActor
@@ -46,6 +46,7 @@ internal final class SplashViewModel: ObservableObject {
                     self.token = token
                     do {
                         try KeychainManager.store(data: token, key: "token")
+                        self.showMainView = true
                     } catch {
                         self.errorMessage = "Failed to store token: \(error.localizedDescription)"
                     }
