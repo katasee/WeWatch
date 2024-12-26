@@ -19,37 +19,35 @@ struct MovieCard: View {
     private var storyline: String = .init()
     
     var body: some View {
-        ZStack {
-            HStack(alignment: .top) {
-                VStack {
-                    HStack {
-                        Spacer()
-                        if bookmark == false {
-                            Image("bookmark-active-icon")
-                        } else {
-                            Image("bookmark-active-icon")
-                        }
+        HStack(alignment: .top) {
+            VStack {
+                HStack {
+                    Spacer()
+                    if bookmark == false {
+                        Image("bookmark-active-icon")
+                    } else {
+                        Image("bookmark-active-icon")
                     }
-                    .padding()
-                    .frame(maxWidth: 182, maxHeight: 273, alignment: .topLeading)
-                    .background(RoundedRectangle(cornerRadius: 15) .fill(Color.darkGreyColor))
                 }
-                VStack {
-                    Text(title)
-                        .font(.poppinsBold20px)
+                .padding()
+                .frame(maxWidth: 182, maxHeight: 273, alignment: .topLeading)
+                .background(RoundedRectangle(cornerRadius: 15) .fill(Color.darkGreyColor))
+            }
+            VStack {
+                Text(title)
+                    .font(.poppinsBold20px)
+                    .foregroundColor(.whiteColor)
+                HStack {
+                    Text("\(ranking, specifier: "%.1f")")                            .font(.poppinsBold16px)
                         .foregroundColor(.whiteColor)
-                    HStack {
-                        Text("\(ranking, specifier: "%.1f")")                            .font(.poppinsBold16px)
-                            .foregroundColor(.whiteColor)
-                        RatingView(ranking: ranking)
-                    }
-                    Text(genres)
-                        .font(.poppinsBold14px)
-                        .foregroundColor(.whiteColor)
-                    Text(storyline)
-                        .font(.poppinsRegular13px)
-                        .foregroundColor(.lightGreyColor)
+                    RatingView(ranking: ranking)
                 }
+                Text(genres)
+                    .font(.poppinsBold14px)
+                    .foregroundColor(.whiteColor)
+                Text(storyline)
+                    .font(.poppinsRegular13px)
+                    .foregroundColor(.lightGreyColor)
             }
         }
     }
