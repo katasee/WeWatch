@@ -1,7 +1,13 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     ". " : {
+
+    },
+    "Anton" : {
 
     },
     "loader.label.title" : {
@@ -15,7 +21,7 @@
         }
       }
     },
-    "See current token" : {
+    "Search" : {
 
     },
     "splash.view.description.first.part.title" : {
@@ -67,9 +73,6 @@
           }
         }
       }
-    },
-    "Update token" : {
-
     }
   },
   "version" : "1.0"
