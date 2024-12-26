@@ -18,8 +18,14 @@ extension Font {
     internal static var poppinsBold20px: Font {
         Font.custom("Poppins-Bold", size: 20)
     }
+    internal static var poppinsBold18px: Font {
+        Font.custom("Poppins-Bold", size: 18)
+    }
     internal static var poppinsBold16px: Font {
         Font.custom("Poppins-Bold", size: 16)
+    }
+    internal static var poppinsRegular18px: Font {
+        Font.custom("Poppins-Regular", size: 18)
     }
     internal static var poppinsRegular16px: Font {
         Font.custom("Poppins-Regular", size: 16)
