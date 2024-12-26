@@ -16,7 +16,6 @@ struct MovieCardDiscover: View {
     var body: some View {
         ZStack {
             Color.black
-            VStack {
                 VStack(alignment: .leading) {
                     HStack() {
                         Spacer()
@@ -38,7 +37,6 @@ struct MovieCardDiscover: View {
                 }
                 .font(.poppinsBold18px)
                 .foregroundColor(.whiteColor)
-            }
         }
     }
 }
