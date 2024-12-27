@@ -38,5 +38,8 @@ struct MovieCardTopFive: View {
 }
 
 #Preview {
-    MovieCardTopFive()
+    ZStack {
+        Color.black.ignoresSafeArea();
+        MovieCardTopFive()
+    }
 }

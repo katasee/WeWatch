@@ -54,7 +54,10 @@ struct MovieCard: View {
 }
 
 #Preview {
-    MovieCard()
+    ZStack {
+        Color.black.ignoresSafeArea();
+        MovieCard()
+    }
 }
 
 struct RatingView: View {

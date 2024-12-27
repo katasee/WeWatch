@@ -39,5 +39,7 @@ struct MovieCardDiscover: View {
 }
 
 #Preview {
-    MovieCardDiscover()
+    ZStack {
+        Color.black.ignoresSafeArea();        MovieCardDiscover()
+    }
 }

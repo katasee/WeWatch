@@ -8,11 +8,30 @@
 import SwiftUI
 
 struct Pill: View {
+    @State private var didTap: Bool = false
+    private var pillTitle: String = .init()
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Button(action: {
+            self.didTap = true
+        }) {
+            Text(pillTitle)
+        }
+        .padding(.top, 2)
+        .padding(.bottom, 2)
+        .padding(.leading, 16)
+        .padding(.trailing,16)
+        .background(didTap ? Color.fieryRed : Color.dakrGrey)
+        .foregroundColor(.whiteColor)
+        .font(.poppinsRegular14px)
+        .clipShape(.capsule)
+        .controlSize(.mini)
     }
 }
 
 #Preview {
-    Pill()
+    ZStack {
+        Color.black.ignoresSafeArea();
+        Pill()
+    }
 }
+
