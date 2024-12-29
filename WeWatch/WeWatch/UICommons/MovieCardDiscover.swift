@@ -7,39 +7,53 @@
 
 import SwiftUI
 
-struct MovieCardDiscover: View {
+internal struct MovieCardDiscover: View {
     
-    private let title: String = .init()
-    private let ranking: Double = .init()
-    private var bookmark: Bool = false
+    private let title: String
+    private let ranking: Double
     
-    var body: some View {
-                VStack(alignment: .leading) {
-                    HStack() {
-                        Spacer()
-                        if bookmark == false {
-                            Image("bookmark-default-icon")
-                        } else {
-                            Image("bookmark-active-icon")
-                        }
-                    }
-                    .padding()
-                    .frame(maxWidth: 182, maxHeight: 273, alignment: .topLeading)
-                    .background(RoundedRectangle(cornerRadius: 15) .fill(Color.darkGreyColor))
-                    Text(title)
-                    HStack {
-                        Text("\(ranking, specifier: "%.1f")")
-                        Image("star-full-icon")
-                    }
-                    .font(.poppinsRegular18px)
-                }
+    internal init(
+        title: String,
+        ranking: Double
+    ) {
+        self.title = title
+        self.ranking = ranking
+    }
+    
+    internal var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            ZStack(alignment: .topTrailing) {
+                ImageComponent(image: Image("splash.screen.icon"))
+                    .cornerRadius(15)
+                    .frame(maxWidth: 182, maxHeight: 273)
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGreyColor)
+                    )
+                Spacer()
+                Bookmark()
+                    .padding(16)
+            }
+            Text(title)
                 .font(.poppinsBold18px)
-                .foregroundColor(.whiteColor)
+            HStack() {
+                Text("\(ranking, specifier: "%.1f")")
+                    .font(.poppinsRegular18px)
+                Image("star-full-icon")
+                    
+            }
+        }
+        .foregroundColor(.whiteColor)
+        .frame(maxWidth: 182)
     }
 }
 
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea();        MovieCardDiscover()
+        Color.black.ignoresSafeArea()
+        MovieCardDiscover(
+            title: "Hitman’s Wife’s Bodyguard",
+            ranking: 3.5
+        )
     }
 }

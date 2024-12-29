@@ -7,33 +7,45 @@
 
 import SwiftUI
 
-struct MovieCard: View {
+internal struct MovieCard: View {
     
-    private let title: String = .init()
-    private var bookmark: Bool = false
-    private let ranking: Double = .init()
-    private var emptyStar: Image = .init("star-empty-icon")
-    private var fullStar: Image = .init("star-full-icon")
-    private var halfStar: Image = .init("star-half-icon")
-    private var genres: String = .init()
-    private var storyline: String = .init()
+    private let bookmark: Bool
+    private let title: String
+    private let ranking: Double
+    private let genres: String
+    private let storyline: String
     
-    var body: some View {
+    internal init(
+        title: String,
+        bookmark: Bool = false,
+        ranking: Double,
+        genres: String,
+        storyline: String
+    ) {
+        self.title = title
+        self.bookmark = bookmark
+        self.ranking = ranking
+        self.genres = genres
+        self.storyline = storyline
+    }
+    
+    internal var body: some View {
         HStack(alignment: .top) {
             VStack {
-                HStack {
+                ZStack(alignment: .topTrailing) {
+                    ImageComponent(image: Image("splash.screen.icon"))
+                        .cornerRadius(15)
+                        .frame(maxWidth: 182, maxHeight: 273)
+                        .background(
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.darkGreyColor)
+                        )
                     Spacer()
-                    if bookmark == false {
-                        Image("bookmark-active-icon")
-                    } else {
-                        Image("bookmark-active-icon")
-                    }
+                    Bookmark()
+                        .padding(16)
                 }
-                .padding()
-                .frame(maxWidth: 182, maxHeight: 273, alignment: .topLeading)
-                .background(RoundedRectangle(cornerRadius: 15) .fill(Color.darkGreyColor))
             }
-            VStack {
+            VStack(alignment: .leading, spacing: 10) {
                 Text(title)
                     .font(.poppinsBold20px)
                     .foregroundColor(.whiteColor)
@@ -55,28 +67,12 @@ struct MovieCard: View {
 
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea();
-        MovieCard()
-    }
-}
-
-struct RatingView: View {
-    let ranking: Double
-    var body: some View {
-        ForEach(0..<5, id: \.self) { index in
-            if Double(index) + 1 <= ranking {
-                Image("star-full-icon")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-            } else if Double(index) + 0.5 <= ranking {
-                Image("star-half-icon")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-            } else  {
-                Image("star-empty-icon")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-            }
-        }
+        Color.black.ignoresSafeArea()
+        MovieCard(
+            title: "Hitman’s Wife’s Bodyguard",
+            ranking: 3.5,
+            genres: "Action, Comedy, Crime",
+            storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......"
+        )
     }
 }

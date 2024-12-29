@@ -7,31 +7,50 @@
 
 import SwiftUI
 
-struct SearchBar: View {
-    @State private var searchText: String = ""
-    var body: some View {
-        HStack {
+internal struct SearchBar: View {
+    @Binding private var searchText: String
+    internal init(searchText: Binding<String>) {
+         self._searchText = searchText
+    }
+    
+    internal var body: some View {
+        HStack(spacing: 16) {
             Image("search-default-icon")
+                .renderingMode(.template)
                 .resizable()
                 .frame(width: 20.0, height: 20.0)
+                .padding(.leading, 16)
+                .padding(.vertical, 14)
             ZStack(alignment: .leading) {
                 if searchText .isEmpty {
                     Text("Search")
-                        .foregroundColor(.lightGreyColor)
                 }
                 TextField("", text: $searchText)
+                    .foregroundColor(Color.whiteColor)
+                    .overlay(
+                        Image(systemName: "xmark.circle.fill")
+                            .padding(16)
+                            .offset(x: 10)
+                            .foregroundColor(Color.lightGreyColor)
+                            .opacity(searchText.isEmpty ? 0.0 : 1.0)
+                            .onTapGesture {
+                                searchText = ""
+                            }
+                        ,alignment: .trailing
+                    )
             }
+            .frame(maxWidth: .infinity, maxHeight: 48)
         }
-        .padding()
-        .foregroundColor(.whiteColor)
+        .foregroundColor(searchText.count > 0 ? .whiteColor : .lightGreyColor)
         .background(RoundedRectangle(cornerRadius: 10.0).fill(Color.darkGreyColor))
         .font(.poppinsRegular16px)
         .cornerRadius(10)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
+        .padding(16)
     }
 }
 
 #Preview {
-    SearchBar()
+    @Previewable @State var text = ""
+     return SearchBar(
+        searchText: $text)
 }

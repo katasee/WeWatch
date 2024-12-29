@@ -7,22 +7,23 @@
 
 import SwiftUI
 
-struct LargeCover: View {
-
-    var body: some View {
+internal struct LargeCover: View {
+    
+    internal var body: some View {
         ZStack {
             Image("photo")
                 .resizable()
-                .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
-                .frame(minWidth: 0, idealWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .cornerRadius(15)
+                .background(Color.dakrGrey)
         }
     }
 }
 
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea();
+        Color.black.ignoresSafeArea()
         LargeCover()
     }
 }

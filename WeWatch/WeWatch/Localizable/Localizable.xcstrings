@@ -10,9 +10,6 @@
     "%.1f" : {
 
     },
-    "action" : {
-
-    },
     "loader.label.title" : {
       "extractionState" : "manual",
       "localizations" : {

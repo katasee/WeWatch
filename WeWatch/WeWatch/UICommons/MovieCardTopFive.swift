@@ -7,29 +7,35 @@
 
 import SwiftUI
 
-struct MovieCardTopFive: View {
+internal struct MovieCardTopFive: View {
     
-    private var bookmark: Bool = false
-    private let title: String = .init()
-    private let ranking: Double = .init()
-    var body: some View {
+    private let title: String
+    private let ranking: Double
+    
+    internal init(
+        title: String,
+        ranking: Double
+    ) {
+        self.title = title
+        self.ranking = ranking
+    }
+    
+    internal var body: some View {
         VStack(alignment: .leading) {
             HStack() {
                 Spacer()
-                if bookmark == false {
-                    Image("bookmark-default-icon")
-                } else {
-                    Image("bookmark-active-icon")
-                }
+                Bookmark()
+                    .padding(16)
             }
-            .padding()
+            .padding(16)
             .frame(maxWidth: 300, maxHeight: 200, alignment: .topLeading)
             .background(RoundedRectangle(cornerRadius: 15) .fill(Color.darkGreyColor))
             Text(title)
                 .font(.poppinsBold20px)
                 .foregroundColor(.whiteColor)
             HStack {
-                Text("\(ranking, specifier: "%.1f")")                            .font(.poppinsRegular22px)
+                Text("\(ranking, specifier: "%.1f")")
+                    .font(.poppinsRegular22px)
                     .foregroundColor(.whiteColor)
                 RatingView(ranking: ranking)
             }
@@ -40,6 +46,9 @@ struct MovieCardTopFive: View {
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea();
-        MovieCardTopFive()
+        MovieCardTopFive(
+            title: "Hitman’s Wife’s Bodyguard",
+            ranking: 3.5
+        )
     }
 }
