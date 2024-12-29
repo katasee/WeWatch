@@ -24,6 +24,17 @@
     "Search" : {
 
     },
+    "search.bar.promt.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        }
+      }
+    },
     "splash.view.description.first.part.title" : {
       "localizations" : {
         "en" : {

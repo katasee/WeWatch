@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+let noop: () -> Void = {}
+
 internal struct PillButton: View {
     
     @State private var didTap: Bool = false
@@ -14,7 +16,6 @@ internal struct PillButton: View {
     private let title: String
     
     internal init(
-        
         title: String,
         action: @escaping () -> Void
     ) {
@@ -24,7 +25,8 @@ internal struct PillButton: View {
     
     internal var body: some View {
         Button(action: {
-            self.didTap = true
+            action()
+            didTap = true
         }) {
             Text(title)
                 .foregroundColor(.whiteColor)
@@ -32,7 +34,7 @@ internal struct PillButton: View {
         }
         .padding(.vertical, 2)
         .padding(.horizontal, 16)
-        .background(didTap ? Color.fieryRed : Color.dakrGrey)
+        .background(didTap ? Color.fieryRed : Color.darkGreyColor)
         .clipShape(.capsule)
         .controlSize(.mini)
     }
@@ -43,9 +45,7 @@ internal struct PillButton: View {
         Color.black.ignoresSafeArea()
         PillButton(
             title: "Action",
-            action: {
-                print("Button is tapped")
-            }
-        )
+            action: noop)
     }
 }
+

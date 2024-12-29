@@ -12,11 +12,11 @@ internal struct RatingView: View {
     private let ranking: Double
     
     internal init(
-        
         ranking: Double
     ) {
         self.ranking = ranking
     }
+    
     internal var body: some View {
         ForEach(0..<5, id: \.self) { index in
             if Double(index) + 1 <= ranking {

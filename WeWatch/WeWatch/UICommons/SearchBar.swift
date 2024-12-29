@@ -12,23 +12,17 @@ internal struct SearchBar: View {
     @Binding private var searchText: String
     
     internal init(searchText: Binding<String>) {
-        
         self._searchText = searchText
     }
     
     internal var body: some View {
         HStack(spacing: 16) {
-            Image("search-default-icon")
-                .renderingMode(.template)
-                .resizable()
-                .frame(width: 20.0, height: 20.0)
-                .padding(.leading, 16)
-                .padding(.vertical, 14)
+            searchIcon
             ZStack(alignment: .leading) {
                 if searchText .isEmpty {
-                    Text("Search")
+                    Text("search.bar.promt.title")
                 }
-                TextFieldView(searchText: $searchText)
+                textField
             }
             .frame(maxWidth: .infinity, maxHeight: 48)
         }
@@ -38,17 +32,15 @@ internal struct SearchBar: View {
         .cornerRadius(10)
         .padding(16)
     }
-}
-
-#Preview {
-    @Previewable @State var text = ""
-    return SearchBar(
-        searchText: $text)
-}
-
-internal struct TextFieldView: View {
-    @Binding internal var searchText: String
-    internal var body: some View {
+    private var searchIcon: some View {
+        Image("search-default-icon")
+            .renderingMode(.template)
+            .resizable()
+            .frame(width: 20.0, height: 20.0)
+            .padding(.leading, 16)
+            .padding(.vertical, 14)
+    }
+    private var textField: some View {
         TextField("", text: $searchText)
             .foregroundColor(Color.whiteColor)
             .overlay(
@@ -63,4 +55,10 @@ internal struct TextFieldView: View {
                 ,alignment: .trailing
             )
     }
+}
+
+#Preview {
+    @Previewable @State var text = ""
+    return SearchBar(
+        searchText: $text)
 }

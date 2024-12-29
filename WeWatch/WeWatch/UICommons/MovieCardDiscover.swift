@@ -13,7 +13,6 @@ internal struct MovieCardDiscover: View {
     private let ranking: Double
     
     internal init(
-        
         title: String,
         ranking: Double
     ) {
@@ -24,28 +23,33 @@ internal struct MovieCardDiscover: View {
     internal var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             ZStack(alignment: .topTrailing) {
-                ImageComponent(image: Image("splash.screen.icon"))
-                    .cornerRadius(15)
-                    .frame(maxWidth: 182, maxHeight: 273)
-                    .background(
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGreyColor)
-                    )
+                filmImage
                 Spacer()
                 Bookmark()
                     .padding(16)
             }
             Text(title)
                 .font(.poppinsBold18px)
-            HStack() {
-                Text("\(ranking, specifier: "%.1f")")
-                    .font(.poppinsRegular18px)
+            HStack {
+                filmRanking
                 Image("star-full-icon")
-                    
             }
         }
         .foregroundColor(.whiteColor)
         .frame(maxWidth: 182)
+    }
+    private var filmRanking: some View {
+        Text("\(ranking, specifier: "%.1f")")
+            .font(.poppinsRegular18px)
+    }
+    private var filmImage: some View {
+        ImageComponent(image: Image("splash.screen.icon"))
+            .cornerRadius(15)
+            .frame(maxWidth: 182, maxHeight: 273)
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.darkGreyColor)
+            )
     }
 }
 

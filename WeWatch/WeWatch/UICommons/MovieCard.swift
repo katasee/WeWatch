@@ -15,7 +15,6 @@ internal struct MovieCard: View {
     private let storyline: String
     
     internal init(
-        
         title: String,
         ranking: Double,
         genres: String,
@@ -31,36 +30,51 @@ internal struct MovieCard: View {
         HStack(alignment: .top) {
             VStack {
                 ZStack(alignment: .topTrailing) {
-                    ImageComponent(image: Image("splash.screen.icon"))
-                        .cornerRadius(15)
-                        .frame(maxWidth: 182, maxHeight: 273)
-                        .background(
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.darkGreyColor)
-                        )
+                    filmImage
                     Spacer()
                     Bookmark()
                         .padding(16)
                 }
             }
             VStack(alignment: .leading, spacing: 10) {
-                Text(title)
-                    .font(.poppinsBold20px)
-                    .foregroundColor(.whiteColor)
+                filmTitle
                 HStack {
-                    Text("\(ranking, specifier: "%.1f")")
-                        .font(.poppinsBold16px)
-                        .foregroundColor(.whiteColor)
+                    filmRanking
                     RatingView(ranking: ranking)
                 }
-                Text(genres)
-                    .font(.poppinsBold14px)
-                    .foregroundColor(.whiteColor)
-                Text(storyline)
-                    .font(.poppinsRegular13px)
-                    .foregroundColor(.lightGreyColor)
+                filmGenres
+                storyLine
             }
         }
+    }
+    private var filmImage: some View {
+        ImageComponent(image: Image("splash.screen.icon"))
+            .cornerRadius(15)
+            .frame(maxWidth: 182, maxHeight: 273)
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.darkGreyColor)
+            )
+    }
+    private var filmTitle: some View {
+        Text(title)
+            .font(.poppinsBold20px)
+            .foregroundColor(.whiteColor)
+    }
+    private var filmRanking: some View {
+        Text("\(ranking, specifier: "%.1f")")
+            .font(.poppinsBold16px)
+            .foregroundColor(.whiteColor)
+    }
+    private var filmGenres: some View {
+        Text(genres)
+            .font(.poppinsBold14px)
+            .foregroundColor(.whiteColor)
+    }
+    private var storyLine: some View {
+        Text(storyline)
+            .font(.poppinsRegular13px)
+            .foregroundColor(.lightGreyColor)
     }
 }
 

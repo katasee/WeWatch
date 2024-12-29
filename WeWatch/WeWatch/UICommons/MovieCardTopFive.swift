@@ -13,7 +13,6 @@ internal struct MovieCardTopFive: View {
     private let ranking: Double
     
     internal init(
-        
         title: String,
         ranking: Double
     ) {
@@ -23,7 +22,7 @@ internal struct MovieCardTopFive: View {
     
     internal var body: some View {
         VStack(alignment: .leading) {
-            HStack() {
+            HStack {
                 Spacer()
                 Bookmark()
                     .padding(16)
@@ -32,16 +31,22 @@ internal struct MovieCardTopFive: View {
             .frame(maxWidth: 300, maxHeight: 200, alignment: .topLeading)
             .background(RoundedRectangle(cornerRadius: 15)
                 .fill(Color.darkGreyColor))
-            Text(title)
-                .font(.poppinsBold20px)
-                .foregroundColor(.whiteColor)
+            filmTitle
             HStack {
-                Text("\(ranking, specifier: "%.1f")")
-                    .font(.poppinsRegular22px)
-                    .foregroundColor(.whiteColor)
+                filmRanking
                 RatingView(ranking: ranking)
             }
         }
+    }
+    private var filmRanking: some View {
+        Text("\(ranking, specifier: "%.1f")")
+            .font(.poppinsRegular22px)
+            .foregroundColor(.whiteColor)
+    }
+    private var filmTitle: some View {
+        Text(title)
+            .font(.poppinsBold20px)
+            .foregroundColor(.whiteColor)
     }
 }
 
