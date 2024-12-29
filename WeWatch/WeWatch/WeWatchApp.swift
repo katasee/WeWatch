@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 internal struct WeWatchApp: App {
-    var body: some Scene {
+    internal var body: some Scene {
         WindowGroup {
             SplashView()
         }

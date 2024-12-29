@@ -1,7 +1,13 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     ". " : {
+
+    },
+    "%.1f" : {
 
     },
     "loader.label.title" : {
@@ -15,8 +21,19 @@
         }
       }
     },
-    "See current token" : {
+    "Search" : {
 
+    },
+    "search.bar.promt.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        }
+      }
     },
     "splash.view.description.first.part.title" : {
       "localizations" : {
@@ -67,9 +84,6 @@
           }
         }
       }
-    },
-    "Update token" : {
-
     }
   },
   "version" : "1.0"
