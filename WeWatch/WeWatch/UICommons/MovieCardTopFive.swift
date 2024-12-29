@@ -21,19 +21,21 @@ internal struct MovieCardTopFive: View {
     }
     
     internal var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                ZStack(alignment: .topTrailing) {
-                    ImageComponent(image: Image("photo"))
-                    Bookmark()
-                        .padding(16)
+        VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    ZStack(alignment: .topTrailing) {
+                        ImageComponent(image: Image("photo"))
+                        Bookmark()
+                            .padding(16)
+                    }
+                    .cornerRadius(15)
+                    .frame(maxWidth: 300, maxHeight: 200)
+                    .background(RoundedRectangle(cornerRadius: 15)
+                        .fill(Color.darkGreyColor))
                 }
-                .cornerRadius(15)
-                .frame(maxWidth: 300, maxHeight: 200)
-                .background(RoundedRectangle(cornerRadius: 15)
-                    .fill(Color.darkGreyColor))
+                filmTitle
             }
-            filmTitle
             HStack {
                 filmRanking
                 RatingView(ranking: ranking)
