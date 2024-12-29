@@ -1,5 +1,5 @@
 //
-//  LargeCover.swift
+//  ImagePlaceholder.swift
 //  WeWatch
 //
 //  Created by Anton on 27/12/2024.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-internal struct LargeCover: View {
+internal struct ImagePlaceholder: View {
     
     internal var body: some View {
         ZStack {
@@ -24,6 +24,6 @@ internal struct LargeCover: View {
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()
-        LargeCover()
+        ImagePlaceholder()
     }
 }

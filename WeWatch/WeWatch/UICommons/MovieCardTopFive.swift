@@ -13,6 +13,7 @@ internal struct MovieCardTopFive: View {
     private let ranking: Double
     
     internal init(
+        
         title: String,
         ranking: Double
     ) {
@@ -29,7 +30,8 @@ internal struct MovieCardTopFive: View {
             }
             .padding(16)
             .frame(maxWidth: 300, maxHeight: 200, alignment: .topLeading)
-            .background(RoundedRectangle(cornerRadius: 15) .fill(Color.darkGreyColor))
+            .background(RoundedRectangle(cornerRadius: 15)
+                .fill(Color.darkGreyColor))
             Text(title)
                 .font(.poppinsBold20px)
                 .foregroundColor(.whiteColor)

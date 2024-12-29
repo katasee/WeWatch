@@ -8,9 +8,12 @@
 import SwiftUI
 
 internal struct SearchBar: View {
+    
     @Binding private var searchText: String
+    
     internal init(searchText: Binding<String>) {
-         self._searchText = searchText
+        
+        self._searchText = searchText
     }
     
     internal var body: some View {
@@ -25,19 +28,7 @@ internal struct SearchBar: View {
                 if searchText .isEmpty {
                     Text("Search")
                 }
-                TextField("", text: $searchText)
-                    .foregroundColor(Color.whiteColor)
-                    .overlay(
-                        Image(systemName: "xmark.circle.fill")
-                            .padding(16)
-                            .offset(x: 10)
-                            .foregroundColor(Color.lightGreyColor)
-                            .opacity(searchText.isEmpty ? 0.0 : 1.0)
-                            .onTapGesture {
-                                searchText = ""
-                            }
-                        ,alignment: .trailing
-                    )
+                TextFieldView(searchText: $searchText)
             }
             .frame(maxWidth: .infinity, maxHeight: 48)
         }
@@ -51,6 +42,25 @@ internal struct SearchBar: View {
 
 #Preview {
     @Previewable @State var text = ""
-     return SearchBar(
+    return SearchBar(
         searchText: $text)
+}
+
+internal struct TextFieldView: View {
+    @Binding internal var searchText: String
+    internal var body: some View {
+        TextField("", text: $searchText)
+            .foregroundColor(Color.whiteColor)
+            .overlay(
+                Image(systemName: "xmark.circle.fill")
+                    .padding(16)
+                    .offset(x: 10)
+                    .foregroundColor(Color.lightGreyColor)
+                    .opacity(searchText.isEmpty ? 0.0 : 1.0)
+                    .onTapGesture {
+                        searchText = ""
+                    }
+                ,alignment: .trailing
+            )
+    }
 }

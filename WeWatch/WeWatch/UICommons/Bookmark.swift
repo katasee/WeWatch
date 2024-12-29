@@ -9,17 +9,18 @@ import SwiftUI
 
 internal struct Bookmark: View {
     
-     internal let bookmark: Bool
+    internal let isBookmarked: Bool
     
     internal init(
+        
         bookmark: Bool = false
     ) {
-        self.bookmark = bookmark
+        self.isBookmarked = bookmark
     }
     
     internal var body: some View {
-        if bookmark == false {
-            Image("bookmark-active-icon")
+        if isBookmarked == false {
+            Image("bookmark-default-icon")
         } else {
             Image("bookmark-active-icon")
         }

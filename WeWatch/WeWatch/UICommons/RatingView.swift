@@ -10,7 +10,9 @@ import SwiftUI
 internal struct RatingView: View {
     
     private let ranking: Double
+    
     internal init(
+        
         ranking: Double
     ) {
         self.ranking = ranking

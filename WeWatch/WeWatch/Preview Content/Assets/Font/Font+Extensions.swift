@@ -1,5 +1,5 @@
 //
-//  Font extension.swift
+//  Font+Extensions.swift
 //  WeWatch
 //
 //  Created by Anton on 25/11/2024.

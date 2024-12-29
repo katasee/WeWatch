@@ -9,21 +9,19 @@ import SwiftUI
 
 internal struct MovieCard: View {
     
-    private let bookmark: Bool
     private let title: String
     private let ranking: Double
     private let genres: String
     private let storyline: String
     
     internal init(
+        
         title: String,
-        bookmark: Bool = false,
         ranking: Double,
         genres: String,
         storyline: String
     ) {
         self.title = title
-        self.bookmark = bookmark
         self.ranking = ranking
         self.genres = genres
         self.storyline = storyline
@@ -50,7 +48,8 @@ internal struct MovieCard: View {
                     .font(.poppinsBold20px)
                     .foregroundColor(.whiteColor)
                 HStack {
-                    Text("\(ranking, specifier: "%.1f")")                            .font(.poppinsBold16px)
+                    Text("\(ranking, specifier: "%.1f")")
+                        .font(.poppinsBold16px)
                         .foregroundColor(.whiteColor)
                     RatingView(ranking: ranking)
                 }

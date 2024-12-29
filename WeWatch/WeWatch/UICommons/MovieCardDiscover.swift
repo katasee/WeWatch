@@ -13,6 +13,7 @@ internal struct MovieCardDiscover: View {
     private let ranking: Double
     
     internal init(
+        
         title: String,
         ranking: Double
     ) {
