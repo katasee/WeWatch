@@ -32,6 +32,7 @@ internal struct SearchBar: View {
         .cornerRadius(10)
         .padding(16)
     }
+    
     private var searchIcon: some View {
         Image("search-default-icon")
             .renderingMode(.template)
@@ -40,6 +41,7 @@ internal struct SearchBar: View {
             .padding(.leading, 16)
             .padding(.vertical, 14)
     }
+    
     private var textField: some View {
         TextField("", text: $searchText)
             .foregroundColor(Color.whiteColor)

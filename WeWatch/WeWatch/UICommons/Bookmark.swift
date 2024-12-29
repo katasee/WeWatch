@@ -19,7 +19,7 @@ internal struct Bookmark: View {
     
     internal var body: some View {
         if isActive == false {
-            Image("bookmark-inActive-icon")
+            Image("bookmark-inactive-icon")
         } else {
             Image("bookmark-active-icon")
         }

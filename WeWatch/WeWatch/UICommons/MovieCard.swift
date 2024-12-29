@@ -47,6 +47,7 @@ internal struct MovieCard: View {
             }
         }
     }
+    
     private var filmImage: some View {
         ImageComponent(image: Image("photo"))
             .cornerRadius(15)
@@ -56,21 +57,25 @@ internal struct MovieCard: View {
                     .fill(Color.darkGreyColor)
             )
     }
+    
     private var filmTitle: some View {
         Text(title)
             .font(.poppinsBold20px)
             .foregroundColor(.whiteColor)
     }
+    
     private var filmRanking: some View {
         Text("\(ranking, specifier: "%.1f")")
             .font(.poppinsBold16px)
             .foregroundColor(.whiteColor)
     }
+    
     private var filmGenres: some View {
         Text(genres)
             .font(.poppinsBold14px)
             .foregroundColor(.whiteColor)
     }
+    
     private var storyLine: some View {
         Text(storyline)
             .font(.poppinsRegular13px)

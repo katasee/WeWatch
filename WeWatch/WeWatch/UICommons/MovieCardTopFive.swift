@@ -42,11 +42,13 @@ internal struct MovieCardTopFive: View {
             }
         }
     }
+    
     private var filmRanking: some View {
         Text("\(ranking, specifier: "%.1f")")
             .font(.poppinsRegular22px)
             .foregroundColor(.whiteColor)
     }
+    
     private var filmTitle: some View {
         Text(title)
             .font(.poppinsBold20px)

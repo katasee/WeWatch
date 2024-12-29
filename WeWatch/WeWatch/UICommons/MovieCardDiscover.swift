@@ -38,10 +38,12 @@ internal struct MovieCardDiscover: View {
         .foregroundColor(.whiteColor)
         .frame(maxWidth: 182)
     }
+    
     private var filmRanking: some View {
         Text("\(ranking, specifier: "%.1f")")
             .font(.poppinsRegular18px)
     }
+    
     private var filmImage: some View {
         ImageComponent(image: Image("photo"))
             .cornerRadius(15)

@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-let noop: () -> Void = {}
-
 internal struct PillButton: View {
     
     @State private var didTap: Bool = false
@@ -45,7 +43,9 @@ internal struct PillButton: View {
         Color.black.ignoresSafeArea()
         PillButton(
             title: "Action",
-            action: noop)
+            action: {
+                // noop
+            }
+        )
     }
 }
-
