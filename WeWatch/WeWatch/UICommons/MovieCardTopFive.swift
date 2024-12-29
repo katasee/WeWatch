@@ -24,7 +24,7 @@ internal struct MovieCardTopFive: View {
         VStack(alignment: .leading) {
             HStack {
                 ZStack(alignment: .topTrailing) {
-                    ImageComponent(image: Image("splash.screen.icon"))
+                    ImageComponent(image: Image("photo"))
                     Bookmark()
                         .padding(16)
                 }
