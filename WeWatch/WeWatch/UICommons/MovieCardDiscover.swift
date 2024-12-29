@@ -43,7 +43,7 @@ internal struct MovieCardDiscover: View {
             .font(.poppinsRegular18px)
     }
     private var filmImage: some View {
-        ImageComponent(image: Image("splash.screen.icon"))
+        ImageComponent(image: Image("photo"))
             .cornerRadius(15)
             .frame(maxWidth: 182, maxHeight: 273)
             .background(

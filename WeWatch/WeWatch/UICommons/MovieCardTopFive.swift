@@ -23,14 +23,16 @@ internal struct MovieCardTopFive: View {
     internal var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Spacer()
-                Bookmark()
-                    .padding(16)
+                ZStack(alignment: .topTrailing) {
+                    ImageComponent(image: Image("splash.screen.icon"))
+                    Bookmark()
+                        .padding(16)
+                }
+                .cornerRadius(15)
+                .frame(maxWidth: 300, maxHeight: 200)
+                .background(RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.darkGreyColor))
             }
-            .padding(16)
-            .frame(maxWidth: 300, maxHeight: 200, alignment: .topLeading)
-            .background(RoundedRectangle(cornerRadius: 15)
-                .fill(Color.darkGreyColor))
             filmTitle
             HStack {
                 filmRanking
