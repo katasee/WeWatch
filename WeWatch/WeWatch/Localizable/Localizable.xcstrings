@@ -10,6 +10,12 @@
     "%.1f" : {
 
     },
+    "BookmarkView" : {
+
+    },
+    "HomeView" : {
+
+    },
     "loader.label.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -21,9 +27,6 @@
         }
       }
     },
-    "Search" : {
-
-    },
     "search.bar.promt.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -34,6 +37,9 @@
           }
         }
       }
+    },
+    "SearchView" : {
+
     },
     "splash.view.description.first.part.title" : {
       "localizations" : {

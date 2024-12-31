@@ -42,6 +42,7 @@ internal struct SplashView: View {
     }
     
     internal var body: some View {
+        
         if viewModel.showMainView {
             ContentView()
         } else {
