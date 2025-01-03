@@ -18,13 +18,12 @@ internal struct CustomTabBar: View {
     internal var body: some View {
         VStack {
             HStack {
-                ForEach (TabViewType.allCases, id: \.self) { tabType in
+                ForEach(TabViewType.allCases, id: \.self) { tabType in
                     Spacer()
                     Button(action: {
                         activeTab = tabType
                     }) {
                         tabType.icon(isActive: activeTab == tabType)
-                        
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(maxWidth: 20, maxHeight: 20)
