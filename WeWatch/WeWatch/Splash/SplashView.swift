@@ -43,7 +43,7 @@ internal struct SplashView: View {
     
     internal var body: some View {
         if viewModel.showMainView {
-            ContentView()
+            TabBar()
         } else {
             splashViewContent
                 .task {
