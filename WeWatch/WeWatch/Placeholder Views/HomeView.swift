@@ -8,6 +8,7 @@
 import SwiftUI
 
 internal struct HomeView: View {
+    
     internal var body: some View {
         ZStack {
             Color.accentColor

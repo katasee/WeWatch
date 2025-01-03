@@ -8,6 +8,7 @@
 import SwiftUI
 
 internal struct SearchView: View {
+    
     internal var body: some View {
         ZStack {
             Color.lightGreyColor

@@ -8,6 +8,7 @@
 import SwiftUI
 
 internal struct BookmarkView: View {
+    
     internal var body: some View {
         ZStack {
             Color.darkGreyColor

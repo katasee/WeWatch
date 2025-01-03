@@ -7,17 +7,31 @@
 
 import SwiftUI
 
-private struct TabBar: View {
+internal struct TabBar: View {
     
     @StateObject private var viewModel: TabBarViewModel = .init()
-
+    
     internal var body: some View {
         ZStack {
-            viewModel.selectedTab.activeView()
-            CustomTabBar(viewModel: viewModel)
-                }
-            }
+            viewForSeletedTab()
         }
+        .overlay(alignment: .bottom) {
+            CustomTabBar(activeTab: $viewModel.selectedTab)
+        }
+    }
+    
+    @ViewBuilder
+    internal func viewForSeletedTab() -> some View {
+        switch viewModel.selectedTab {
+        case .bookmark:
+            BookmarkView()
+        case .homeView:
+            HomeView()
+        case .searchView:
+            SearchView()
+        }
+    }
+}
 
 #Preview {
     TabBar()

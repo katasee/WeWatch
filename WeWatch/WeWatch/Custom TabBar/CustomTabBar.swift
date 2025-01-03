@@ -9,35 +9,30 @@ import SwiftUI
 
 internal struct CustomTabBar: View {
     
-    @ObservedObject internal var viewModel: TabBarViewModel = .init()
+    @Binding private var activeTab: TabViewType
+    
+    internal init(activeTab: Binding<TabViewType>) {
+        self._activeTab = activeTab
+    }
     
     internal var body: some View {
         VStack {
-            Spacer()
             HStack {
-                Spacer()
-                Button(action: {
-                    viewModel.selectTab(.homeView)
-                }) {
-                    viewModel.homeViewButton()
-                        .frame(maxWidth: 25, maxHeight: 25)
+                ForEach (TabViewType.allCases, id: \.self) { tabType in
+                    Spacer()
+                    Button(action: {
+                        activeTab = tabType
+                    }) {
+                        tabType.icon(isActive: activeTab == tabType)
+                        
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(maxWidth: 20, maxHeight: 20)
+                    }
+                    Spacer()
                 }
-                Spacer()
-                Button(action: {
-                    viewModel.selectTab(.searchView)
-                }) {
-                    viewModel.searchViewButton()
-                        .frame(maxWidth: 25, maxHeight: 25)
-                }
-                Spacer()
-                Button(action: {
-                    viewModel.selectTab(.bookmark)
-                }) {
-                    viewModel.bookmarkView()
-                        .frame(maxWidth: 25, maxHeight: 25)
-                }
-                Spacer()
             }
+            .frame(maxWidth: .infinity)
             .frame(maxHeight: 70)
             .background(Color.black)
         }
@@ -45,5 +40,5 @@ internal struct CustomTabBar: View {
 }
 
 #Preview {
-    CustomTabBar(viewModel: .init())
+    CustomTabBar(activeTab: .constant(.homeView))
 }
