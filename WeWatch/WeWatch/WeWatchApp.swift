@@ -11,7 +11,7 @@ import SwiftUI
 internal struct WeWatchApp: App {
     internal var body: some Scene {
         WindowGroup {
-            SplashView()
+            NavigationViews()
         }
     }
 }

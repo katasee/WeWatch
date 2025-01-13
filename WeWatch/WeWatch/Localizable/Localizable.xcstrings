@@ -10,7 +10,22 @@
     "%.1f" : {
 
     },
+    "%lld" : {
+
+    },
+    "Add movie" : {
+
+    },
     "BookmarkView" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Edit" : {
+
+    },
+    "Edit Movie" : {
 
     },
     "HomeView" : {
@@ -26,6 +41,18 @@
           }
         }
       }
+    },
+    "Movies" : {
+
+    },
+    "overview" : {
+
+    },
+    "posterUrl" : {
+
+    },
+    "releaseDate" : {
+
     },
     "search.bar.promt.title" : {
       "extractionState" : "manual",
@@ -90,6 +117,9 @@
           }
         }
       }
+    },
+    "title" : {
+
     }
   },
   "version" : "1.0"
