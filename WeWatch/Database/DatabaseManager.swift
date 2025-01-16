@@ -1,42 +1,52 @@
 //
-//  DBManager.swift
+//  DatabaseManager.swift
 //  WeWatch
 //
 //  Created by Anton on 07/01/2025.
 //
 //
+
 import Foundation
 import SQLite3
 
-internal class DBManager {
+internal final class DatabaseManager {
     
-    static let shared = DBManager()
+    internal static let shared: DatabaseManager = .init()
     
-    internal enum insertError: Error {
+    internal enum DatabaseError: Error {
         
         case movieAddError
         case movieNotAdd
         case dublicateError
         case updateError
         case notUpdate
+        case movieTableCreatioFailed
+        case selectStatementFailed
+        case movieNotDelete
+        case movieDeleteNotPrepare
     }
     
-    internal init() {
+    private init() {
         db = openDatabase()
-        createMovieTable()
+        do {
+            try createMovieTable()
+        } catch {
+            DatabaseError.movieTableCreatioFailed
+        }
     }
     
-    internal let dataPath: String = "MyDB"
-    internal var db: OpaquePointer?
+    private let dataPath: String = "MyDB"
+    private var db: OpaquePointer?
     
     internal func openDatabase() -> OpaquePointer? {
-        let filePath = try! FileManager.default.url(
+        let filePath: URL = try! FileManager.default.url(
             for: .documentDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
             create: false
         ).appendingPathComponent(dataPath)
         var db: OpaquePointer? = nil
+        
         if sqlite3_open(filePath.path, &db) != SQLITE_OK {
             return nil
         } else {
@@ -44,25 +54,25 @@ internal class DBManager {
         }
     }
     
-    internal func createMovieTable() {
-        let createTableString = """
-CREATE TABLE IF NOT EXISTS Movie (
+    internal func createMovieTable() throws {
+        let createTableString: String = """
+        CREATE TABLE IF NOT EXISTS Movie(
             movieId INTEGER PRIMARY KEY,
             title TEXT,
             overview TEXT,
             releaseDate TEXT,
             rating INTEGER,
             posterUrl TEXT
-);
+        );
 """
         var createTableStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, createTableString, -1, &createTableStatement, nil) == SQLITE_OK {
             if sqlite3_step(createTableStatement) == SQLITE_DONE {
             } else {
-                print("Movie table creation failed.")
+                throw DatabaseError.movieTableCreatioFailed
             }
         } else {
-            print("Movie table creation failed.")
+            throw DatabaseError.movieTableCreatioFailed
         }
         sqlite3_finalize(createTableStatement)
     }
@@ -75,13 +85,13 @@ CREATE TABLE IF NOT EXISTS Movie (
         rating: Int,
         posterUrl: String
     ) throws {
-        let movies = getAllMovies()
+        let movies: [Movie] = try getAllMovies()
         for movie in movies {
             if movie.movieId == movieId || movie.title == title {
-                throw insertError.dublicateError
+                throw DatabaseError.dublicateError
             }
         }
-        let insertStatementString = "INSERT INTO Movie (title, overview, releaseDate, rating, posterUrl) VALUES (?, ?, ?, ?, ?);"
+        let insertStatementString: String = "INSERT INTO Movie (title, overview, releaseDate, rating, posterUrl) VALUES (?, ?, ?, ?, ?);"
         var insertStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
             sqlite3_bind_text(insertStatement, 1, (title as NSString).utf8String, -1, nil)
@@ -92,37 +102,35 @@ CREATE TABLE IF NOT EXISTS Movie (
             if sqlite3_step(insertStatement) == SQLITE_DONE {
                 sqlite3_finalize(insertStatement)
             } else {
-                throw insertError.movieNotAdd
+                throw DatabaseError.movieNotAdd
             }
         } else {
-            throw insertError.movieAddError
+            throw DatabaseError.movieAddError
         }
     }
-    
-    internal func getAllMovies() -> [Movie] {
-        let queryStatementString = "SELECT * FROM Movie;"
+    internal func getAllMovies() throws -> Array<Movie> {
+        let queryStatementString: String = "SELECT * FROM Movie;"
         var queryStatement: OpaquePointer? = nil
         var movies: [Movie] = []
         if sqlite3_prepare_v2(db, queryStatementString, -1, &queryStatement, nil) == SQLITE_OK {
             while sqlite3_step(queryStatement) == SQLITE_ROW {
-                let movieId = sqlite3_column_int(queryStatement, 0)
-                let title = String(describing: String(cString: sqlite3_column_text(queryStatement, 1)))
-                print(title)
-                let overview = String(describing: String(cString: sqlite3_column_text(queryStatement, 2)))
-                let releaseDate = String(describing: String(cString: sqlite3_column_text(queryStatement, 3)))
-                let rating = sqlite3_column_int(queryStatement, 4)
-                let posterUrl = String(describing: String(cString: sqlite3_column_text(queryStatement, 5)))
+                let movieId: Int32 = sqlite3_column_int(queryStatement, 0)
+                let title: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 1)))
+                let overview: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 2)))
+                let releaseDate: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 3)))
+                let rating: Int32 = sqlite3_column_int(queryStatement, 4)
+                let posterUrl: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 5)))
                 movies.append(Movie(
                     movieId: Int(movieId),
                     title: title,
                     overview: overview,
                     releaseDate: releaseDate,
                     rating: Int(rating),
-                    posterUrl: ""
+                    posterUrl: posterUrl
                 ))
             }
         } else {
-            print("SELECT statement is failed.")
+            throw DatabaseError.selectStatementFailed
         }
         sqlite3_finalize(queryStatement)
         return movies
@@ -136,7 +144,7 @@ CREATE TABLE IF NOT EXISTS Movie (
         rating: Int,
         posterUrl: String
     ) throws {
-        let updateStatementString = "UPDATE Movie SET title = ?, overview = ?, releaseDate = ?, rating = ?, posterUrl = ? WHERE movieId = ?;"
+        let updateStatementString: String = "UPDATE Movie SET title = ?, overview = ?, releaseDate = ?, rating = ?, posterUrl = ? WHERE movieId = ?;"
         var updateStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, updateStatementString, -1, &updateStatement, nil) == SQLITE_OK {
             sqlite3_bind_text(updateStatement, 1, (title as NSString).utf8String, -1, nil)
@@ -148,28 +156,27 @@ CREATE TABLE IF NOT EXISTS Movie (
             if sqlite3_step(updateStatement) == SQLITE_DONE {
                 sqlite3_finalize(updateStatement)
             } else {
-                throw insertError.notUpdate
+                throw DatabaseError.notUpdate
             }
         } else {
-            throw insertError.updateError
+            throw DatabaseError.updateError
         }
     }
     
-    internal func deleteMovieById(movieId: Int) -> Bool {
-        let deleteStatementString = "DELETE FROM Movie WHERE movieId = ?;"
+    internal func deleteMovieById(movieId: Int) throws  {
+        let deleteStatementString: String = "DELETE FROM Movie WHERE movieId = ?;"
         var deleteStatement: OpaquePointer? = nil
-        var result = false
         if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
             sqlite3_bind_int(deleteStatement, 1, Int32(movieId))
             if sqlite3_step(deleteStatement) == SQLITE_DONE {
-                result = true
             } else {
-                print("Could not delete row")
+                throw DatabaseError.movieNotDelete
             }
         } else {
-            print("DELETE statement could not be prepared")
+            throw DatabaseError.movieDeleteNotPrepare
         }
         sqlite3_finalize(deleteStatement)
-        return result
     }
 }
+
+
