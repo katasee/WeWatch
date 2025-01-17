@@ -10,6 +10,7 @@
 		6E33D0CD2D184B45004C376C /* Development.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E33D0CC2D184B45004C376C /* Development.xcconfig */; };
 		6E33D0D02D184B8A004C376C /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 6E33D0CF2D184B8A004C376C /* Lottie */; };
 		6E39E6002D06ED8600516C00 /* JWTDecode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E39E5FF2D06ED8600516C00 /* JWTDecode.swift */; };
+		6E7EA0212D29D72500B154B4 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 6E7EA0202D29D72500B154B4 /* SQLite */; };
 		6E8E31192CFA24F800B5894A /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8E31182CFA24F800B5894A /* Environment.swift */; };
 		6ED883562CFB9232004A29AE /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED883552CFB9232004A29AE /* KeychainManager.swift */; };
 /* End PBXBuildFile section */
@@ -33,6 +34,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6EB5E7892D2DB16F008508B6 /* Database */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Database;
+			sourceTree = "<group>";
+		};
 		6ECE93CC2CF10C8300852DDD /* WeWatch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -48,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6E7EA0212D29D72500B154B4 /* SQLite in Frameworks */,
 				6E33D0D02D184B8A004C376C /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -64,6 +71,7 @@
 				6E39E5FF2D06ED8600516C00 /* JWTDecode.swift */,
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
 				6ECE93CB2CF10C8300852DDD /* Products */,
+				6EB5E7892D2DB16F008508B6 /* Database */,
 			);
 			sourceTree = "<group>";
 		};
@@ -91,11 +99,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6EB5E7892D2DB16F008508B6 /* Database */,
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
 			);
 			name = WeWatch;
 			packageProductDependencies = (
 				6E33D0CF2D184B8A004C376C /* Lottie */,
+				6E7EA0202D29D72500B154B4 /* SQLite */,
 			);
 			productName = WeWatch;
 			productReference = 6ECE93CA2CF10C8300852DDD /* WeWatch.app */;
@@ -128,6 +138,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6E33D0CE2D184B8A004C376C /* XCRemoteSwiftPackageReference "lottie-spm" */,
+				6E7EA01F2D29D72500B154B4 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6ECE93CB2CF10C8300852DDD /* Products */;
@@ -416,6 +427,14 @@
 				minimumVersion = 4.5.0;
 			};
 		};
+		6E7EA01F2D29D72500B154B4 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -423,6 +442,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6E33D0CE2D184B8A004C376C /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
+		};
+		6E7EA0202D29D72500B154B4 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6E7EA01F2D29D72500B154B4 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
