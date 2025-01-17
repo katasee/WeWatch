@@ -108,6 +108,7 @@ internal final class DatabaseManager {
             throw DatabaseError.movieAddError
         }
     }
+    
     internal func getAllMovies() throws -> Array<Movie> {
         let queryStatementString: String = "SELECT * FROM Movie;"
         var queryStatement: OpaquePointer? = nil
