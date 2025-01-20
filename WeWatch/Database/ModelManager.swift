@@ -32,4 +32,39 @@ internal struct Movie: Identifiable, Sendable {
         self.rating = rating
         self.posterUrl = posterUrl
     }
+    static func dataForTodaySelction() -> [Movie] {
+        [Movie (movieId: 1,
+                title: "From",
+                overview: "Good",
+                releaseDate: "today",
+                rating: 4,
+                posterUrl: "www.facebook.com"),
+         Movie (movieId: 2,
+                 title: "Avatar",
+                 overview: "Good",
+                 releaseDate: "today",
+                 rating: 3,
+                 posterUrl: "www.facebook.com"),
+         Movie (movieId: 3,
+                 title: "Batman",
+                 overview: "Good",
+                 releaseDate: "today",
+                 rating: 4,
+                 posterUrl: "www.facebook.com"),
+         Movie (movieId: 4,
+                 title: "Bitcoin",
+                 overview: "Good",
+                 releaseDate: "today",
+                 rating: 5,
+                 posterUrl: "www.facebook.com"),
+         Movie (movieId: 5,
+                 title: "Superman",
+                 overview: "Good",
+                 releaseDate: "today",
+                 rating: 3,
+                 posterUrl: "www.facebook.com")
+         ]
+    }
 }
+
+

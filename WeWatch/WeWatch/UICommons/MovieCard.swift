@@ -13,17 +13,22 @@ internal struct MovieCard: View {
     private let ranking: Double
     private let genres: String
     private let storyline: String
+    private let image: URL?
+    @State private var didTap: Bool = false
+
     
     internal init(
         title: String,
         ranking: Double,
         genres: String,
-        storyline: String
+        storyline: String,
+        image: URL?
     ) {
         self.title = title
         self.ranking = ranking
         self.genres = genres
         self.storyline = storyline
+        self.image = image
     }
     
     internal var body: some View {
@@ -32,7 +37,15 @@ internal struct MovieCard: View {
                 ZStack(alignment: .topTrailing) {
                     filmImage
                     Spacer()
-                    Bookmark()
+                    Button  {
+                        self.didTap = true && self.didTap == false
+                    } label: {
+                        if didTap == true {
+                            Bookmark(isActive: true)
+                        } else {
+                            Bookmark(isActive: false)
+                        }
+                    }
                         .padding(16)
                 }
             }
@@ -49,7 +62,11 @@ internal struct MovieCard: View {
     }
     
     private var filmImage: some View {
-        ImageComponent(image: Image("photo"))
+        AsyncImage(url: image) {
+            image in
+            image
+                .image?.resizable()
+        }
             .cornerRadius(15)
             .frame(maxWidth: 182, maxHeight: 273)
             .background(
@@ -90,7 +107,8 @@ internal struct MovieCard: View {
             title: "Hitman’s Wife’s Bodyguard",
             ranking: 3.5,
             genres: "Action, Comedy, Crime",
-            storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......"
+            storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......", 
+            image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")
         )
     }
 }

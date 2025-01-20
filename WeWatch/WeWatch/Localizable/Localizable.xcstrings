@@ -13,16 +13,7 @@
     "%lld" : {
 
     },
-    "Add movie" : {
-
-    },
     "BookmarkView" : {
-
-    },
-    "Delete" : {
-
-    },
-    "Edit Movie" : {
 
     },
     "HomeView" : {
@@ -39,18 +30,6 @@
         }
       }
     },
-    "Movies" : {
-
-    },
-    "overview" : {
-
-    },
-    "posterUrl" : {
-
-    },
-    "releaseDate" : {
-
-    },
     "search.bar.promt.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -64,6 +43,17 @@
     },
     "SearchView" : {
 
+    },
+    "SeeMore.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See more"
+          }
+        }
+      }
     },
     "splash.view.description.first.part.title" : {
       "localizations" : {
@@ -115,8 +105,16 @@
         }
       }
     },
-    "title" : {
-
+    "todaySelection.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today’s selection"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

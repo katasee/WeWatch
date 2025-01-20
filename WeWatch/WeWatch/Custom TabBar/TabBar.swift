@@ -24,11 +24,11 @@ internal struct TabBar: View {
     internal func viewForSeletedTab() -> some View {
         switch viewModel.selectedTab {
         case .bookmark:
-            BookmarkView()
+            BookmarkViewPlaceholder()
         case .homeView:
             HomeView()
         case .searchView:
-            SearchView()
+            SearchViewPlaceholder()
         }
     }
 }

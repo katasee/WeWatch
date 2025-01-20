@@ -1,5 +1,5 @@
 //
-//  SearchView.swift
+//  HomeViewPlaceholder.swift
 //  WeWatch
 //
 //  Created by Anton on 29/12/2024.
@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-internal struct SearchView: View {
+internal struct HomeViewPlaceholder: View {
     
     internal var body: some View {
         ZStack {
-            Color.lightGreyColor
+            Color.accentColor
                 .ignoresSafeArea()
-            Text("SearchView")
+            Text("HomeView")
         }
     }
 }
 
 #Preview {
-    SearchView()
+    HomeViewPlaceholder()
 }

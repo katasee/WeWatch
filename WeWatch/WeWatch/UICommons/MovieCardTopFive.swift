@@ -11,13 +11,18 @@ internal struct MovieCardTopFive: View {
     
     private let title: String
     private let ranking: Double
+    private let image: URL?
+
+    @State private var didTap: Bool = false
     
     internal init(
         title: String,
-        ranking: Double
+        ranking: Double,
+        image: URL?
     ) {
         self.title = title
         self.ranking = ranking
+        self.image = image
     }
     
     internal var body: some View {
@@ -25,8 +30,20 @@ internal struct MovieCardTopFive: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     ZStack(alignment: .topTrailing) {
-                        ImageComponent(image: Image("photo"))
-                        Bookmark()
+                        AsyncImage(url: image) {
+                            image in
+                            image
+                                .image?.resizable()
+                        }
+                        Button  {
+                            self.didTap = true && self.didTap == false
+                        } label: {
+                            if didTap == true {
+                                Bookmark(isActive: true)
+                            } else {
+                                Bookmark(isActive: false)
+                            }
+                        }
                             .padding(16)
                     }
                     .cornerRadius(15)
@@ -61,7 +78,8 @@ internal struct MovieCardTopFive: View {
         Color.black.ignoresSafeArea();
         MovieCardTopFive(
             title: "Hitman’s Wife’s Bodyguard",
-            ranking: 3.5
+            ranking: 3.5,
+            image: URL(string: "https://miro.medium.com/v2/resize:fit:4800/format:webp/1*39M4XbHXCTfBenNNqLLyLA@2x.jpeg")
         )
     }
 }
