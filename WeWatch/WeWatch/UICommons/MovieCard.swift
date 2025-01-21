@@ -9,26 +9,28 @@ import SwiftUI
 
 internal struct MovieCard: View {
     
+    @State private var isActive: Bool = false
     private let title: String
     private let ranking: Double
     private let genres: String
     private let storyline: String
     private let image: URL?
-    @State private var didTap: Bool = false
-
+    private var didTap: @MainActor (Bool) -> Void
     
     internal init(
         title: String,
         ranking: Double,
         genres: String,
         storyline: String,
-        image: URL?
+        imageUrl: URL?,
+        didTap: @escaping @MainActor (Bool) -> Void
     ) {
         self.title = title
         self.ranking = ranking
         self.genres = genres
         self.storyline = storyline
-        self.image = image
+        self.image = imageUrl
+        self.didTap = didTap
     }
     
     internal var body: some View {
@@ -37,10 +39,11 @@ internal struct MovieCard: View {
                 ZStack(alignment: .topTrailing) {
                     filmImage
                     Spacer()
-                    Button  {
-                        self.didTap = true && self.didTap == false
+                    Button {
+                        isActive.toggle()
+                        didTap(isActive)
                     } label: {
-                        if didTap == true {
+                        if isActive == true {
                             Bookmark(isActive: true)
                         } else {
                             Bookmark(isActive: false)
@@ -108,7 +111,8 @@ internal struct MovieCard: View {
             ranking: 3.5,
             genres: "Action, Comedy, Crime",
             storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......", 
-            image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")
+            imageUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"),
+            didTap: { isActive in }
         )
     }
 }

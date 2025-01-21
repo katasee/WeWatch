@@ -16,8 +16,16 @@
     "BookmarkView" : {
 
     },
-    "HomeView" : {
-
+    "home.view.some.key" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover"
+          }
+        }
+      }
     },
     "loader.label.title" : {
       "extractionState" : "manual",

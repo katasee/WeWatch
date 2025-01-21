@@ -9,20 +9,22 @@ import SwiftUI
 
 internal struct MovieCardTopFive: View {
     
+    @State private var isActive: Bool = false
     private let title: String
     private let ranking: Double
-    private let image: URL?
-
-    @State private var didTap: Bool = false
+    private let imageUrl: URL?
+    private var didTap: @MainActor (Bool) -> Void
     
     internal init(
         title: String,
         ranking: Double,
-        image: URL?
+        image: URL?,
+        didTap: @escaping @MainActor (Bool) -> Void
     ) {
         self.title = title
         self.ranking = ranking
-        self.image = image
+        self.imageUrl = image
+        self.didTap = didTap
     }
     
     internal var body: some View {
@@ -30,21 +32,22 @@ internal struct MovieCardTopFive: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     ZStack(alignment: .topTrailing) {
-                        AsyncImage(url: image) {
+                        AsyncImage(url: imageUrl) {
                             image in
                             image
                                 .image?.resizable()
                         }
-                        Button  {
-                            self.didTap = true && self.didTap == false
+                        Button {
+                            isActive.toggle()
+                            didTap(isActive)
                         } label: {
-                            if didTap == true {
+                            if isActive == true {
                                 Bookmark(isActive: true)
                             } else {
                                 Bookmark(isActive: false)
                             }
                         }
-                            .padding(16)
+                        .padding(16)
                     }
                     .cornerRadius(15)
                     .frame(maxWidth: 300, maxHeight: 200)
@@ -79,7 +82,8 @@ internal struct MovieCardTopFive: View {
         MovieCardTopFive(
             title: "Hitman’s Wife’s Bodyguard",
             ranking: 3.5,
-            image: URL(string: "https://miro.medium.com/v2/resize:fit:4800/format:webp/1*39M4XbHXCTfBenNNqLLyLA@2x.jpeg")
+            image: URL(string: "https://miro.medium.com/v2/resize:fit:4800/format:webp/1*39M4XbHXCTfBenNNqLLyLA@2x.jpeg"),
+            didTap: { isActive in }
         )
     }
 }
