@@ -24,47 +24,42 @@ internal struct DiscoverSectionView: View {
     }
     
     internal var body: some View {
-        HStack {
-            Text("home.view.some.key")
-                .foregroundColor(.whiteColor)
-                .font(.poppinsBold30px)
-            + Text(". ")
+        VStack {
+            HStack {
+                Text("home.view.some.key")
+                    .foregroundColor(.whiteColor)
+                    .font(.poppinsBold30px)
+                + Text(". ")
+                    .foregroundColor(.fieryRed)
+                    .font(.poppinsBold30px)
+                Spacer()
+                Button("SeeMore.button") {
+                    seeMoreButtonAction()
+                }
+                .font(.poppinsRegular16px)
                 .foregroundColor(.fieryRed)
-                .font(.poppinsBold30px)
-            Spacer()
-            Button("SeeMore.button") {
-                seeMoreButtonAction()
             }
-            .font(.poppinsRegular16px)
-            .foregroundColor(.fieryRed)
-        }
-        ForEach(data) { model in
-            Button( action : {chooseButtonAction(model)
-            }, label: {
-                MovieCard(
-                    title: model.title,
-                    ranking: model.rating,
-                    genres: model.genres,
-                    storyline: model.storyline,
-                    imageUrl: model.image,
-                    didTap: { isActive in }
-                )
-                .multilineTextAlignment(.leading)
-            })
+            ForEach(data) { model in
+                Button( action : {chooseButtonAction(model)
+                }, label: {
+                    MovieCard(
+                        title: model.title,
+                        ranking: model.rating,
+                        genres: model.genres,
+                        storyline: model.storyline,
+                        imageUrl: model.image,
+                        didTap: { isActive in }
+                    )
+                    .multilineTextAlignment(.leading)
+                })
+            }
         }
     }
 }
 
 #Preview {
     DiscoverSectionView (
-        data: [DiscoveryPreviewModel(
-            id: 1,
-            title: "Hitman’s Wife’s Bodyguard",
-            rating: 3.5,
-            genres: "Action, Comedy, Crime",
-            storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......",
-            image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
-                      ))],
+        data: DiscoveryPreviewModel.mock(),
         seeMoreButtonAction: {},
         chooseButtonAction: { isActive in })
 }

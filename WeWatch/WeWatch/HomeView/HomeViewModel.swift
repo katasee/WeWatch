@@ -11,7 +11,7 @@ internal final class HomeViewModel: ObservableObject {
     
     @Published internal var dataForTodaysSelectionSectionView: Array<TodaySelectionPreviewModel> = []
     @Published internal var dataForDiscoveryPreviewModel: Array<DiscoveryPreviewModel> = []
-
+    
     internal func prepareDataTodaySelection() {
         dataForTodaysSelectionSectionView = TodaySelectionPreviewModel.mock()
     }

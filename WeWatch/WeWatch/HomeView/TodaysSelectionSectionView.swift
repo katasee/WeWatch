@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TodaysSelectionSectionView: View {
+internal struct TodaysSelectionSectionView: View {
     
     private let data: Array<TodaySelectionPreviewModel>
     private let chooseButtonAction: @MainActor (TodaySelectionPreviewModel) -> Void
@@ -34,15 +34,16 @@ struct TodaysSelectionSectionView: View {
             ScrollView(.horizontal, showsIndicators: true) {
                 HStack(spacing: 20) {
                     ForEach(data) { model in
-                        Button( action: {chooseButtonAction(model)},
-                                label: {
+                        Button {
+                            chooseButtonAction(model)
+                        } label: {
                             MovieCardTopFive(
                                 title: model.title,
                                 ranking: Double(model.rating),
                                 image: model.image,
                                 didTap: { isActive in }
                             )
-                        })
+                        }
                     }
                 }
             }
@@ -52,11 +53,7 @@ struct TodaysSelectionSectionView: View {
 
 #Preview {
     TodaysSelectionSectionView(
-        data: [TodaySelectionPreviewModel(
-            id: 1,
-            title: "From",
-            rating: 3.5,
-            image: URL(string: "https://cdn.europosters.eu/image/350/182855.jpg"
-                      ))],
-        chooseButtonAction: { isActive in })
+        data: TodaySelectionPreviewModel.mock(),
+        chooseButtonAction: { isActive in }
+    )
 }

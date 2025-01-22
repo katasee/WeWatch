@@ -15,15 +15,26 @@ internal struct HomeView: View {
         ZStack {
             Color(.black)
                 .ignoresSafeArea()
-            VStack {
-                ScrollView {
-                    TodaysSelectionSectionView(data: viewModel.dataForTodaysSelectionSectionView, chooseButtonAction: { isActive in })
-                    DiscoverSectionView(data: viewModel.dataForDiscoveryPreviewModel, seeMoreButtonAction: {}, chooseButtonAction: { isActive in })
+            ScrollView {
+                VStack {
+                    TodaysSelectionSectionView(
+                        data: viewModel.dataForTodaysSelectionSectionView,
+                        chooseButtonAction: { isActive in
+                            // noop
+                        }
+                    )
+                    DiscoverSectionView(
+                        data: viewModel.dataForDiscoveryPreviewModel,
+                        seeMoreButtonAction: {},
+                        chooseButtonAction: { isActive in
+                            // noop
+                        }
+                    )
                 }
-                .onAppear {
-                    viewModel.prepareDataTodaySelection()
-                    viewModel.prepareDataDiscovery()
-                }
+            }
+            .onAppear {
+                viewModel.prepareDataTodaySelection()
+                viewModel.prepareDataDiscovery()
             }
             .padding(16)
         }
