@@ -16,7 +16,18 @@
     "BookmarkView" : {
 
     },
-    "home.view.some.key" : {
+    "home.see.more.button.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See more"
+          }
+        }
+      }
+    },
+    "home.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -51,17 +62,6 @@
     },
     "SearchView" : {
 
-    },
-    "SeeMore.button" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "See more"
-          }
-        }
-      }
     },
     "splash.view.description.first.part.title" : {
       "localizations" : {
