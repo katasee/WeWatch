@@ -1,5 +1,5 @@
 //
-//  SearchView.swift
+//  SearchViewPlaceholder.swift
 //  WeWatch
 //
 //  Created by Anton on 29/12/2024.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-internal struct SearchView: View {
+internal struct SearchViewPlaceholder: View {
     
     internal var body: some View {
         ZStack {
@@ -19,5 +19,5 @@ internal struct SearchView: View {
 }
 
 #Preview {
-    SearchView()
+    SearchViewPlaceholder()
 }

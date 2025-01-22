@@ -13,20 +13,30 @@
     "%lld" : {
 
     },
-    "Add movie" : {
-
-    },
     "BookmarkView" : {
 
     },
-    "Delete" : {
-
+    "home.see.more.button.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See more"
+          }
+        }
+      }
     },
-    "Edit Movie" : {
-
-    },
-    "HomeView" : {
-
+    "home.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover"
+          }
+        }
+      }
     },
     "loader.label.title" : {
       "extractionState" : "manual",
@@ -38,18 +48,6 @@
           }
         }
       }
-    },
-    "Movies" : {
-
-    },
-    "overview" : {
-
-    },
-    "posterUrl" : {
-
-    },
-    "releaseDate" : {
-
     },
     "search.bar.promt.title" : {
       "extractionState" : "manual",
@@ -115,8 +113,16 @@
         }
       }
     },
-    "title" : {
-
+    "todaySelection.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today’s selection"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -9,21 +9,28 @@ import SwiftUI
 
 internal struct MovieCard: View {
     
+    @State private var isActive: Bool = false
     private let title: String
     private let ranking: Double
     private let genres: String
     private let storyline: String
+    private let image: URL?
+    private var didTap: @MainActor (Bool) -> Void
     
     internal init(
         title: String,
         ranking: Double,
         genres: String,
-        storyline: String
+        storyline: String,
+        imageUrl: URL?,
+        didTap: @escaping @MainActor (Bool) -> Void
     ) {
         self.title = title
         self.ranking = ranking
         self.genres = genres
         self.storyline = storyline
+        self.image = imageUrl
+        self.didTap = didTap
     }
     
     internal var body: some View {
@@ -32,7 +39,16 @@ internal struct MovieCard: View {
                 ZStack(alignment: .topTrailing) {
                     filmImage
                     Spacer()
-                    Bookmark()
+                    Button {
+                        isActive.toggle()
+                        didTap(isActive)
+                    } label: {
+                        if isActive == true {
+                            Bookmark(isActive: true)
+                        } else {
+                            Bookmark(isActive: false)
+                        }
+                    }
                         .padding(16)
                 }
             }
@@ -49,7 +65,11 @@ internal struct MovieCard: View {
     }
     
     private var filmImage: some View {
-        ImageComponent(image: Image("photo"))
+        AsyncImage(url: image) {
+            image in
+            image
+                .image?.resizable()
+        }
             .cornerRadius(15)
             .frame(maxWidth: 182, maxHeight: 273)
             .background(
@@ -90,7 +110,9 @@ internal struct MovieCard: View {
             title: "Hitman’s Wife’s Bodyguard",
             ranking: 3.5,
             genres: "Action, Comedy, Crime",
-            storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......"
+            storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......", 
+            imageUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"),
+            didTap: { isActive in }
         )
     }
 }

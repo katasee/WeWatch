@@ -9,15 +9,22 @@ import SwiftUI
 
 internal struct MovieCardTopFive: View {
     
+    @State private var isActive: Bool = false
     private let title: String
     private let ranking: Double
+    private let imageUrl: URL?
+    private var didTap: @MainActor (Bool) -> Void
     
     internal init(
         title: String,
-        ranking: Double
+        ranking: Double,
+        image: URL?,
+        didTap: @escaping @MainActor (Bool) -> Void
     ) {
         self.title = title
         self.ranking = ranking
+        self.imageUrl = image
+        self.didTap = didTap
     }
     
     internal var body: some View {
@@ -25,9 +32,22 @@ internal struct MovieCardTopFive: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     ZStack(alignment: .topTrailing) {
-                        ImageComponent(image: Image("photo"))
-                        Bookmark()
-                            .padding(16)
+                        AsyncImage(url: imageUrl) {
+                            image in
+                            image
+                                .image?.resizable()
+                        }
+                        Button {
+                            isActive.toggle()
+                            didTap(isActive)
+                        } label: {
+                            if isActive == true {
+                                Bookmark(isActive: true)
+                            } else {
+                                Bookmark(isActive: false)
+                            }
+                        }
+                        .padding(16)
                     }
                     .cornerRadius(15)
                     .frame(maxWidth: 300, maxHeight: 200)
@@ -61,7 +81,9 @@ internal struct MovieCardTopFive: View {
         Color.black.ignoresSafeArea();
         MovieCardTopFive(
             title: "Hitman’s Wife’s Bodyguard",
-            ranking: 3.5
+            ranking: 3.5,
+            image: URL(string: "https://miro.medium.com/v2/resize:fit:4800/format:webp/1*39M4XbHXCTfBenNNqLLyLA@2x.jpeg"),
+            didTap: { isActive in }
         )
     }
 }

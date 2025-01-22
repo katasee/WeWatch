@@ -33,3 +33,5 @@ internal struct Movie: Identifiable, Sendable {
         self.posterUrl = posterUrl
     }
 }
+
+
