@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 internal struct WeWatchApp: App {
+    
+    @State private var searchText: String = ""
+    
     internal var body: some Scene {
         WindowGroup {
-            TabBar()
+            TabBar(searchText: $searchText) 
         }
     }
 }
