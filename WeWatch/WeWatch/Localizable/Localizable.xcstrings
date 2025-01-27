@@ -4,6 +4,12 @@
     "" : {
 
     },
+    " %lld" : {
+
+    },
+    "." : {
+
+    },
     ". " : {
 
     },
@@ -50,6 +56,28 @@
       }
     },
     "search.bar.promt.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        }
+      }
+    },
+    "search.result" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search results:"
+          }
+        }
+      }
+    },
+    "search.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

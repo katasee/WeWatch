@@ -9,14 +9,16 @@ import SwiftUI
 
 internal struct PillButton: View {
     
-    @State private var didTap: Bool = false
-    private let action: () -> Void
+    private var isActive: Bool
     private let title: String
+    private var action: () -> Void
     
     internal init(
+        isActive: Bool,
         title: String,
         action: @escaping () -> Void
     ) {
+        self.isActive = isActive
         self.title = title
         self.action = action
     }
@@ -24,28 +26,25 @@ internal struct PillButton: View {
     internal var body: some View {
         Button(action: {
             action()
-            didTap = true
         }) {
             Text(title)
                 .foregroundColor(.whiteColor)
                 .font(.poppinsRegular14px)
+                .padding(.vertical, 2)
+                .padding(.horizontal, 16)
+                .background(isActive ? Color.fieryRed : Color.darkGreyColor)
+                .clipShape(.capsule)
+                .controlSize(.mini)
         }
-        .padding(.vertical, 2)
-        .padding(.horizontal, 16)
-        .background(didTap ? Color.fieryRed : Color.darkGreyColor)
-        .clipShape(.capsule)
-        .controlSize(.mini)
     }
 }
 
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()
-        PillButton(
-            title: "Action",
-            action: {
-                // noop
-            }
-        )
+        PillButton(isActive: true, title: "Action", action: {
+            //nope
+        })
     }
 }
+

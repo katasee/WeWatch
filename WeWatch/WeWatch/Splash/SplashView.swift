@@ -54,5 +54,5 @@ internal struct SplashView: View {
 }
 
 #Preview {
-    SplashView()
+     SearchView()
 }

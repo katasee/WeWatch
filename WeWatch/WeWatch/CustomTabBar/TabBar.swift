@@ -28,7 +28,7 @@ internal struct TabBar: View {
         case .homeView:
             HomeView()
         case .searchView:
-            SearchViewPlaceholder()
+            SearchView()
         }
     }
 }
