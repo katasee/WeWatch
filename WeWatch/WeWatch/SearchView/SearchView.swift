@@ -9,12 +9,7 @@ import SwiftUI
 
 internal struct SearchView: View {
     
-    @StateObject private var viewModel: SearchViewModel = .init()
-    @Binding private var searchText: String
-    
-    internal init(searchText: Binding<String>) {
-        self._searchText = searchText
-    }
+    @StateObject private var viewModel: SearchViewModel = .init(searchText: "")
     
     internal var body: some View {
         ZStack {
@@ -22,23 +17,30 @@ internal struct SearchView: View {
                 .ignoresSafeArea()
             ScrollView {
                 VStack {
-                    SearchListView( data: viewModel.dataForSearchView,
-                                    seeMoreButtonAction: {},
-                                    chooseButtonAction: { isActive in },
-                                    // noop
-                                    isActive: true, searchText: $searchText)
+                    SearchListView(
+                        didTap: true,
+                        setOfGenre: viewModel.setOfGenres,
+                        selectedGenre: viewModel.selectedGenre,
+                        selectGenreAction: { genre in
+                            viewModel.selectedGenre = genre
+                        },
+                        data: viewModel.filteredMovie,
+                        seeMoreButtonAction: {},
+                        chooseButtonAction: { isActive in },
+                        isActive: true,
+                        searchText: $viewModel.searchText
+                    )
                 }
                 .padding(16)
             }
             .onAppear {
                 viewModel.prepareDataSearchView()
+                viewModel.prepareUniqGenres()
             }
         }
     }
 }
 
 #Preview {
-    @Previewable @State var text = ""
-    return SearchView(
-        searchText: $text)
+    SearchView()
 }

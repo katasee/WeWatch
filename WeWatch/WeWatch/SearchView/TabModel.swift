@@ -7,15 +7,9 @@
 
 import Foundation
 
-internal struct CategoryModel: Identifiable {
+internal struct Genre: Sendable, Hashable {
     
-    private(set) var id: Tab
-    
-    internal enum Tab: String, CaseIterable {
-        case All
-        case Animation
-        case Action
-        case Comedy
-        case etc
-    }
+    internal let id: UUID = .init()
+    internal let title: String
 }
+

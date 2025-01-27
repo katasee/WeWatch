@@ -8,47 +8,43 @@
 import SwiftUI
 
 internal struct PillButton: View {
-
-//    @State private var didTap: Bool
-//    private let action: () -> Void
+    
+    private var isActive: Bool
     private let title: String
-
+    private var action: () -> Void
+    
     internal init(
-        title: String
-//        action: @escaping () -> Void,
-//        didTap: Bool
+        isActive: Bool,
+        title: String,
+        action: @escaping () -> Void
     ) {
+        self.isActive = isActive
         self.title = title
-//        self.action = action
-//        self.didTap = didTap
+        self.action = action
     }
-
+    
     internal var body: some View {
-//        Button(action: {
-////            action()
-//            didTap = true
-//        }) {
+        Button(action: {
+            action()
+        }) {
             Text(title)
                 .foregroundColor(.whiteColor)
                 .font(.poppinsRegular14px)
-//        }
-        .padding(.vertical, 2)
-        .padding(.horizontal, 16)
-//        .background(didTap ? Color.fieryRed : Color.darkGreyColor)
-//        .clipShape(.capsule)
-//        .controlSize(.mini)
+                .padding(.vertical, 2)
+                .padding(.horizontal, 16)
+                .background(isActive ? Color.fieryRed : Color.darkGreyColor)
+                .clipShape(.capsule)
+                .controlSize(.mini)
+        }
     }
 }
 
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()
-        PillButton(
-            title: "Action"
-//            action: {
-//                // noop
-//            },
-
-        )
+        PillButton(isActive: true, title: "Action", action: {
+            //nope
+        })
     }
 }
+

@@ -7,10 +7,10 @@
 
 import Foundation
 
-extension DiscoveryPreviewModel {
+extension DataMovieCardPreviewModel {
     
-    internal static func mock() -> Array<DiscoveryPreviewModel> {
-        [DiscoveryPreviewModel(
+    internal static func mock() -> Array<DataMovieCardPreviewModel> {
+        [DataMovieCardPreviewModel(
             id: 1,
             title: "Hitman’s Wife’s Bodyguard",
             rating: 3.5,
@@ -18,7 +18,7 @@ extension DiscoveryPreviewModel {
             storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......",
             image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
                       )),
-         DiscoveryPreviewModel(
+         DataMovieCardPreviewModel(
             id: 3,
             title: "Film 2",
             rating: 3.5,
@@ -26,7 +26,7 @@ extension DiscoveryPreviewModel {
             storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......",
             image: URL(string: "https://upload.wikimedia.org/wikipedia/en/6/67/The_Apprentice_%282024_film%29_poster.jpg"
                       )),
-         DiscoveryPreviewModel(
+         DataMovieCardPreviewModel(
             id: 4,
             title: "Film 3",
             rating: 3.5,
@@ -34,7 +34,7 @@ extension DiscoveryPreviewModel {
             storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......",
             image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
                       )),
-         DiscoveryPreviewModel(
+         DataMovieCardPreviewModel(
             id: 5,
             title: "Film 4",
             rating: 3.5,
@@ -42,7 +42,7 @@ extension DiscoveryPreviewModel {
             storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......",
             image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
                       )),
-         DiscoveryPreviewModel(
+         DataMovieCardPreviewModel(
             id: 6,
             title: "Film 5",
             rating: 3.5,
@@ -50,7 +50,7 @@ extension DiscoveryPreviewModel {
             storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......",
             image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
                       )),
-         DiscoveryPreviewModel(
+         DataMovieCardPreviewModel(
             id: 7,
             title: "Film 6",
             rating: 3.5,

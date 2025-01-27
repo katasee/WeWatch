@@ -1,5 +1,5 @@
 //
-//  DiscoveryPreviewModel.swift
+//  DataMovieCardPreviewModel.swift
 //  WeWatch
 //
 //  Created by Anton on 19/01/2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct DiscoveryPreviewModel: Identifiable, Sendable {
+internal struct DataMovieCardPreviewModel: Identifiable, Sendable {
     
     internal var id: Int
     internal var title: String

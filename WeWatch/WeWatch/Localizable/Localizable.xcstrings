@@ -4,6 +4,9 @@
     "" : {
 
     },
+    " %lld" : {
+
+    },
     "." : {
 
     },
@@ -69,13 +72,10 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search results"
+            "value" : "Search results:"
           }
         }
       }
-    },
-    "search.result: %lld" : {
-
     },
     "search.title" : {
       "extractionState" : "manual",

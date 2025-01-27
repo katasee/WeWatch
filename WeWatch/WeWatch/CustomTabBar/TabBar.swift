@@ -11,12 +11,6 @@ internal struct TabBar: View {
     
     @StateObject private var viewModel: TabBarViewModel = .init()
     
-    @Binding private var searchText: String
-    
-    internal init(searchText: Binding<String>) {
-        self._searchText = searchText
-    }
-    
     internal var body: some View {
         ZStack {
             viewForSeletedTab()
@@ -34,12 +28,11 @@ internal struct TabBar: View {
         case .homeView:
             HomeView()
         case .searchView:
-            SearchView(searchText: $searchText)
+            SearchView()
         }
     }
 }
 
 #Preview {
-    @Previewable @State var text = ""
-    TabBar(searchText: $text)
+    TabBar()
 }

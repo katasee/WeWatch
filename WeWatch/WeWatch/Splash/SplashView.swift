@@ -11,12 +11,6 @@ internal struct SplashView: View {
     
     @StateObject private var viewModel: SplashViewModel = .init()
     
-    @Binding private var searchText: String
-    
-    internal init(searchText: Binding<String>) {
-        self._searchText = searchText
-    }
-    
     private var splashViewContent: some View {
         ZStack {
             Color(.black)
@@ -49,7 +43,7 @@ internal struct SplashView: View {
     
     internal var body: some View {
         if viewModel.showMainView {
-            TabBar(searchText: $searchText)
+            TabBar()
         } else {
             splashViewContent
                 .task {
@@ -60,7 +54,5 @@ internal struct SplashView: View {
 }
 
 #Preview {
-    @Previewable @State var text = ""
-    return SearchView(
-    searchText: $text)
+     SearchView()
 }

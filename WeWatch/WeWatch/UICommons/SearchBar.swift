@@ -30,7 +30,6 @@ internal struct SearchBar: View {
         .background(RoundedRectangle(cornerRadius: 10.0).fill(Color.darkGreyColor))
         .font(.poppinsRegular16px)
         .cornerRadius(10)
-//        .padding(16)
     }
     
     internal var searchIcon: some View {

@@ -9,27 +9,31 @@ import SwiftUI
 
 internal struct MovieCategoryView: View {
     
-    @State private var activeTab: CategoryModel.Tab = .All
-    @State private var tabs: [CategoryModel] = [
-        .init(id: CategoryModel.Tab.All),
-        .init(id: CategoryModel.Tab.Animation),
-        .init(id: CategoryModel.Tab.Action),
-        .init(id: CategoryModel.Tab.Comedy),
-        .init(id: CategoryModel.Tab.etc)
-    ]
+    private let selectedGenre: Genre
+    private let genreTabs: Array<Genre>
+    private var action: (Genre) -> Void
+    
+    internal init(
+        genreTabs: Array<Genre>,
+        selectedGenre: Genre,
+        action: @escaping (Genre) -> Void
+    ) {
+        self.genreTabs = genreTabs
+        self.selectedGenre = selectedGenre
+        self.action = action
+    }
     
     internal var body: some View {
         ScrollView(.horizontal) {
             HStack {
-                ForEach(tabs) { tab in
-                    Button(action: {
-                        activeTab = tab.id
-                    }) {
-                        PillButton(title: tab.id.rawValue)
-                            .background(activeTab == tab.id ? Color.fieryRed : Color.darkGreyColor)
-                            .clipShape(.capsule)
-                            .controlSize(.mini)
-                    }
+                ForEach(genreTabs, id: \.self) { tab in
+                    PillButton(
+                        isActive: tab == selectedGenre,
+                        title: tab.title,
+                        action: {
+                            action(tab)
+                        }
+                    )
                 }
             }
         }
@@ -37,5 +41,9 @@ internal struct MovieCategoryView: View {
 }
 
 #Preview {
-    MovieCategoryView()
+    MovieCategoryView(
+        genreTabs: [],
+        selectedGenre: .init(title: ""),
+        action: { _ in }
+    )
 }
