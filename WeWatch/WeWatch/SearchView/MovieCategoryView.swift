@@ -11,7 +11,7 @@ internal struct MovieCategoryView: View {
     
     private let selectedGenre: Genre
     private let genreTabs: Array<Genre>
-    private var action: (Genre) -> Void
+    private let action: (Genre) -> Void
     
     internal init(
         genreTabs: Array<Genre>,
@@ -38,12 +38,4 @@ internal struct MovieCategoryView: View {
             }
         }
     }
-}
-
-#Preview {
-    MovieCategoryView(
-        genreTabs: [],
-        selectedGenre: .init(title: ""),
-        action: { _ in }
-    )
 }

@@ -9,28 +9,24 @@ import SwiftUI
 
 internal struct SearchView: View {
     
-    @StateObject private var viewModel: SearchViewModel = .init(searchText: "")
+    @StateObject private var viewModel: SearchViewModel = .init()
     
     internal var body: some View {
         ZStack {
             Color(.black)
                 .ignoresSafeArea()
             ScrollView {
-                VStack {
-                    SearchListView(
-                        didTap: true,
-                        setOfGenre: viewModel.setOfGenres,
-                        selectedGenre: viewModel.selectedGenre,
-                        selectGenreAction: { genre in
-                            viewModel.selectedGenre = genre
-                        },
-                        data: viewModel.filteredMovie,
-                        seeMoreButtonAction: {},
-                        chooseButtonAction: { isActive in },
-                        isActive: true,
-                        searchText: $viewModel.searchText
-                    )
-                }
+                SearchListView(
+                    searchText: $viewModel.searchText,
+                    didTap: true,
+                    selectedGenre: viewModel.selectedGenre,
+                    setOfGenre: viewModel.setOfGenres,
+                    data: viewModel.filteredMovie,
+                    isActive: true,
+                    selectGenreAction: { genre in viewModel.selectedGenre = genre },
+                    seeMoreButtonAction: {},
+                    chooseButtonAction: { isActive in }
+                )
                 .padding(16)
             }
             .onAppear {

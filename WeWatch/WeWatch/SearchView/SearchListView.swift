@@ -9,58 +9,60 @@ import SwiftUI
 
 internal struct SearchListView: View {
     
+    @Binding private var searchText: String
     private let didTap: Bool
     private let selectedGenre: Genre
-    private let selectGenreAction: (Genre) -> Void
     private let setOfGenre: Array<Genre>
-    private let data: Array<DataMovieCardPreviewModel>
-    private let seeMoreButtonAction: @MainActor () -> Void
-    private let chooseButtonAction: @MainActor (DataMovieCardPreviewModel) -> Void
+    private let data: Array<MovieCardPreviewModel>
     private var isActive: Bool
-    @Binding private var searchText: String
+    private let selectGenreAction: (Genre) -> Void
+    private let seeMoreButtonAction: @MainActor () -> Void
+    private let chooseButtonAction: @MainActor (MovieCardPreviewModel) -> Void
     
     internal init(
+        searchText: Binding<String>,
         didTap: Bool,
-        setOfGenre: Array<Genre>,
         selectedGenre: Genre,
-        selectGenreAction: @escaping (Genre) -> Void,
-        data: Array<DataMovieCardPreviewModel>,
-        seeMoreButtonAction: @escaping @MainActor () -> Void,
-        chooseButtonAction: @escaping @MainActor (DataMovieCardPreviewModel) -> Void,
+        setOfGenre: Array<Genre>,
+        data: Array<MovieCardPreviewModel>,
         isActive: Bool,
-        searchText: Binding<String>
+        selectGenreAction: @escaping (Genre) -> Void,
+        seeMoreButtonAction: @escaping @MainActor () -> Void,
+        chooseButtonAction: @escaping @MainActor (MovieCardPreviewModel) -> Void
     ) {
+        self._searchText = searchText
         self.didTap = didTap
+        self.selectedGenre = selectedGenre
         self.setOfGenre = setOfGenre
         self.data = data
-        self.selectedGenre = selectedGenre
+        self.isActive = isActive
         self.selectGenreAction = selectGenreAction
         self.seeMoreButtonAction = seeMoreButtonAction
         self.chooseButtonAction = chooseButtonAction
-        self.isActive = isActive
-        self._searchText = searchText
     }
     
     internal var body: some View {
-        titleView
-        VStack(alignment: .leading) {
-            SearchBar(searchText: $searchText)
-            categoryTabBar
-            searchResult
-            movieCardButton
+        VStack {
+            titleView
+            VStack(alignment: .leading) {
+                SearchBar(searchText: $searchText)
+                categoryTabBar
+                searchResult
+                movieCardButton
+            }
         }
     }
     
     private var titleView: some View {
-         HStack {
-                Text("search.title")
-                    .foregroundColor(.whiteColor)
-                    .font(.poppinsBold30px)
-                + Text(".")
-                    .foregroundColor(.fieryRed)
-                    .font(.poppinsBold30px)
-                Spacer()
-            }
+        HStack {
+            Text("search.title")
+                .foregroundColor(.whiteColor)
+                .font(.poppinsBold30px)
+            + Text(".")
+                .foregroundColor(.fieryRed)
+                .font(.poppinsBold30px)
+            Spacer()
+        }
     }
     
     private var searchResult: some View {
@@ -99,18 +101,4 @@ internal struct SearchListView: View {
             }
         )
     }
-}
-
-#Preview {
-    @Previewable @State var text: String = ""
-    SearchListView(
-        didTap: true,
-        setOfGenre: [],
-        selectedGenre: .init(title: ""),
-        selectGenreAction: {_ in },
-        data: DataMovieCardPreviewModel.mock(),
-        seeMoreButtonAction: {},
-        chooseButtonAction: { isActive in },
-        isActive: true, searchText: $text
-    )
 }

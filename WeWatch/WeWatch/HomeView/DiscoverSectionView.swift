@@ -9,14 +9,14 @@ import SwiftUI
 
 internal struct DiscoverSectionView: View {
     
-    private let data: Array<DataMovieCardPreviewModel>
+    private let data: Array<MovieCardPreviewModel>
     private let seeMoreButtonAction: @MainActor () -> Void
-    private let chooseButtonAction: @MainActor (DataMovieCardPreviewModel) -> Void
+    private let chooseButtonAction: @MainActor (MovieCardPreviewModel) -> Void
     
     internal init(
-        data: Array<DataMovieCardPreviewModel>,
+        data: Array<MovieCardPreviewModel>,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
-        chooseButtonAction: @escaping @MainActor (DataMovieCardPreviewModel) -> Void
+        chooseButtonAction: @escaping @MainActor (MovieCardPreviewModel) -> Void
     ) {
         self.data = data
         self.seeMoreButtonAction = seeMoreButtonAction
@@ -60,7 +60,7 @@ internal struct DiscoverSectionView: View {
 
 #Preview {
     DiscoverSectionView (
-        data: DataMovieCardPreviewModel.mock(),
+        data: MovieCardPreviewModel.mock(),
         seeMoreButtonAction: {},
         chooseButtonAction: { isActive in })
 }

@@ -10,13 +10,13 @@ import Foundation
 internal final class HomeViewModel: ObservableObject {
     
     @Published internal var dataForTodaysSelectionSectionView: Array<TodaySelectionPreviewModel> = []
-    @Published internal var dataForDiscoveryPreviewModel: Array<DataMovieCardPreviewModel> = []
+    @Published internal var dataForDiscoveryPreviewModel: Array<MovieCardPreviewModel> = []
     
     internal func prepareDataTodaySelection() {
         dataForTodaysSelectionSectionView = TodaySelectionPreviewModel.mock()
     }
     
     internal func prepareDataDiscovery() {
-        dataForDiscoveryPreviewModel = DataMovieCardPreviewModel.mock()
+        dataForDiscoveryPreviewModel = MovieCardPreviewModel.mock()
     }
 }
