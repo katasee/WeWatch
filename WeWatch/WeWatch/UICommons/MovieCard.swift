@@ -9,7 +9,7 @@ import SwiftUI
 
 internal struct MovieCard: View {
     
-    @State private var isActive: Bool = false
+    @State private var isActive: Bool
     private let title: String
     private let ranking: Double
     private let genres: String
@@ -18,6 +18,7 @@ internal struct MovieCard: View {
     private var didTap: @MainActor (Bool) -> Void
     
     internal init(
+        isActive: Bool,
         title: String,
         ranking: Double,
         genres: String,
@@ -25,6 +26,7 @@ internal struct MovieCard: View {
         imageUrl: URL?,
         didTap: @escaping @MainActor (Bool) -> Void
     ) {
+        self.isActive = isActive
         self.title = title
         self.ranking = ranking
         self.genres = genres
@@ -107,7 +109,7 @@ internal struct MovieCard: View {
     ZStack {
         Color.black.ignoresSafeArea()
         MovieCard(
-            title: "Hitman’s Wife’s Bodyguard",
+            isActive: false, title: "Hitman’s Wife’s Bodyguard",
             ranking: 3.5,
             genres: "Action, Comedy, Crime",
             storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......", 

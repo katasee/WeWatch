@@ -24,7 +24,7 @@ internal struct TabBar: View {
     internal func viewForSeletedTab() -> some View {
         switch viewModel.selectedTab {
         case .bookmark:
-            BookmarkViewPlaceholder()
+            BookmarkView()
         case .homeView:
             HomeView()
         case .searchView:
