@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct BookmarkListView: View {
+internal struct BookmarkListView: View {
     
     @Binding private var searchText: String
     private let data: Array<MovieCardPreviewModel>
