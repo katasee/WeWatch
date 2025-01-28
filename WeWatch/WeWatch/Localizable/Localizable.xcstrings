@@ -19,6 +19,20 @@
     "%lld" : {
 
     },
+    "Bookmarks" : {
+
+    },
+    "bookmarks.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bookmarks"
+          }
+        }
+      }
+    },
     "BookmarkView" : {
 
     },
@@ -87,9 +101,6 @@
           }
         }
       }
-    },
-    "SearchView" : {
-
     },
     "splash.view.description.first.part.title" : {
       "localizations" : {

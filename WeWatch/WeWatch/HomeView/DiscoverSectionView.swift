@@ -44,7 +44,7 @@ internal struct DiscoverSectionView: View {
                     chooseButtonAction(model)
                 } label: {
                     MovieCard(
-                        title: model.title,
+                        isActive: false, title: model.title,
                         ranking: model.rating,
                         genres: model.genres,
                         storyline: model.storyline,

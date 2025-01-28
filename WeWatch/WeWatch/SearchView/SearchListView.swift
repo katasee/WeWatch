@@ -42,7 +42,7 @@ internal struct SearchListView: View {
     }
     
     internal var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             titleView
             VStack(alignment: .leading) {
                 SearchBar(searchText: $searchText)
@@ -80,7 +80,7 @@ internal struct SearchListView: View {
                 chooseButtonAction(model)
             } label: {
                 MovieCard(
-                    title: model.title,
+                    isActive: false, title: model.title,
                     ranking: model.rating,
                     genres: model.genres,
                     storyline: model.storyline,
