@@ -12,7 +12,6 @@ internal struct BookmarkListView: View {
     @Binding private var searchText: String
     private let data: Array<MovieCardPreviewModel>
     private let chooseButtonAction: @MainActor (MovieCardPreviewModel) -> Void
-    let lineLimit: Int = 3
     
     internal init(
         searchText: Binding<String>,
@@ -54,7 +53,8 @@ internal struct BookmarkListView: View {
             } label: {
                 NavigationLink(destination: DetailsView()) {
                     MovieCard(
-                        isActive: true, title: model.title,
+                        isActive: true,
+                        title: model.title,
                         ranking: model.rating,
                         genres: model.genres,
                         storyline: model.storyline,

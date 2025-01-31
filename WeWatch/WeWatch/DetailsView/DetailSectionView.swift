@@ -16,10 +16,7 @@ internal struct DetailSectionView: View {
             poster
             VStack(alignment: .leading) {
                 title
-                HStack {
-                    rating
-                    RatingView(ranking: movie.rating)
-                }
+                rating
                 genres
                 readMoreButton
             }
@@ -48,10 +45,13 @@ internal struct DetailSectionView: View {
     }
     
     private var rating: some View {
-        Text("\(movie.rating, specifier: "%.1f")")
-            .foregroundColor(Color.whiteColor)
-            .font(.poppinsBold16px)
-            .foregroundColor(.whiteColor)
+        HStack {
+            Text("\(movie.rating, specifier: "%.1f")")
+                .foregroundColor(Color.whiteColor)
+                .font(.poppinsBold16px)
+                .foregroundColor(.whiteColor)
+            RatingView(ranking: movie.rating)
+        }
     }
     
     private var genres: some View {
@@ -61,7 +61,7 @@ internal struct DetailSectionView: View {
     }
     
     private var readMoreButton: some View {
-        ReadMoreButtonView(lineLimit: 2, movie: movie)
+        ExpandableTextView(lineLimit: 2, movie: movie)
             .foregroundColor(Color.lightGreyColor)
     }
 }

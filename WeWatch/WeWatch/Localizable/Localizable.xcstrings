@@ -63,6 +63,28 @@
         }
       }
     },
+    "read.less.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "read less"
+          }
+        }
+      }
+    },
+    "read.more.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "read more"
+          }
+        }
+      }
+    },
     "search.bar.promt.title" : {
       "extractionState" : "manual",
       "localizations" : {

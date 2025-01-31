@@ -10,13 +10,26 @@ import SwiftUI
 internal struct NavigationBarButtons: View {
     
     @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
-    @State private var isActive: Bool = true
+    internal var movie: MovieCardPreviewModel
+    private var action: (Int) -> Void
+    init(
+        movie: MovieCardPreviewModel,
+        action: @escaping (Int) -> Void
+    ) {
+        self.movie = movie
+        self.action = action
+        UINavigationBar.appearance().setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+        UINavigationBar.appearance().shadowImage = UIImage()
+        UINavigationBar.appearance().isTranslucent = true
+        UINavigationBar.appearance().tintColor = .clear
+        UINavigationBar.appearance().backgroundColor = .clear
+    }
     
     internal var body: some View {
         HStack {
             Spacer()
                 .navigationBarBackButtonHidden(true)
-                .toolbar(content: {
+                .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
                             presentationMode.wrappedValue.dismiss()
@@ -26,16 +39,12 @@ internal struct NavigationBarButtons: View {
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            isActive.toggle()
+                            action(movie.id)
                         } label: {
-                            if isActive == true {
-                                Bookmark(isActive: true)
-                            } else {
-                                Bookmark(isActive: false)
-                            }
+                            Bookmark()
                         }
                     }
-                })
+                }
         }
     }
 }

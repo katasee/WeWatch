@@ -1,5 +1,5 @@
 //
-//  ReadMoreButtonView.swift
+//  ExpandableTextView.swift
 //  WeWatch
 //
 //  Created by Anton on 29/01/2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-internal struct ReadMoreButtonView: View {
+internal struct ExpandableTextView: View {
     
     @State private var fullText: Bool = false
     @State private var clipped: Bool = false
@@ -23,11 +23,11 @@ internal struct ReadMoreButtonView: View {
         self.movie = movie
     }
     
-    private var moreLessText: String {
+    private var moreLessText: LocalizedStringKey {
         if !clipped {
-            return ""
+            ""
         } else {
-            return self.fullText ? "read less" : "read more"
+            self.fullText ? "read.less.button" : "read.more.button"
         }
     }
     

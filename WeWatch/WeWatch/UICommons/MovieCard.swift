@@ -103,7 +103,6 @@ internal struct MovieCard: View {
             .font(.poppinsRegular13px)
             .foregroundColor(.lightGreyColor)
             .lineLimit(4)
-
     }
 }
 
