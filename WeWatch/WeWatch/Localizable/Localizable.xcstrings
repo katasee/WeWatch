@@ -19,9 +19,6 @@
     "%lld" : {
 
     },
-    "Bookmarks" : {
-
-    },
     "bookmarks.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32,9 +29,6 @@
           }
         }
       }
-    },
-    "BookmarkView" : {
-
     },
     "home.see.more.button.title" : {
       "extractionState" : "manual",

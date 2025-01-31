@@ -23,28 +23,38 @@ internal struct TodaysSelectionSectionView: View {
     internal var body: some View {
         VStack {
             HStack {
-                Text("todaySelection.title")
-                    .foregroundColor(.whiteColor)
-                    .font(.poppinsBold30px)
-                + Text(". ")
-                    .foregroundColor(.fieryRed)
-                    .font(.poppinsBold30px)
+                title
                 Spacer()
             }
             ScrollView(.horizontal, showsIndicators: true) {
                 HStack(spacing: 20) {
-                    ForEach(data) { model in
-                        Button {
-                            chooseButtonAction(model)
-                        } label: {
-                            MovieCardTopFive(
-                                title: model.title,
-                                ranking: Double(model.rating),
-                                image: model.image,
-                                didTap: { isActive in }
-                            )
-                        }
-                    }
+                    movieCardButton
+                }
+            }
+        }
+    }
+    
+    private var title: some View {
+        Text("todaySelection.title")
+            .foregroundColor(.whiteColor)
+            .font(.poppinsBold30px)
+        + Text(". ")
+            .foregroundColor(.fieryRed)
+            .font(.poppinsBold30px)
+    }
+    
+    private var movieCardButton: some View {
+        ForEach(data) { model in
+            Button {
+                chooseButtonAction(model)
+            } label: {
+                NavigationLink(destination: DetailsView()) {
+                    MovieCardTopFive(
+                        title: model.title,
+                        ranking: Double(model.rating),
+                        image: model.image,
+                        didTap: { isActive in }
+                    )
                 }
             }
         }

@@ -102,6 +102,8 @@ internal struct MovieCard: View {
         Text(storyline)
             .font(.poppinsRegular13px)
             .foregroundColor(.lightGreyColor)
+            .lineLimit(4)
+
     }
 }
 

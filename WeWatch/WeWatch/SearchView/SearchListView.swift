@@ -79,15 +79,17 @@ internal struct SearchListView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                MovieCard(
-                    isActive: false, title: model.title,
-                    ranking: model.rating,
-                    genres: model.genres,
-                    storyline: model.storyline,
-                    imageUrl: model.image,
-                    didTap: { isActive in }
-                )
-                .multilineTextAlignment(.leading)
+                NavigationLink(destination: DetailsView()) {
+                    MovieCard(
+                        isActive: false, title: model.title,
+                        ranking: model.rating,
+                        genres: model.genres,
+                        storyline: model.storyline,
+                        imageUrl: model.image,
+                        didTap: { isActive in }
+                    )
+                    .multilineTextAlignment(.leading)
+                }
             }
         }
     }

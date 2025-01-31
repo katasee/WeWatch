@@ -24,7 +24,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6E8E31172CFA245300B5894A /* Exceptions for "WeWatch" folder in "WeWatch" target */ = {
+		6E4E76CE2D4CE40300F21F6F /* Exceptions for "WeWatch" folder in "WeWatch" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -42,7 +42,7 @@
 		6ECE93CC2CF10C8300852DDD /* WeWatch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				6E8E31172CFA245300B5894A /* Exceptions for "WeWatch" folder in "WeWatch" target */,
+				6E4E76CE2D4CE40300F21F6F /* Exceptions for "WeWatch" folder in "WeWatch" target */,
 			);
 			path = WeWatch;
 			sourceTree = "<group>";

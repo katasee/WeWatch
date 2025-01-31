@@ -26,23 +26,37 @@ internal struct DiscoverSectionView: View {
     internal var body: some View {
         VStack {
             HStack {
-                Text("home.title")
-                    .foregroundColor(.whiteColor)
-                    .font(.poppinsBold30px)
-                + Text(". ")
-                    .foregroundColor(.fieryRed)
-                    .font(.poppinsBold30px)
+                title
                 Spacer()
-                Button("home.see.more.button.title") {
-                    seeMoreButtonAction()
-                }
-                .font(.poppinsRegular16px)
-                .foregroundColor(.fieryRed)
+                seeMoreButton
             }
-            ForEach(data) { model in
-                Button {
-                    chooseButtonAction(model)
-                } label: {
+            movieCardButton
+        }
+    }
+    
+    private var title: some View {
+        Text("home.title")
+            .foregroundColor(.whiteColor)
+            .font(.poppinsBold30px)
+        + Text(". ")
+            .foregroundColor(.fieryRed)
+            .font(.poppinsBold30px)
+    }
+    
+    private var seeMoreButton: some View {
+        Button("home.see.more.button.title") {
+            seeMoreButtonAction()
+        }
+        .font(.poppinsRegular16px)
+        .foregroundColor(.fieryRed)
+    }
+    
+    private var movieCardButton: some View {
+        ForEach(data) { model in
+            Button {
+                chooseButtonAction(model)
+            } label: {
+                NavigationLink(destination: DetailsView()) {
                     MovieCard(
                         isActive: false, title: model.title,
                         ranking: model.rating,
@@ -58,9 +72,3 @@ internal struct DiscoverSectionView: View {
     }
 }
 
-#Preview {
-    DiscoverSectionView (
-        data: MovieCardPreviewModel.mock(),
-        seeMoreButtonAction: {},
-        chooseButtonAction: { isActive in })
-}

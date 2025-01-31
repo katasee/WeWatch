@@ -12,31 +12,29 @@ internal struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel = .init()
     
     internal var body: some View {
-        ZStack {
-            Color(.black)
-                .ignoresSafeArea()
-            ScrollView {
-                VStack {
-                    TodaysSelectionSectionView(
-                        data: viewModel.dataForTodaysSelectionSectionView,
-                        chooseButtonAction: { isActive in
-                            // noop
-                        }
-                    )
-                    DiscoverSectionView(
-                        data: viewModel.dataForDiscoveryPreviewModel,
-                        seeMoreButtonAction: {},
-                        chooseButtonAction: { isActive in
-                            // noop
-                        }
-                    )
+        NavigationView {
+            ZStack {
+                Color(.black)
+                    .ignoresSafeArea()
+                ScrollView {
+                    VStack {
+                        TodaysSelectionSectionView(
+                            data: viewModel.dataForTodaysSelectionSectionView,
+                            chooseButtonAction: { isActive in }
+                        )
+                        DiscoverSectionView(
+                            data: viewModel.dataForDiscoveryPreviewModel,
+                            seeMoreButtonAction: {},
+                            chooseButtonAction: { isActive in }
+                        )
+                    }
                 }
+                .onAppear {
+                    viewModel.prepareDataTodaySelection()
+                    viewModel.prepareDataDiscovery()
+                }
+                .padding(16)
             }
-            .onAppear {
-                viewModel.prepareDataTodaySelection()
-                viewModel.prepareDataDiscovery()
-            }
-            .padding(16)
         }
     }
 }
