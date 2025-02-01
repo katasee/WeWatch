@@ -14,4 +14,5 @@ extension Color {
     internal static var darkGreyColor = Color("dakrGrey")
     internal static var lightGreyColor = Color("lightGrey")
     internal static var whiteColor = Color("whiteColor")
+    internal static var darkColor = Color("darkColor")
 }

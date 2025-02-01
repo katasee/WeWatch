@@ -51,15 +51,18 @@ internal struct BookmarkListView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                MovieCard(
-                    isActive: true, title: model.title,
-                    ranking: model.rating,
-                    genres: model.genres,
-                    storyline: model.storyline,
-                    imageUrl: model.image,
-                    didTap: { isActive in }
-                )
-                .multilineTextAlignment(.leading)
+                NavigationLink(destination: DetailsView()) {
+                    MovieCard(
+                        isActive: true,
+                        title: model.title,
+                        ranking: model.rating,
+                        genres: model.genres,
+                        storyline: model.storyline,
+                        imageUrl: model.image,
+                        didTap: { isActive in }
+                    )
+                    .multilineTextAlignment(.leading)
+                }
             }
         }
     }

@@ -19,9 +19,6 @@
     "%lld" : {
 
     },
-    "Bookmarks" : {
-
-    },
     "bookmarks.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32,9 +29,6 @@
           }
         }
       }
-    },
-    "BookmarkView" : {
-
     },
     "home.see.more.button.title" : {
       "extractionState" : "manual",
@@ -65,6 +59,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading…"
+          }
+        }
+      }
+    },
+    "read.less.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "read less"
+          }
+        }
+      }
+    },
+    "read.more.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "read more"
           }
         }
       }

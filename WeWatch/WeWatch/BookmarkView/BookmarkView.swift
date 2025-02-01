@@ -10,23 +10,24 @@ import SwiftUI
 internal struct BookmarkView: View {
     
     @StateObject private var viewModel: BookmarkViewModel = .init()
-    private let isActive: Bool = false
     
     internal var body: some View {
-        ZStack {
-            Color.black
-                .ignoresSafeArea()
-            VStack {
+        NavigationView {
+            ZStack {
+                Color.black
+                    .ignoresSafeArea()
                 ScrollView {
-                    BookmarkListView(
-                        searchText: $viewModel.searchText,
-                        data: viewModel.filteredBookmarkedMovie,
-                        chooseButtonAction: { isActive in }
-                    )
-                    .padding(16)
-                }
-                .onAppear {
-                    viewModel.prepareDataBookmarkView()
+                    VStack {
+                        BookmarkListView(
+                            searchText: $viewModel.searchText,
+                            data: viewModel.filteredBookmarkedMovie,
+                            chooseButtonAction: { isActive in }
+                        )
+                        .padding(16)
+                    }
+                    .onAppear {
+                        viewModel.prepareDataBookmarkView()
+                    }
                 }
             }
         }
