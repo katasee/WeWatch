@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 internal struct TodaysSelectionSectionView: View {
     
@@ -59,6 +60,25 @@ internal struct TodaysSelectionSectionView: View {
             }
         }
     }
+    
+
+    
+//    func randomMovieByIndex() -> Int {
+//        let key = "randomElementIndices"
+//        let defaults = UserDefaults.standard
+//        var dictionary = defaults.object(forKey: key) as? [Date: Int] ?? [Date: Int]()
+//        let calendar = Calendar.autoupdatingCurrent
+//        let now = Date()
+//        let components = calendar.dateComponents([.calendar, .year, .month, .day], from: now)
+//        let today = calendar.date(from: components)!
+//        if dictionary.keys.contains(today) {
+//            return dictionary[today]!
+//        } else {
+//            let randomValue = Int.random(in: 1...100)
+//            dictionary = [today: randomValue]
+//            return randomValue
+//        }
+//    }
 }
 
 #Preview {
