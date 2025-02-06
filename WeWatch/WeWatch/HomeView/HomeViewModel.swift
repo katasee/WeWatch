@@ -9,25 +9,29 @@ import Foundation
 
 internal final class HomeViewModel: ObservableObject {
     
-    @Published internal var dataForTodaysSelectionSectionView: Array<TodaySelectionPreviewModel> = []
+    @Published internal var dataForTodaysSelectionSectionView: DomainModels = .init()
     @Published internal var dataForDiscoveryPreviewModel: Array<MovieCardPreviewModel> = []
     
-    internal func prepareDataTodaySelection() {
-        dataForTodaysSelectionSectionView = TodaySelectionPreviewModel.mock()
+    internal func prepareDataTodaySelection(title: String) async  {
+        do {
+            let movie = try await WebService.getMovie(query: randomData())
+            self.dataForTodaysSelectionSectionView = movie
+        } catch(let error) {
             
+        }
     }
     
     internal func prepareDataDiscovery() {
         dataForDiscoveryPreviewModel = MovieCardPreviewModel.mock()
     }
     
-    func randomData() -> String {
+    internal func randomData() -> String {
         let alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
         let randomLetter = alphabet.randomElement()
         return randomLetter ?? "error"
     }
     
-    func isNewDay() -> Bool {
+    internal func isNewDay() -> Bool {
         let currentDate = Date()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -44,5 +48,4 @@ internal final class HomeViewModel: ObservableObject {
             return false
         }
     }
-    
 }

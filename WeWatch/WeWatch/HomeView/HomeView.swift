@@ -11,6 +11,8 @@ internal struct HomeView: View {
     
     @StateObject private var viewModel: HomeViewModel = .init()
     
+//    @State private var movie: DomainModels?
+    
     internal var body: some View {
         NavigationView {
             ZStack {
@@ -18,10 +20,11 @@ internal struct HomeView: View {
                     .ignoresSafeArea()
                 ScrollView {
                     VStack {
-                        TodaysSelectionSectionView(
-                            data: viewModel.dataForTodaysSelectionSectionView,
-                            chooseButtonAction: { isActive in }
-                        )
+
+//                        TodaysSelectionSectionView(
+//                            data: viewModel.dataForTodaysSelectionSectionView,
+//                            chooseButtonAction: { isActive in }
+//                        )
                         DiscoverSectionView(
                             data: viewModel.dataForDiscoveryPreviewModel,
                             seeMoreButtonAction: {},
@@ -29,10 +32,13 @@ internal struct HomeView: View {
                         )
                     }
                 }
-                .onAppear {
-                    viewModel.prepareDataTodaySelection()
-                    viewModel.prepareDataDiscovery()
+             
+                .onAppear{
+                    Task{
+                        await viewModel.prepareDataTodaySelection(title: viewModel.randomData())
+                    }
                 }
+                
                 .padding(16)
             }
         }
