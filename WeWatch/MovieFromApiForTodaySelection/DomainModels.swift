@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct DomainModels: Codable {
+internal struct DomainModels: Codable {
     
     var status: String?
     var data: [Details]?
 }
 
-struct Details: Codable {
+internal struct Details: Codable {
     
     var objectID: String?
     var aliases: [String]?
@@ -23,7 +23,7 @@ struct Details: Codable {
     var genres: [String]?
     var studios: [String]?
     var id: String?
-    var imageUrl: String?
+    var imageUrl: URL?
     var name: String?
     var firstAirTime: String?
     var overview: String?
@@ -39,7 +39,7 @@ struct Details: Codable {
     var remoteIDs: [RemoteID]?
     var thumbnail: String?
     
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case objectID = "objectID"
         case aliases = "aliases"
         case country = "country"
@@ -66,7 +66,7 @@ struct Details: Codable {
     }
 }
 
-struct RemoteID: Codable {
+internal struct RemoteID: Codable {
     
     var id: String?
     var type: Int?

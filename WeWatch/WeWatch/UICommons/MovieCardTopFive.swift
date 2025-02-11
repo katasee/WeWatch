@@ -55,12 +55,19 @@ internal struct MovieCardTopFive: View {
                         .fill(Color.darkGreyColor))
                 }
                 filmTitle
+
             }
             HStack {
                 filmRanking
                 RatingView(ranking: ranking)
             }
         }
+        .frame(width: 300)
+        .fixedSize(horizontal: true, vertical: false)
+        .lineLimit(1)
+//        .border(Color.red)
+
+
     }
     
     private var filmRanking: some View {
@@ -73,6 +80,8 @@ internal struct MovieCardTopFive: View {
         Text(title)
             .font(.poppinsBold20px)
             .foregroundColor(.whiteColor)
+            
+
     }
 }
 
@@ -80,7 +89,7 @@ internal struct MovieCardTopFive: View {
     ZStack {
         Color.black.ignoresSafeArea();
         MovieCardTopFive(
-            title: "Hitman’s Wife’s Bodyguard",
+            title: "Hitman’s Wife’s Bodyguard nfjdfnsjfdn",
             ranking: 3.5,
             image: URL(string: "https://miro.medium.com/v2/resize:fit:4800/format:webp/1*39M4XbHXCTfBenNNqLLyLA@2x.jpeg"),
             didTap: { isActive in }
