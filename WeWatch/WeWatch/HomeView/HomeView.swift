@@ -10,7 +10,7 @@ import SwiftUI
 internal struct HomeView: View {
     
     @StateObject private var viewModel: HomeViewModel = .init()
-        
+    
     internal var body: some View {
         NavigationView {
             ZStack {
@@ -18,7 +18,6 @@ internal struct HomeView: View {
                     .ignoresSafeArea()
                 ScrollView {
                     VStack {
-
                         TodaysSelectionSectionView(
                             data: viewModel.dataForTodaysSelectionSectionView,
                             chooseButtonAction: { isActive in }
@@ -30,13 +29,11 @@ internal struct HomeView: View {
                         )
                     }
                 }
-             
                 .onAppear{
                     Task{
-                        try await viewModel.checkDay()
+                        try await viewModel.dateCheck()
                     }
                 }
-                
                 .padding(16)
             }
         }

@@ -31,7 +31,7 @@ internal final class DatabaseManager {
         do {
             try createMovieTable()
         } catch {
-            DatabaseError.movieTableCreatioFailed
+            print("Error creating table: \(error)")
         }
     }
     
@@ -91,15 +91,15 @@ internal final class DatabaseManager {
                 throw DatabaseError.dublicateError
             }
         }
-        let insertStatementString: String = "INSERT INTO Movie (title, overview, releaseDate, rating, posterUrl) VALUES (?, ?, ?, ?, ?);"
+        let insertStatementString: String = "INSERT INTO Movie (movieId, title, overview, releaseDate, rating, posterUrl) VALUES (?, ?, ?, ?, ?, ?);"
         var insertStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
-            sqlite3_bind_text(insertStatement, 1, (title as NSString).utf8String, -1, nil)
-            print(title)
-            sqlite3_bind_text(insertStatement, 2, (overview as NSString).utf8String, -1, nil)
-            sqlite3_bind_text(insertStatement, 3, (releaseDate as NSString).utf8String, -1, nil)
-            sqlite3_bind_int(insertStatement, 4, Int32(rating))
-            sqlite3_bind_text(insertStatement, 5, (posterUrl as NSString).utf8String, -1, nil)
+            sqlite3_bind_text(insertStatement, 1, (movieId as NSString).utf8String, -1, nil)
+            sqlite3_bind_text(insertStatement, 2, (title as NSString).utf8String, -1, nil)
+            sqlite3_bind_text(insertStatement, 3, (overview as NSString).utf8String, -1, nil)
+            sqlite3_bind_text(insertStatement, 4, (releaseDate as NSString).utf8String, -1, nil)
+            sqlite3_bind_int(insertStatement, 5, Int32(rating))
+            sqlite3_bind_text(insertStatement, 6, (posterUrl as NSString).utf8String, -1, nil)
             if sqlite3_step(insertStatement) == SQLITE_DONE {
                 sqlite3_finalize(insertStatement)
             } else {
@@ -128,7 +128,7 @@ internal final class DatabaseManager {
                     overview: overview,
                     releaseDate: releaseDate,
                     rating: Int(rating),
-                    posterUrl: URL(string:posterUrl)
+                    posterUrl: posterUrl
                 ))
             }
         } else {
@@ -153,7 +153,7 @@ internal final class DatabaseManager {
             sqlite3_bind_text(updateStatement, 2, (overview as NSString).utf8String, -1, nil)
             sqlite3_bind_text(updateStatement, 3, (releaseDate as NSString).utf8String, -1, nil)
             sqlite3_bind_int(updateStatement, 4, Int32(rating))
-            sqlite3_bind_text(updateStatement, 5, "", -1, nil)
+            sqlite3_bind_text(updateStatement, 5, (posterUrl as NSString).utf8String, -1, nil)
             sqlite3_bind_text(updateStatement, 6, (movieId as NSString).utf8String, -1, nil)
             if sqlite3_step(updateStatement) == SQLITE_DONE {
                 sqlite3_finalize(updateStatement)
@@ -178,6 +178,17 @@ internal final class DatabaseManager {
             throw DatabaseError.movieDeleteNotPrepare
         }
         sqlite3_finalize(deleteStatement)
+    }
+    deinit {
+        closeDatabase()
+    }
+    
+    internal func closeDatabase() {
+        if sqlite3_close(db) == SQLITE_OK {
+            print("Database connection closed successfully.")
+        } else {
+            print("Error closing database connection.")
+        }
     }
 }
 

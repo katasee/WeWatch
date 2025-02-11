@@ -9,21 +9,20 @@ import Foundation
 
 internal final class  HomeViewModel: ObservableObject {
     
-    let dbManager: DatabaseManager = .shared
+    internal let dbManager: DatabaseManager = .shared
     @Published internal var transferToDataBase: DomainModels = .init()
     @Published internal var dataForTodaysSelectionSectionView: [Movie] = []
     @Published internal var dataForDiscoveryPreviewModel: Array<MovieCardPreviewModel> = []
     
     internal func prepareDataTodaySelection() async throws -> [Movie] {
         do {
-            let movie = try await WebService.getMovie(query: randomData())
-            print(movie)
-            let transferData = movie.data?.compactMap { details in
-                if let movieId = details.id,
-                   let title = details.name,
-                   let overview = details.overview,
-                   let releaseDate = details.year,
-                   let posterUrl = details.imageUrl
+            let movie: DomainModels = try await WebService.getMovie(query: randomData())
+            let transferData: [Movie]? =  movie.data?.compactMap { details in
+                if let movieId: String = details.id,
+                   let title: String = details.name,
+                   let overview: String = details.overview,
+                   let releaseDate: String = details.year,
+                   let posterUrl: String = details.imageUrl
                 {
                     do {
                         try dbManager.insertMovie(
@@ -32,9 +31,10 @@ internal final class  HomeViewModel: ObservableObject {
                             overview: overview,
                             releaseDate: releaseDate,
                             rating: 3,
-                            posterUrl: String(contentsOf: posterUrl)
+                            posterUrl: posterUrl
                         )
                     } catch {
+                        print(error)
                     }
                     return Movie(
                         movieId: movieId,
@@ -45,86 +45,78 @@ internal final class  HomeViewModel: ObservableObject {
                         posterUrl: posterUrl
                     )
                 } else {
-                    print("error")
                     return nil
                 }
             }
-            guard let unwrapData = transferData else {
+            guard let unwrapData: [Movie] = transferData else {
                 throw vieModelError.invalidUnwrapping
             }
             await MainActor.run { [weak self] in
                 self?.dataForTodaysSelectionSectionView = unwrapData
-                print(unwrapData)
             }
         } catch {
-            print(vieModelError.invalidDataFromEndpoint)
             throw vieModelError.invalidDataFromEndpoint
         }
-        print(dataForTodaysSelectionSectionView)
         return dataForTodaysSelectionSectionView
     }
     
-    internal func dateFromEndpoint() async {
+    internal func dateFromEndpoint() async throws {
         do {
             try await prepareDataTodaySelection()
         } catch {
-            
+            print(error)
         }
     }
-    internal func dateFromDatabase() async throws  {
+    
+    internal func dateFromDatabase() async throws {
         try await MainActor.run { [weak self] in
             self?.dataForTodaysSelectionSectionView = try dbManager.getAllMovies()
-            print(try dbManager.getAllMovies())
         }
     }
     
     internal func isNewDay() -> Bool {
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
+        let currentDate: Date = Date()
+        let dateFormatter: DateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
-        let currentDateString: String = DateFormatter.localizedString(from: currentDate, dateStyle: .short, timeStyle: .none)
-        if let lastSaved = UserDefaults.standard.string(forKey: "cachDateString") {
-            print(lastSaved)
-            if "10/02/2025" != currentDateString {
+        let currentDateString: String = DateFormatter.localizedString(
+            from: currentDate,
+            dateStyle: .short,
+            timeStyle: .none
+        )
+        if let lastDate: String = UserDefaults.standard.string(forKey: "cachDateString") {
+            if lastDate != currentDateString {
                 UserDefaults.standard.setValue(currentDateString, forKey: "cachDateString")
                 return true
             } else {
-                print(currentDateString)
                 return false
             }
         } else {
             UserDefaults.standard.setValue(currentDateString, forKey: "cachDateString")
-            print(currentDateString)
             return true
         }
     }
     
-    internal func checkDay() async throws  {
+    internal func dateCheck() async throws {
         if isNewDay() {
             try await dateFromEndpoint()
-            print( try await dateFromEndpoint())
         } else {
             do {
                 try await dateFromDatabase()
-                print(try await dateFromDatabase())
             } catch {
-                print("error")
+                print(error)
             }
         }
     }
     
     internal func randomData() -> String {
-        let alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
-        let randomLetter = alphabet.randomElement()
-        print(randomLetter ?? "error")
+        let alphabet: [String] = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+        let randomLetter: String? = alphabet.randomElement()
         return randomLetter ?? "error"
-        
     }
     
     enum vieModelError: Error {
         case invalidUnwrapping
         case invalidDataFromEndpoint
-        case invalidDataFromDatabase
     }
     
     internal func prepareDataDiscovery() {

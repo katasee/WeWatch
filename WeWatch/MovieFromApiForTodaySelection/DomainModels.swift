@@ -23,7 +23,7 @@ internal struct Details: Codable {
     var genres: [String]?
     var studios: [String]?
     var id: String?
-    var imageUrl: URL?
+    var imageUrl: String?
     var name: String?
     var firstAirTime: String?
     var overview: String?

@@ -37,7 +37,6 @@ internal struct TodaysSelectionSectionView: View {
                 }
             }
         }
-        
     }
     
     private var title: some View {
@@ -58,29 +57,11 @@ internal struct TodaysSelectionSectionView: View {
                     MovieCardTopFive(
                         title: model.title,
                         ranking: Double(model.rating),
-                        image: model.posterUrl,
+                        image: URL(string: model.posterUrl),
                         didTap: { isActive in }
                     )
                 }
             }
         }
-        
     }
-}
-
-#Preview {
-    TodaysSelectionSectionView(
-        data: [
-            Movie(movieId: "1", title: "zmndksnk cndsfjdbnsjdbsjd bjsbckdnckdnkcndk", overview: "goog", releaseDate: "asca", rating: 3, posterUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
-                                                                                                                                                      )),
-            Movie(movieId: "1", title: "zmndksnkcndknckdncdkcnkdnkcnkdckdnckdnkcndk", overview: "goog", releaseDate: "asca", rating: 3, posterUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
-                                                                                                                                                       )),
-            Movie(movieId: "1", title: "zmndksnkcndknckdncdkcnkdnkcnkdckdnckdnkcndk", overview: "goog", releaseDate: "asca", rating: 3, posterUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
-                                                                                                                                                      ))
-        ],
-        chooseButtonAction: { movie in
-            // Тут можете реалізувати якусь дію для вибраного фільму, наприклад:
-            print("Обраний фільм: \(movie.title)")
-        }
-    )
 }

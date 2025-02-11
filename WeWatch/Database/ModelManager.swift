@@ -15,7 +15,7 @@ internal struct Movie: Identifiable, Sendable {
     internal var overview: String
     internal var releaseDate: String
     internal var rating: Int
-    internal var posterUrl: URL?
+    internal var posterUrl: String
     
     internal init(
         movieId: String,
@@ -23,7 +23,7 @@ internal struct Movie: Identifiable, Sendable {
         overview: String,
         releaseDate: String,
         rating: Int,
-        posterUrl: URL?
+        posterUrl: String
     ) {
         self.movieId = movieId
         self.title = title
