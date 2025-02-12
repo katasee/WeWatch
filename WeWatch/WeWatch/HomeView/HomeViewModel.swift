@@ -16,7 +16,10 @@ internal final class  HomeViewModel: ObservableObject {
     
     internal func prepareDataTodaySelection() async throws -> [Movie] {
         do {
-            let movie: DomainModels = try await WebService.getMovie(query: randomData())
+            var movie: DomainModels = try await WebService.getMovie(query: randomData())
+            while (movie.data?.count ?? 0) < 10 {
+                movie = try await WebService.getMovie(query: randomData())
+            }
             let transferData: [Movie]? =  movie.data?.compactMap { details in
                 if let movieId: String = details.id,
                    let title: String = details.name,
@@ -117,6 +120,15 @@ internal final class  HomeViewModel: ObservableObject {
     enum vieModelError: Error {
         case invalidUnwrapping
         case invalidDataFromEndpoint
+    }
+    
+    func date() async {
+        if dataForTodaysSelectionSectionView.count < 10 {
+            do {
+                try await dateCheck()
+            } catch {
+            }
+        }
     }
     
     internal func prepareDataDiscovery() {
