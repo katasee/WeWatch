@@ -1,5 +1,5 @@
 //
-//  DomainModels.swift
+//  HomeViewEndpoint.swift
 //  WeWatch
 //
 //  Created by Anton on 01/02/2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct DomainModels: Codable {
+internal struct HomeViewEndpoint: Codable {
     
     var status: String?
     var data: [Details]?

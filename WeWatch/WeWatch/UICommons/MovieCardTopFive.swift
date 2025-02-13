@@ -55,7 +55,6 @@ internal struct MovieCardTopFive: View {
                         .fill(Color.darkGreyColor))
                 }
                 filmTitle
-
             }
             HStack {
                 filmRanking
@@ -65,9 +64,6 @@ internal struct MovieCardTopFive: View {
         .frame(width: 300)
         .fixedSize(horizontal: true, vertical: false)
         .lineLimit(1)
-//        .border(Color.red)
-
-
     }
     
     private var filmRanking: some View {
@@ -80,8 +76,6 @@ internal struct MovieCardTopFive: View {
         Text(title)
             .font(.poppinsBold20px)
             .foregroundColor(.whiteColor)
-            
-
     }
 }
 

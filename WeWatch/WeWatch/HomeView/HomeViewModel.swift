@@ -7,38 +7,51 @@
 
 import Foundation
 
-internal final class  HomeViewModel: ObservableObject {
-    
+internal final class HomeViewModel: ObservableObject {
     internal let dbManager: DatabaseManager = .shared
-    @Published internal var transferToDataBase: DomainModels = .init()
-    @Published internal var dataForTodaysSelectionSectionView: [Movie] = []
+    @Published internal var dataForTodaysSelectionSectionView: Array<Movie> = []
     @Published internal var dataForDiscoveryPreviewModel: Array<MovieCardPreviewModel> = []
+    private var errorMessage: String?
+
+    internal enum KeychainKey {
+        static let token: String = "token"
+    }
     
-    internal func prepareDataTodaySelection() async throws -> [Movie] {
+    fileprivate enum vieModelError: Error {
+        case invalidUnwrapping
+        case invalidDataFromEndpoint
+    }
+
+    internal func prepareDataTodaySelection(query: String) async throws -> [Movie] {
+        
+        let tokenData: Data? = try KeychainManager.getData(key: KeychainKey.token)
+               let token: String = .init(decoding: tokenData ?? Data(), as: UTF8.self)
+         let searchResource: Resource<HomeViewEndpoint> = .init(
+            url: URL.homeViewEndpointURL,
+            method: .get([.init(name: "query", value: "\(query)")]),
+            token: token
+        )
         do {
-            var movie: DomainModels = try await WebService.getMovie(query: randomData())
-            while (movie.data?.count ?? 0) < 10 {
-                movie = try await WebService.getMovie(query: randomData())
+            var response: HomeViewEndpoint = try await Webservice().call(searchResource)
+            while (response.data?.count ?? 0) < 10 {
+                response = try await Webservice().call(searchResource)
             }
-            let transferData: [Movie]? =  movie.data?.compactMap { details in
+            let movieForUI: [Movie]? =  response.data?.prefix(10).compactMap { details in
                 if let movieId: String = details.id,
                    let title: String = details.name,
                    let overview: String = details.overview,
                    let releaseDate: String = details.year,
                    let posterUrl: String = details.imageUrl
                 {
-                    do {
-                        try dbManager.insertMovie(
-                            movieId: movieId,
-                            title: title,
-                            overview: overview,
-                            releaseDate: releaseDate,
-                            rating: 3,
-                            posterUrl: posterUrl
-                        )
-                    } catch {
-                        print(error)
-                    }
+//                    try dbManager.insertMovie(
+//                        movieId: movieId,
+//                        title: title,
+//                        overview: overview,
+//                        releaseDate: releaseDate,
+//                        rating: 3,
+//                        posterUrl: posterUrl
+//                    )
+
                     return Movie(
                         movieId: movieId,
                         title: title,
@@ -51,11 +64,11 @@ internal final class  HomeViewModel: ObservableObject {
                     return nil
                 }
             }
-            guard let unwrapData: [Movie] = transferData else {
+            guard let todaySelectionData: [Movie] = movieForUI else {
                 throw vieModelError.invalidUnwrapping
             }
             await MainActor.run { [weak self] in
-                self?.dataForTodaysSelectionSectionView = unwrapData
+                self?.dataForTodaysSelectionSectionView = todaySelectionData
             }
         } catch {
             throw vieModelError.invalidDataFromEndpoint
@@ -65,7 +78,7 @@ internal final class  HomeViewModel: ObservableObject {
     
     internal func dateFromEndpoint() async throws {
         do {
-            try await prepareDataTodaySelection()
+            try await prepareDataTodaySelection(query: randomData())
         } catch {
             print(error)
         }
@@ -77,58 +90,34 @@ internal final class  HomeViewModel: ObservableObject {
         }
     }
     
-    internal func isNewDay() -> Bool {
-        let currentDate: Date = Date()
-        let dateFormatter: DateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let currentDateString: String = DateFormatter.localizedString(
-            from: currentDate,
+    internal func hasDateChanged() -> Bool {
+        let currentDateString = DateFormatter.localizedString(
+            from: Date(),
             dateStyle: .short,
             timeStyle: .none
         )
-        if let lastDate: String = UserDefaults.standard.string(forKey: "cachDateString") {
-            if lastDate != currentDateString {
-                UserDefaults.standard.setValue(currentDateString, forKey: "cachDateString")
-                return true
-            } else {
-                return false
-            }
-        } else {
-            UserDefaults.standard.setValue(currentDateString, forKey: "cachDateString")
-            return true
-        }
+        let lastDate = UserDefaults.standard.string(forKey: "cachedDateString")
+        guard "10/02/2025" != currentDateString else { return false }
+        UserDefaults.standard.setValue(currentDateString, forKey: "cachedDateString")
+        return true
     }
     
     internal func dateCheck() async throws {
-        if isNewDay() {
-            try await dateFromEndpoint()
-        } else {
-            do {
+        do {
+            if hasDateChanged() {
+                try dbManager.deleteMovie()
+                try await dateFromEndpoint()
+            } else {
                 try await dateFromDatabase()
-            } catch {
-                print(error)
             }
+        } catch {
+            print(error)
         }
     }
     
     internal func randomData() -> String {
-        let alphabet: [String] = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
-        let randomLetter: String? = alphabet.randomElement()
-        return randomLetter ?? "error"
-    }
-    
-    enum vieModelError: Error {
-        case invalidUnwrapping
-        case invalidDataFromEndpoint
-    }
-    
-    func date() async {
-        if dataForTodaysSelectionSectionView.count < 10 {
-            do {
-                try await dateCheck()
-            } catch {
-            }
-        }
+        let alphabet: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        return alphabet.randomElement().map(String.init) ?? "A"
     }
     
     internal func prepareDataDiscovery() {

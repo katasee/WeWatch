@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 internal struct TodaysSelectionSectionView: View {
     
@@ -32,7 +31,6 @@ internal struct TodaysSelectionSectionView: View {
                 ScrollView(.horizontal, showsIndicators: true) {
                     HStack(spacing: 20) {
                         movieCardButton
-                        
                     }
                 }
             }
@@ -49,7 +47,7 @@ internal struct TodaysSelectionSectionView: View {
     }
     
     private var movieCardButton: some View {
-        ForEach(data.prefix(10)) { model in
+        ForEach(data) { model in
             Button {
                 chooseButtonAction(model)
             } label: {
