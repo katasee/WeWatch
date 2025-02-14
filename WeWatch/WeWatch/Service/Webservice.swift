@@ -60,20 +60,17 @@ internal final class Webservice {
     
     internal func call <T: Codable>(_ resource: Resource<T>) async throws -> T {
         var request: URLRequest = URLRequest(url: resource.url)
-        print(request)
-    
         switch resource.method {
         case .post(let data):
             request.httpMethod = resource.method.name
             request.httpBody = data
-
+            
         case .get(let queryItems):
             var components: URLComponents? = URLComponents(
                 url: resource.url,
                 resolvingAgainstBaseURL: false
             )
             components?.queryItems = queryItems
-            print(queryItems)
             guard let url = components?.url else {
                 throw AuthenticationError.invalidCredentials
             }
@@ -86,23 +83,19 @@ internal final class Webservice {
         
         if let token = resource.token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-            print("Bearer \(token)")
         }
         let (data, response) = try await session.data(for: request)
-        print(String(data: data, encoding: .utf8))
         guard let response: HTTPURLResponse = response as? HTTPURLResponse else {
             throw AuthenticationError.invalidResponse
         }
         guard response.statusCode == 200 else {
-            print(response.statusCode)
             throw AuthenticationError.invalidStatusCode
         }
-      
+        
         
         guard let result = try? JSONDecoder().decode(T.self, from: data) else {
             throw AuthenticationError.decodingError
         }
-        print(result)
         return result
     }
 }
@@ -111,7 +104,7 @@ extension URL {
     static var loginURL: URL {
         return URL(string: "https://api4.thetvdb.com/v4/login")!
     }
-
+    
     static var homeViewEndpointURL: URL {
         return URL(string: "https://api4.thetvdb.com/v4/search")!
     }

@@ -57,7 +57,7 @@ internal final class DatabaseManager {
     internal func createMovieTable() throws {
         let createTableString: String = """
         CREATE TABLE IF NOT EXISTS Movie(
-            movieId TEXT PRIMARY KEY,
+            movieId TEXT PRIMARY KEY UNIQUE,
             title TEXT,
             overview TEXT,
             releaseDate TEXT,
@@ -65,6 +65,7 @@ internal final class DatabaseManager {
             posterUrl TEXT
         );
 """
+        
         var createTableStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, createTableString, -1, &createTableStatement, nil) == SQLITE_OK {
             if sqlite3_step(createTableStatement) == SQLITE_DONE {
@@ -88,9 +89,7 @@ internal final class DatabaseManager {
     ) throws {
         let movies: [Movie] = try getAllMovies()
         for movie in movies {
-            if movie.movieId == movieId || movie.title == title {
-                print(movieId)
-                print(DatabaseError.dublicateError)
+            while movie.movieId == movieId  {
                 throw DatabaseError.dublicateError
             }
         }
@@ -98,30 +97,18 @@ internal final class DatabaseManager {
         var insertStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
             sqlite3_bind_text(insertStatement, 1, (movieId as NSString).utf8String, -1, nil)
-            print(movieId)
             sqlite3_bind_text(insertStatement, 2, (title as NSString).utf8String, -1, nil)
-            print(title)
             sqlite3_bind_text(insertStatement, 3, (overview as NSString).utf8String, -1, nil)
-            print(overview)
-
             sqlite3_bind_text(insertStatement, 4, (releaseDate as NSString).utf8String, -1, nil)
-            print(releaseDate)
             sqlite3_bind_int(insertStatement, 5, Int32(rating))
-            print(rating)
             sqlite3_bind_text(insertStatement, 6, (posterUrl as NSString).utf8String, -1, nil)
-            print(posterUrl)
             if sqlite3_step(insertStatement) == SQLITE_DONE {
-                print("User is created successfully.")
-
                 sqlite3_finalize(insertStatement)
             } else {
                 let errorMessage = String(cString: sqlite3_errmsg(db))
-                print("Could not add movie. Error: \(errorMessage)")
                 throw DatabaseError.movieNotAdd
             }
         } else {
-            print("INSERT statement is failed.")
-
             throw DatabaseError.movieAddError
         }
     }
@@ -181,11 +168,11 @@ internal final class DatabaseManager {
         }
     }
     
-    internal func deleteMovie() throws  {
+    internal func deleteMovie(by id: String) throws  {
         let deleteStatementString: String = "DELETE FROM Movie;"
         var deleteStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
-//            sqlite3_bind_text(deleteStatement, 1, (id as NSString).utf8String, -1, nil)
+            sqlite3_bind_text(deleteStatement, 1, (id as NSString).utf8String, -1, nil)
             if sqlite3_step(deleteStatement) == SQLITE_DONE {
             } else {
                 throw DatabaseError.movieNotDelete
@@ -194,7 +181,6 @@ internal final class DatabaseManager {
             throw DatabaseError.movieDeleteNotPrepare
         }
         sqlite3_finalize(deleteStatement)
-        print(deleteStatement)
     }
     
     deinit {

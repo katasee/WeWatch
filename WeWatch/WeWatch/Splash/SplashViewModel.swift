@@ -31,7 +31,6 @@ internal final class SplashViewModel: ObservableObject {
     internal func loginToSplashView() async {
         if isValidToken() {
             self.showMainView = true
-            print(showMainView)
         } else {
             guard let loginData: Data = prepareLoginRequest() else {
                 self.errorMessage = "failed to encode login data."

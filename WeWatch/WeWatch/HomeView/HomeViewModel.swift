@@ -23,7 +23,6 @@ internal final class HomeViewModel: ObservableObject {
     }
 
     internal func prepareDataTodaySelection(query: String) async throws -> [Movie] {
-        
         let tokenData: Data? = try KeychainManager.getData(key: KeychainKey.token)
                let token: String = .init(decoding: tokenData ?? Data(), as: UTF8.self)
          let searchResource: Resource<HomeViewEndpoint> = .init(
@@ -31,27 +30,31 @@ internal final class HomeViewModel: ObservableObject {
             method: .get([.init(name: "query", value: "\(query)")]),
             token: token
         )
+        var thereIsDateInDatabase: Bool = true
         do {
             var response: HomeViewEndpoint = try await Webservice().call(searchResource)
             while (response.data?.count ?? 0) < 10 {
                 response = try await Webservice().call(searchResource)
             }
-            let movieForUI: [Movie]? =  response.data?.prefix(10).compactMap { details in
+            let movieForUI: [Movie]? = try response.data?.prefix(10).compactMap { details in
                 if let movieId: String = details.id,
                    let title: String = details.name,
                    let overview: String = details.overview,
                    let releaseDate: String = details.year,
                    let posterUrl: String = details.imageUrl
                 {
-//                    try dbManager.insertMovie(
-//                        movieId: movieId,
-//                        title: title,
-//                        overview: overview,
-//                        releaseDate: releaseDate,
-//                        rating: 3,
-//                        posterUrl: posterUrl
-//                    )
-
+                    if thereIsDateInDatabase == true {
+                        try dbManager.deleteMovie(by: movieId)
+                        thereIsDateInDatabase = false
+                    }
+                    try dbManager.insertMovie(
+                        movieId: movieId,
+                        title: title,
+                        overview: overview,
+                        releaseDate: releaseDate,
+                        rating: 3,
+                        posterUrl: posterUrl
+                    )
                     return Movie(
                         movieId: movieId,
                         title: title,
@@ -97,7 +100,7 @@ internal final class HomeViewModel: ObservableObject {
             timeStyle: .none
         )
         let lastDate = UserDefaults.standard.string(forKey: "cachedDateString")
-        guard "10/02/2025" != currentDateString else { return false }
+        guard lastDate != currentDateString else { return false }
         UserDefaults.standard.setValue(currentDateString, forKey: "cachedDateString")
         return true
     }
@@ -105,7 +108,6 @@ internal final class HomeViewModel: ObservableObject {
     internal func dateCheck() async throws {
         do {
             if hasDateChanged() {
-                try dbManager.deleteMovie()
                 try await dateFromEndpoint()
             } else {
                 try await dateFromDatabase()
