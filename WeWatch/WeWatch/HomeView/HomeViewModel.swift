@@ -34,9 +34,7 @@ internal final class HomeViewModel: ObservableObject {
         let maxAttempts: Int = 5
         while (response.data?.count ?? 0) < 10  && attempts < maxAttempts {
             response = try await Webservice().call(searchResource)
-            print(response)
             attempts += 1
-            print(attempts)
         }
         if (response.data?.count ?? 0) < 10 {
             throw HomeViewModelError.insufficientData
@@ -60,7 +58,6 @@ internal final class HomeViewModel: ObservableObject {
                     posterUrl: posterUrl
                 )
             } ?? .init()
-        print(moviesForUI)
         for movie in moviesForUI {
             try dbManager.insertMovie(
                 movieId: movie.movieId,
@@ -71,13 +68,11 @@ internal final class HomeViewModel: ObservableObject {
                 posterUrl: movie.posterUrl
             )
         }
-        print(dataForTodaysSelectionSectionView)
-        return dataForTodaysSelectionSectionView
+        return moviesForUI
     }
     
     internal func dateFromEndpoint() async throws {
-        let todaySelectionData = try await prepareDataTodaySelection(query: randomData())
-        print(todaySelectionData)
+        let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
         await MainActor.run { [weak self] in
             self?.dataForTodaysSelectionSectionView = todaySelectionData
         }
@@ -96,7 +91,7 @@ internal final class HomeViewModel: ObservableObject {
             timeStyle: .none
         )
         let lastDate: String? = UserDefaults.standard.string(forKey: "cachedDateString")
-        guard "10/02/2024" != currentDateString else { return false }
+        guard lastDate != currentDateString else { return false }
         UserDefaults.standard.setValue(currentDateString, forKey: "cachedDateString")
         return true
     }
@@ -110,7 +105,7 @@ internal final class HomeViewModel: ObservableObject {
             }
         } catch {
             print(error)
-#warning("Handle error later")
+            #warning("Handle error later")
         }
     }
     

@@ -34,7 +34,7 @@ internal struct HomeView: View {
                         try await viewModel.dateFromEndpoint()
                     } catch {
                         print(error)
-#warning("Handle error later")
+                        #warning("Handle error later")
                     }
                 }
                 .padding(16)
