@@ -9,7 +9,7 @@ import Foundation
 
 internal final class HomeViewModel: ObservableObject {
     
-    internal let dbManager: DatabaseManager = .shared
+    private let dbManager: DatabaseManager = .shared
     @Published internal var dataForTodaysSelectionSectionView: Array<Movie> = []
     @Published internal var dataForDiscoveryPreviewModel: Array<MovieCardPreviewModel> = []
     private var errorMessage: String?
@@ -105,7 +105,7 @@ internal final class HomeViewModel: ObservableObject {
             }
         } catch {
             print(error)
-            #warning("Handle error later")
+#warning("Handle error later")
         }
     }
     

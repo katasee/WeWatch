@@ -30,12 +30,7 @@ internal struct HomeView: View {
                     }
                 }
                 .task {
-                    do {
-                        try await viewModel.dateFromEndpoint()
-                    } catch {
-                        print(error)
-                        #warning("Handle error later")
-                    }
+                    await viewModel.dataForTodaySelection()
                 }
                 .padding(16)
             }

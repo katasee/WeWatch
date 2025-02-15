@@ -32,7 +32,7 @@ internal final class DatabaseManager {
             try createMovieTable()
         } catch {
             print("Error creating table: \(error)")
-            #warning("Handle error later")
+#warning("Handle error later")
         }
     }
     
@@ -186,7 +186,7 @@ internal final class DatabaseManager {
             print("Database connection closed successfully.")
         } else {
             print("Error closing database connection.")
-            #warning("Handle error later")
+#warning("Handle error later")
         }
     }
 }

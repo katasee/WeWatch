@@ -9,35 +9,35 @@ import Foundation
 
 internal struct SearchResponse: Codable {
     
-    var status: String?
-    var data: [Details]?
+    internal let status: String?
+    internal let data: [Details]?
 }
 
 internal struct Details: Codable {
     
-    var objectID: String?
-    var aliases: [String]?
-    var country: String?
-    var director: String?
-    var extendedTitle: String?
-    var genres: [String]?
-    var studios: [String]?
-    var id: String?
-    var imageUrl: String?
-    var name: String?
-    var firstAirTime: String?
-    var overview: String?
-    var primaryLanguage: String?
-    var primaryType: String?
-    var status: String?
-    var type: String?
-    var tvdbID: String?
-    var year: String?
-    var slug: String?
-    var overviews: [String: String]?
-    var translations: [String: String]?
-    var remoteIDs: [RemoteID]?
-    var thumbnail: String?
+    internal let objectID: String?
+    internal let aliases: [String]?
+    internal let country: String?
+    internal let director: String?
+    internal let extendedTitle: String?
+    internal let genres: [String]?
+    internal let studios: [String]?
+    internal let id: String?
+    internal let imageUrl: String?
+    internal let name: String?
+    internal let firstAirTime: String?
+    internal let overview: String?
+    internal let primaryLanguage: String?
+    internal let primaryType: String?
+    internal let status: String?
+    internal let type: String?
+    internal let tvdbID: String?
+    internal let year: String?
+    internal let slug: String?
+    internal let overviews: [String: String]?
+    internal let translations: [String: String]?
+    internal let remoteIDs: [RemoteID]?
+    internal let thumbnail: String?
     
     internal enum CodingKeys: String, CodingKey {
         case objectID = "objectID"
@@ -68,7 +68,7 @@ internal struct Details: Codable {
 
 internal struct RemoteID: Codable {
     
-    var id: String?
-    var type: Int?
-    var sourceName: String?
+    internal let id: String?
+    internal let type: Int?
+    internal let sourceName: String?
 }
