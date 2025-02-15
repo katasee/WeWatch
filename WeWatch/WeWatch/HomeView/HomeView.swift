@@ -29,9 +29,8 @@ internal struct HomeView: View {
                         )
                     }
                 }
-                .onAppear {
-                    viewModel.prepareDataTodaySelection()
-                    viewModel.prepareDataDiscovery()
+                .task {
+                    await viewModel.dataForTodaySelection()
                 }
                 .padding(16)
             }

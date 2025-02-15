@@ -14,8 +14,7 @@ internal struct DetailsView: View {
     internal var body: some View {
         ZStack {
             NavigationBarButtons(
-                action: {_ in },
-                movie: viewModel.dataForDetailsView
+                movie: viewModel.dataForDetailsView, action: {_ in }
             )
             ScrollView {
                 VStack {

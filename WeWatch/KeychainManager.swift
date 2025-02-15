@@ -11,6 +11,10 @@ internal final class KeychainManager {
         case unexpectedDataFormat
     }
     
+    internal enum KeychainKey {
+        static let token: String = "token"
+    }
+    
     internal static func store(
         data: String,
         key: String

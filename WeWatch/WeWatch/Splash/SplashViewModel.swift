@@ -14,11 +14,7 @@ internal final class SplashViewModel: ObservableObject {
         case invalidExpirationClaim
         case dataError
     }
-    
-    internal enum KeychainKey {
-        static let token: String = "token"
-    }
-    
+
     internal enum JWTClaim {
         static let expiration = "exp"
     }
@@ -38,7 +34,8 @@ internal final class SplashViewModel: ObservableObject {
             }
             let loginResource: Resource<LoginResponse> = .init(
                 url: URL.loginURL,
-                method: .post(loginData)
+                method: .post(loginData),
+                token: nil
             )
             do {
                 let response: LoginResponse = try await Webservice().call(loginResource)
@@ -60,7 +57,7 @@ internal final class SplashViewModel: ObservableObject {
     }
     
     internal func decodingJwtToken() throws -> [String: Any] {
-        let tokenData: Data? = try KeychainManager.getData(key: KeychainKey.token)
+        let tokenData: Data? = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData ?? Data(), as: UTF8.self)
         let jwtDecoder: JWTDecoder = .init()
         let decodeToken: [String: Any] = try jwtDecoder.decode(jwtoken: token)

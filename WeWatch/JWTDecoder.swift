@@ -56,4 +56,3 @@ internal final class JWTDecoder {
         }
     }
 }
-

@@ -9,26 +9,29 @@ import SwiftUI
 
 internal struct TodaysSelectionSectionView: View {
     
-    private let data: Array<TodaySelectionPreviewModel>
-    private let chooseButtonAction: @MainActor (TodaySelectionPreviewModel) -> Void
+    private let data: [Movie]
+    private let chooseButtonAction: @MainActor (Movie) -> Void
     
     internal init(
-        data: Array<TodaySelectionPreviewModel>,
-        chooseButtonAction: @escaping @MainActor (TodaySelectionPreviewModel) -> Void
+        data: [Movie],
+        chooseButtonAction: @escaping @MainActor (Movie) -> Void
     ) {
         self.data = data
         self.chooseButtonAction = chooseButtonAction
     }
     
     internal var body: some View {
-        VStack {
-            HStack {
-                title
-                Spacer()
-            }
-            ScrollView(.horizontal, showsIndicators: true) {
-                HStack(spacing: 20) {
-                    movieCardButton
+        ZStack {
+            Color.black
+            VStack {
+                HStack {
+                    title
+                    Spacer()
+                }
+                ScrollView(.horizontal, showsIndicators: true) {
+                    HStack(spacing: 20) {
+                        movieCardButton
+                    }
                 }
             }
         }
@@ -52,18 +55,11 @@ internal struct TodaysSelectionSectionView: View {
                     MovieCardTopFive(
                         title: model.title,
                         ranking: Double(model.rating),
-                        image: model.image,
+                        image: URL(string: model.posterUrl),
                         didTap: { isActive in }
                     )
                 }
             }
         }
     }
-}
-
-#Preview {
-    TodaysSelectionSectionView(
-        data: TodaySelectionPreviewModel.mock(),
-        chooseButtonAction: { isActive in }
-    )
 }

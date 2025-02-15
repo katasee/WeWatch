@@ -36,6 +36,9 @@ internal struct MovieCardTopFive: View {
                             image in
                             image
                                 .image?.resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(maxWidth: 300, maxHeight: 200)
+                                .clipped()
                         }
                         Button {
                             isActive.toggle()
@@ -50,7 +53,6 @@ internal struct MovieCardTopFive: View {
                         .padding(16)
                     }
                     .cornerRadius(15)
-                    .frame(maxWidth: 300, maxHeight: 200)
                     .background(RoundedRectangle(cornerRadius: 15)
                         .fill(Color.darkGreyColor))
                 }
@@ -61,6 +63,9 @@ internal struct MovieCardTopFive: View {
                 RatingView(ranking: ranking)
             }
         }
+        .frame(width: 300)
+        .fixedSize(horizontal: true, vertical: false)
+        .lineLimit(1)
     }
     
     private var filmRanking: some View {
@@ -73,17 +78,5 @@ internal struct MovieCardTopFive: View {
         Text(title)
             .font(.poppinsBold20px)
             .foregroundColor(.whiteColor)
-    }
-}
-
-#Preview {
-    ZStack {
-        Color.black.ignoresSafeArea();
-        MovieCardTopFive(
-            title: "Hitman’s Wife’s Bodyguard",
-            ranking: 3.5,
-            image: URL(string: "https://miro.medium.com/v2/resize:fit:4800/format:webp/1*39M4XbHXCTfBenNNqLLyLA@2x.jpeg"),
-            didTap: { isActive in }
-        )
     }
 }

@@ -9,8 +9,8 @@ import Foundation
 
 internal struct Movie: Identifiable, Sendable {
     
-    internal var id: Int { movieId }
-    internal var movieId: Int
+    internal var id: String { movieId }
+    internal var movieId: String
     internal var title: String
     internal var overview: String
     internal var releaseDate: String
@@ -18,7 +18,7 @@ internal struct Movie: Identifiable, Sendable {
     internal var posterUrl: String
     
     internal init(
-        movieId: Int,
+        movieId: String,
         title: String,
         overview: String,
         releaseDate: String,

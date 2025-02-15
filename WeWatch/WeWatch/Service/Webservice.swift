@@ -13,6 +13,8 @@ enum AuthenticationError: Error {
     case invalidResponse
     case decodingError
     case custom(errorMessage: String)
+    case invalidURL
+    case invalidStatusCode
 }
 
 internal struct LoginRequestBody: Encodable {
@@ -51,18 +53,18 @@ internal struct Resource<T: Codable> {
     
     internal let url: URL
     internal var method: HttpMethod = .get([])
+    internal let token: String?
 }
 
 internal final class Webservice {
     
     internal func call <T: Codable>(_ resource: Resource<T>) async throws -> T {
         var request: URLRequest = URLRequest(url: resource.url)
-        
         switch resource.method {
         case .post(let data):
             request.httpMethod = resource.method.name
             request.httpBody = data
-
+            
         case .get(let queryItems):
             var components: URLComponents? = URLComponents(
                 url: resource.url,
@@ -79,13 +81,16 @@ internal final class Webservice {
         configuration.httpAdditionalHeaders = ["Content-Type": "application/json"]
         let session: URLSession = URLSession(configuration: configuration)
         
+        if let token = resource.token {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
         let (data, response) = try await session.data(for: request)
-        guard let httpResponse: HTTPURLResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200
-        else {
+        guard let response: HTTPURLResponse = response as? HTTPURLResponse else {
             throw AuthenticationError.invalidResponse
         }
-        
+        guard response.statusCode == 200 else {
+            throw AuthenticationError.invalidStatusCode
+        }
         guard let result = try? JSONDecoder().decode(T.self, from: data) else {
             throw AuthenticationError.decodingError
         }
@@ -96,5 +101,9 @@ internal final class Webservice {
 extension URL {
     static var loginURL: URL {
         return URL(string: "https://api4.thetvdb.com/v4/login")!
+    }
+    
+    static var SearchResponseURL: URL {
+        return URL(string: "https://api4.thetvdb.com/v4/search")!
     }
 }

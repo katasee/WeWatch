@@ -12,7 +12,7 @@ internal struct WeWatchApp: App {
     
     internal var body: some Scene {
         WindowGroup {
-            TabBar()
+            SplashView()
         }
     }
 }
