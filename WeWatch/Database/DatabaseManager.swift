@@ -32,6 +32,7 @@ internal final class DatabaseManager {
             try createMovieTable()
         } catch {
             print("Error creating table: \(error)")
+#warning("Handle error later")
         }
     }
     
@@ -87,12 +88,6 @@ internal final class DatabaseManager {
         rating: Int,
         posterUrl: String
     ) throws {
-        let movies: [Movie] = try getAllMovies()
-        for movie in movies {
-            while movie.movieId == movieId  {
-                throw DatabaseError.dublicateError
-            }
-        }
         let insertStatementString: String = "INSERT INTO Movie (movieId, title, overview, releaseDate, rating, posterUrl) VALUES (?, ?, ?, ?, ?, ?);"
         var insertStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
@@ -105,7 +100,6 @@ internal final class DatabaseManager {
             if sqlite3_step(insertStatement) == SQLITE_DONE {
                 sqlite3_finalize(insertStatement)
             } else {
-                let errorMessage = String(cString: sqlite3_errmsg(db))
                 throw DatabaseError.movieNotAdd
             }
         } else {
@@ -192,6 +186,7 @@ internal final class DatabaseManager {
             print("Database connection closed successfully.")
         } else {
             print("Error closing database connection.")
+#warning("Handle error later")
         }
     }
 }

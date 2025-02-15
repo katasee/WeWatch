@@ -8,82 +8,78 @@
 import Foundation
 
 internal final class HomeViewModel: ObservableObject {
+    
     internal let dbManager: DatabaseManager = .shared
     @Published internal var dataForTodaysSelectionSectionView: Array<Movie> = []
     @Published internal var dataForDiscoveryPreviewModel: Array<MovieCardPreviewModel> = []
     private var errorMessage: String?
-
-    internal enum KeychainKey {
-        static let token: String = "token"
-    }
     
-    fileprivate enum vieModelError: Error {
+    fileprivate enum HomeViewModelError: Error {
         case invalidUnwrapping
         case invalidDataFromEndpoint
+        case tokenDecodingError
+        case insufficientData
     }
-
-    internal func prepareDataTodaySelection(query: String) async throws -> [Movie] {
-        let tokenData: Data? = try KeychainManager.getData(key: KeychainKey.token)
-               let token: String = .init(decoding: tokenData ?? Data(), as: UTF8.self)
-         let searchResource: Resource<HomeViewEndpoint> = .init(
-            url: URL.homeViewEndpointURL,
+    
+    internal func prepareDataTodaySelection(query: String) async throws -> Array<Movie> {
+        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
+        let token: String = .init(decoding: tokenData, as: UTF8.self)
+        let searchResource: Resource<SearchResponse> = .init(
+            url: URL.SearchResponseURL,
             method: .get([.init(name: "query", value: "\(query)")]),
             token: token
         )
-        var thereIsDateInDatabase: Bool = true
-        do {
-            var response: HomeViewEndpoint = try await Webservice().call(searchResource)
-            while (response.data?.count ?? 0) < 10 {
-                response = try await Webservice().call(searchResource)
-            }
-            let movieForUI: [Movie]? = try response.data?.prefix(10).compactMap { details in
-                if let movieId: String = details.id,
-                   let title: String = details.name,
-                   let overview: String = details.overview,
-                   let releaseDate: String = details.year,
-                   let posterUrl: String = details.imageUrl
-                {
-                    if thereIsDateInDatabase == true {
-                        try dbManager.deleteMovie(by: movieId)
-                        thereIsDateInDatabase = false
-                    }
-                    try dbManager.insertMovie(
-                        movieId: movieId,
-                        title: title,
-                        overview: overview,
-                        releaseDate: releaseDate,
-                        rating: 3,
-                        posterUrl: posterUrl
-                    )
-                    return Movie(
-                        movieId: movieId,
-                        title: title,
-                        overview: overview,
-                        releaseDate: releaseDate,
-                        rating: 3,
-                        posterUrl: posterUrl
-                    )
-                } else {
+        var response: SearchResponse = try await Webservice().call(searchResource)
+        var attempts: Int = 0
+        let maxAttempts: Int = 5
+        while (response.data?.count ?? 0) < 10  && attempts < maxAttempts {
+            response = try await Webservice().call(searchResource)
+            print(response)
+            attempts += 1
+            print(attempts)
+        }
+        if (response.data?.count ?? 0) < 10 {
+            throw HomeViewModelError.insufficientData
+        }
+        let moviesForUI: Array<Movie> = response.data?
+            .prefix(10)
+            .compactMap { details in
+                guard let movieId = details.id,
+                      let title = details.name,
+                      let overview = details.overview,
+                      let releaseDate = details.year,
+                      let posterUrl = details.imageUrl else {
                     return nil
                 }
-            }
-            guard let todaySelectionData: [Movie] = movieForUI else {
-                throw vieModelError.invalidUnwrapping
-            }
-            await MainActor.run { [weak self] in
-                self?.dataForTodaysSelectionSectionView = todaySelectionData
-            }
-        } catch {
-            throw vieModelError.invalidDataFromEndpoint
+                return .init(
+                    movieId: movieId,
+                    title: title,
+                    overview: overview,
+                    releaseDate: releaseDate,
+                    rating: 3,
+                    posterUrl: posterUrl
+                )
+            } ?? .init()
+        print(moviesForUI)
+        for movie in moviesForUI {
+            try dbManager.insertMovie(
+                movieId: movie.movieId,
+                title: movie.title,
+                overview: movie.overview,
+                releaseDate: movie.releaseDate,
+                rating: movie.rating,
+                posterUrl: movie.posterUrl
+            )
         }
+        print(dataForTodaysSelectionSectionView)
         return dataForTodaysSelectionSectionView
     }
     
     internal func dateFromEndpoint() async throws {
-        do {
-            try await prepareDataTodaySelection(query: randomData())
-        } catch {
-            print(error)
+        let todaySelectionData = try await prepareDataTodaySelection(query: randomData())
+        print(todaySelectionData)
+        await MainActor.run { [weak self] in
+            self?.dataForTodaysSelectionSectionView = todaySelectionData
         }
     }
     
@@ -94,18 +90,18 @@ internal final class HomeViewModel: ObservableObject {
     }
     
     internal func hasDateChanged() -> Bool {
-        let currentDateString = DateFormatter.localizedString(
+        let currentDateString: String = DateFormatter.localizedString(
             from: Date(),
             dateStyle: .short,
             timeStyle: .none
         )
-        let lastDate = UserDefaults.standard.string(forKey: "cachedDateString")
-        guard lastDate != currentDateString else { return false }
+        let lastDate: String? = UserDefaults.standard.string(forKey: "cachedDateString")
+        guard "10/02/2024" != currentDateString else { return false }
         UserDefaults.standard.setValue(currentDateString, forKey: "cachedDateString")
         return true
     }
     
-    internal func dateCheck() async throws {
+    internal func dataForTodaySelection() async {
         do {
             if hasDateChanged() {
                 try await dateFromEndpoint()
@@ -114,6 +110,7 @@ internal final class HomeViewModel: ObservableObject {
             }
         } catch {
             print(error)
+#warning("Handle error later")
         }
     }
     

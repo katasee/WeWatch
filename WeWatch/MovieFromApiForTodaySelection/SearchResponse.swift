@@ -1,5 +1,5 @@
 //
-//  HomeViewEndpoint.swift
+//  SearchResponse.swift
 //  WeWatch
 //
 //  Created by Anton on 01/02/2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct HomeViewEndpoint: Codable {
+internal struct SearchResponse: Codable {
     
     var status: String?
     var data: [Details]?

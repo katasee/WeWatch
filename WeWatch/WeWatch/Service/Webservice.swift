@@ -91,8 +91,6 @@ internal final class Webservice {
         guard response.statusCode == 200 else {
             throw AuthenticationError.invalidStatusCode
         }
-        
-        
         guard let result = try? JSONDecoder().decode(T.self, from: data) else {
             throw AuthenticationError.decodingError
         }
@@ -105,7 +103,7 @@ extension URL {
         return URL(string: "https://api4.thetvdb.com/v4/login")!
     }
     
-    static var homeViewEndpointURL: URL {
+    static var SearchResponseURL: URL {
         return URL(string: "https://api4.thetvdb.com/v4/search")!
     }
 }

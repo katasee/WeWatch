@@ -29,9 +29,12 @@ internal struct HomeView: View {
                         )
                     }
                 }
-                .onAppear{
-                    Task{
-                        try await viewModel.dateCheck()
+                .task {
+                    do {
+                        try await viewModel.dateFromEndpoint()
+                    } catch {
+                        print(error)
+#warning("Handle error later")
                     }
                 }
                 .padding(16)
