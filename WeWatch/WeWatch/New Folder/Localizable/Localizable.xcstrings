@@ -30,6 +30,9 @@
         }
       }
     },
+    "Discover" : {
+
+    },
     "home.see.more.button.title" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -34,9 +34,9 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		6E8F774E2D4E973F00E2CEDF /* MovieFromApiForTodaySelection */ = {
+		6E8F774E2D4E973F00E2CEDF /* Response */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MovieFromApiForTodaySelection;
+			path = Response;
 			sourceTree = "<group>";
 		};
 		6EB5E7892D2DB16F008508B6 /* Database */ = {
@@ -77,7 +77,7 @@
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
 				6ECE93CB2CF10C8300852DDD /* Products */,
 				6EB5E7892D2DB16F008508B6 /* Database */,
-				6E8F774E2D4E973F00E2CEDF /* MovieFromApiForTodaySelection */,
+				6E8F774E2D4E973F00E2CEDF /* Response */,
 			);
 			sourceTree = "<group>";
 		};
@@ -105,7 +105,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				6E8F774E2D4E973F00E2CEDF /* MovieFromApiForTodaySelection */,
+				6E8F774E2D4E973F00E2CEDF /* Response */,
 				6EB5E7892D2DB16F008508B6 /* Database */,
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
 			);

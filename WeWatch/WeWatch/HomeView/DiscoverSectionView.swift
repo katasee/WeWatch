@@ -44,11 +44,15 @@ internal struct DiscoverSectionView: View {
     }
     
     private var seeMoreButton: some View {
-        Button("home.see.more.button.title") {
-            seeMoreButtonAction()
+        Button() {
+            
+        } label: {
+            NavigationLink(destination: DiscoveryView()) {
+                Text("home.see.more.button.title")
+                    .font(.poppinsRegular16px)
+                    .foregroundColor(.fieryRed)
+            }
         }
-        .font(.poppinsRegular16px)
-        .foregroundColor(.fieryRed)
     }
     
     private var movieCardButton: some View {

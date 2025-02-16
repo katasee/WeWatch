@@ -1,13 +1,13 @@
 //
-//  TodaySelectionPreviewModel.swift
+//  DiscoveryPreviewModel.swift
 //  WeWatch
 //
-//  Created by Anton on 19/01/2025.
+//  Created by Anton on 16/02/2025.
 //
 
 import Foundation
 
-internal struct TodaySelectionPreviewModel: Identifiable, Sendable {
+internal struct DiscoveryPreviewModel: Identifiable, Sendable {
     
     internal var id: Int
     internal var title: String
@@ -19,7 +19,7 @@ internal struct TodaySelectionPreviewModel: Identifiable, Sendable {
         title: String,
         rating: Double,
         image: URL?
-    ) {
+) {
         self.id = id
         self.title = title
         self.rating = rating
