@@ -12,7 +12,7 @@ internal final class SearchViewModel: ObservableObject {
     @Published internal var setOfGenres: Array<Genre> = []
     @Published internal var dataForSearchView: Array<MovieCardPreviewModel> = []
     @Published internal var searchText: String = ""
-    @Published internal var selectedGenre: Genre = .init(title: "")
+    @Published internal var selectedGenre: Genre = .init(title: "All")
     
     internal func prepareDataSearchView() {
         dataForSearchView = MovieCardPreviewModel.mock()

@@ -119,13 +119,16 @@ internal final class DatabaseManager {
                 let releaseDate: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 3)))
                 let rating: Int32 = sqlite3_column_int(queryStatement, 4)
                 let posterUrl: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 5)))
+                let genres: [String] = [String](arrayLiteral: String(cString: sqlite3_column_text(queryStatement, 5)))
+
                 movies.append(Movie(
                     movieId: String(movieId),
                     title: title,
                     overview: overview,
                     releaseDate: releaseDate,
                     rating: Int(rating),
-                    posterUrl: posterUrl
+                    posterUrl: posterUrl,
+                    genres: genres
                 ))
             }
         } else {

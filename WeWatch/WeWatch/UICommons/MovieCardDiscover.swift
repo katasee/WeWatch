@@ -9,18 +9,24 @@ import SwiftUI
 
 internal struct MovieCardDiscover: View {
     
+    @State private var isActive: Bool
     private let title: String
     private let ranking: Double
     private let imageUrl: URL?
+    private var didTap: @MainActor (Bool) -> Void
 
     internal init(
+        isActive: Bool,
         title: String,
         ranking: Double,
-        imageUrl: URL?
+        imageUrl: URL?,
+        didTap: @escaping @MainActor (Bool) -> Void
     ) {
+        self.isActive = isActive
         self.title = title
         self.ranking = ranking
         self.imageUrl = imageUrl
+        self.didTap = didTap
     }
     
     internal var body: some View {
@@ -28,8 +34,17 @@ internal struct MovieCardDiscover: View {
             ZStack(alignment: .topTrailing) {
                 filmImage
                 Spacer()
-                Bookmark()
-                    .padding(16)
+                Button {
+                    isActive.toggle()
+                    didTap(isActive)
+                } label: {
+                    if isActive == true {
+                        Bookmark(isActive: true)
+                    } else {
+                        Bookmark(isActive: false)
+                    }
+                }
+                .padding(16)
             }
             Text(title)
                 .font(.poppinsBold18px)
@@ -61,13 +76,13 @@ internal struct MovieCardDiscover: View {
             )
     }
 }
-
-#Preview {
-    ZStack {
-        Color.black.ignoresSafeArea()
-        MovieCardDiscover(
-            title: "Hitman’s Wife’s Bodyguard",
-            ranking: 3.5, imageUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")
-        )
-    }
-}
+//
+//#Preview {
+//    ZStack {
+//        Color.black.ignoresSafeArea()
+//        MovieCardDiscover(
+//            title: "Hitman’s Wife’s Bodyguard",
+//            ranking: 3.5, imageUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")
+//        )
+//    }
+//}

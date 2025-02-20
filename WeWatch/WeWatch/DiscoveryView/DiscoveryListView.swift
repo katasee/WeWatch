@@ -9,20 +9,23 @@ import SwiftUI
 
 internal struct DiscoveryListView: View {
     
-    private let data: Array<DiscoveryPreviewModel>
-    private let chooseButtonAction: @MainActor (DiscoveryPreviewModel) -> Void
+    private let dataForAllMovies: Array<MovieForDiscoveryView>
+    private let dataForFilteredMovies: Array<Movie>
+    private let chooseButtonAction: @MainActor (MovieForDiscoveryView) -> Void
     private let selectedGenre: Genre
     private let setOfGenre: Array<Genre>
     private let selectGenreAction: (Genre) -> Void
     
     internal init(
-        data: Array<DiscoveryPreviewModel>,
-        chooseButtonAction: @escaping @MainActor (DiscoveryPreviewModel) -> Void,
+        data: Array<MovieForDiscoveryView>,
+        secondData: Array<Movie>,
+        chooseButtonAction: @escaping @MainActor (MovieForDiscoveryView) -> Void,
         selectedGenre: Genre,
         setOfGenre: Array<Genre>,
         selectGenreAction: @escaping (Genre) -> Void
     ) {
-        self.data = data
+        self.dataForAllMovies = data
+        self.dataForFilteredMovies = secondData
         self.chooseButtonAction = chooseButtonAction
         self.selectedGenre = selectedGenre
         self.setOfGenre = setOfGenre
@@ -36,13 +39,17 @@ internal struct DiscoveryListView: View {
             VStack(alignment: .leading) {
                 VStack(spacing: 20) {
                     categoryTabBar
-                    movies
+                    ScrollView {
+                        if selectedGenre.title.starts(with: "All") {
+                            allMovie
+                        } else {
+                            anotherTabs
+                        }
+                    }
                 }
             }
         }
     }
-    
- 
     
     private var categoryTabBar: some View {
         MovieCategoryView(genreTabs: Array(setOfGenre),
@@ -53,32 +60,42 @@ internal struct DiscoveryListView: View {
         )
     }
     
-    private var movies: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-                ForEach(data) { model in
-                    Button {
-                        chooseButtonAction(model)
-                    } label: {
-                        NavigationLink(destination: DetailsView()) {
-                            MovieCardDiscover(title: model.title, ranking: model.rating, imageUrl: model.image)
-                        }
+    private var allMovie: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+            ForEach(dataForAllMovies) { model in
+                Button {
+                    chooseButtonAction(model)
+                } label: {
+                    NavigationLink(destination: DetailsView()) {
+                        MovieCardDiscover(
+                            isActive: false,
+                            title: model.title,
+                            ranking: Double(model.rating),
+                            imageUrl:URL(string: "https://artworks.thetvdb.com" + model.image),
+                            didTap: { isActive in }
+                        )
                     }
                 }
             }
         }
     }
-}
-
-#Preview {
-    DiscoveryListView(data: [
-        DiscoveryPreviewModel(id: 1, title: "Inception", rating: 8.8, image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")),
-        DiscoveryPreviewModel(id: 2, title: "Inception", rating: 8.8, image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")),
-        DiscoveryPreviewModel(id: 3, title: "Inception", rating: 8.8, image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")),
-        DiscoveryPreviewModel(id: 4, title: "Inception", rating: 8.8, image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")),
-        DiscoveryPreviewModel(id: 5, title: "Inception", rating: 8.8, image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")),
-        DiscoveryPreviewModel(id: 6, title: "Inception", rating: 8.8, image: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")),
-        
-    ],
-                      chooseButtonAction: { _ in }, selectedGenre: Genre(title: "Comedy"), setOfGenre: [ Genre(title: "Comedy"), Genre(title: "Horror"), Genre(title: "Action")],  selectGenreAction: { _ in } )
+    
+    private var anotherTabs: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+            ForEach(dataForFilteredMovies) { model in
+                Button {
+                } label: {
+                    NavigationLink(destination: DetailsView()) {
+                        MovieCardDiscover(
+                            isActive: false,
+                            title: model.title,
+                            ranking: Double(model.rating),
+                            imageUrl: URL(string: model.posterUrl),
+                            didTap: { isActive in }
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

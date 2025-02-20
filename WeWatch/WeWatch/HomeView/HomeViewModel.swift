@@ -12,12 +12,8 @@ internal final class HomeViewModel: ObservableObject {
     private let dbManager: DatabaseManager = .shared
     @Published internal var dataForTodaysSelectionSectionView: Array<Movie> = []
     @Published internal var dataForDiscoveryPreviewModel: Array<MovieCardPreviewModel> = []
-    private var errorMessage: String?
     
     fileprivate enum HomeViewModelError: Error {
-        case invalidUnwrapping
-        case invalidDataFromEndpoint
-        case tokenDecodingError
         case insufficientData
     }
     
@@ -46,7 +42,8 @@ internal final class HomeViewModel: ObservableObject {
                       let title = details.name,
                       let overview = details.overview,
                       let releaseDate = details.year,
-                      let posterUrl = details.imageUrl else {
+                      let posterUrl = details.imageUrl,
+                      let genres = details.genres else {
                     return nil
                 }
                 return .init(
@@ -55,7 +52,8 @@ internal final class HomeViewModel: ObservableObject {
                     overview: overview,
                     releaseDate: releaseDate,
                     rating: 3,
-                    posterUrl: posterUrl
+                    posterUrl: posterUrl,
+                    genres: genres
                 )
             } ?? .init()
         for movie in moviesForUI {
