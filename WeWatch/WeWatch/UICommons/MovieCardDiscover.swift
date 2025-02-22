@@ -48,6 +48,7 @@ internal struct MovieCardDiscover: View {
             }
             Text(title)
                 .font(.poppinsBold18px)
+                .lineLimit(1)
             HStack {
                 filmRanking
                 Image("star-full-icon")

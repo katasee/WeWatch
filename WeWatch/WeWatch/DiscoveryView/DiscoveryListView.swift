@@ -37,16 +37,12 @@ internal struct DiscoveryListView: View {
             Color.blackColor
                 .ignoresSafeArea()
             VStack(alignment: .leading) {
-                VStack(spacing: 20) {
                     categoryTabBar
-                    ScrollView {
                         if selectedGenre.title.starts(with: "All") {
                             allMovie
                         } else {
                             anotherTabs
                         }
-                    }
-                }
             }
         }
     }

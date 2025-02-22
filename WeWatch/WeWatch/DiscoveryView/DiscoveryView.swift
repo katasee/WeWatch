@@ -16,21 +16,31 @@ internal struct DiscoveryView: View {
             BackButton()
             Color.black
                 .ignoresSafeArea()
-            DiscoveryListView(
-                data: viewModel.dataForAllMovieTab, secondData: viewModel.dataForFilteredMovies,
-                chooseButtonAction: { isActive in },
-                selectedGenre: viewModel.selectedGenre,
-                setOfGenre: viewModel.genresForDiscoveryView,
-                selectGenreAction: { genre in viewModel.selectedGenre = genre }
-            )
+            ScrollView {
+                LazyVStack {
+                    DiscoveryListView(
+                        data: viewModel.dataForAllMovieTab, secondData: viewModel.dataForFilteredMovies,
+                        chooseButtonAction: { isActive in },
+                        selectedGenre: viewModel.selectedGenre,
+                        setOfGenre: viewModel.genresForDiscoveryView,
+                        selectGenreAction: { genre in viewModel.selectedGenre = genre }
+                    )
+                    Rectangle()
+                        .frame(minHeight: 1)
+                        .foregroundColor(Color.clear)
+                        .onAppear { viewModel.isFirstTimeLoad = false
+                            Task { viewModel.hasReachedEnd()}
+                        }
+                }
+            }
             .onChange(of: viewModel.selectedGenre) { change in Task {
+                viewModel.currentPage = 0
                 await viewModel.prepeareDataForFilteredMovies()
             }
             }
         }
         .task {
             await viewModel.prepeareGenreForDiscoveryView()
-            await viewModel.prepeareDataForAllMovies()
         }
     }
 }

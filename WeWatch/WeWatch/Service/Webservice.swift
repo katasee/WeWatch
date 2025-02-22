@@ -60,7 +60,6 @@ internal final class Webservice {
     
     internal func call <T: Codable>(_ resource: Resource<T>) async throws -> T {
         var request: URLRequest = URLRequest(url: resource.url)
-        print(request)
         switch resource.method {
         case .post(let data):
             request.httpMethod = resource.method.name
@@ -91,7 +90,6 @@ internal final class Webservice {
         guard let response: HTTPURLResponse = response as? HTTPURLResponse else {
             throw AuthenticationError.invalidResponse
         }
-        print(response.statusCode)
         guard response.statusCode == 200 else {
             throw AuthenticationError.invalidStatusCode
         }

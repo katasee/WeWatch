@@ -14,12 +14,40 @@ internal final class DiscoveryViewModel: ObservableObject {
     @Published internal var dataForFilteredMovies: Array<Movie> = []
     @Published internal var genresForDiscoveryView: Array<Genre> = []
     @Published internal var selectedGenre: Genre = .init(title: "All")
+    internal var isFirstTimeLoad = true
+    internal var filterMovieIsFirstTimeLoad = true
+    internal var page: String = "0"
+    internal var currentPage: Int = 0
+    internal var currentPageForFilterMovie: Int = 0
+    internal var isBackEndDateEmpty: Bool = false
     
-    fileprivate enum HomeViewModelError: Error {
-        case insufficientData
+    
+    internal func hasReachedEnd() -> Bool {
+        if isFirstTimeLoad == false {
+            Task {
+                do {
+                    let discoveryMovieData: [MovieForDiscoveryView] = try await prepareDataDiscoveryView(page: String(currentPage))
+                    let filterMovie: [Movie] = try await prepareDataForDiscoverySelection(genre: filterGenres(), page: String(currentPage))
+                    currentPage += 1
+                    if discoveryMovieData.isEmpty {
+                        isBackEndDateEmpty = true
+                    } else {
+                        isBackEndDateEmpty = false
+                        await MainActor.run { [weak self] in
+                            self?.dataForAllMovieTab.append(contentsOf:  discoveryMovieData)
+                            self?.dataForFilteredMovies.append(contentsOf:  filterMovie)
+                        }
+                    }
+                } catch {
+                    print(error)
+                }
+            }
+            return true
+        } else {
+            return false
+        }
     }
     
-    internal var page: String = "0"
     
     internal func prepareDataDiscoveryView(page: String) async throws -> Array<MovieForDiscoveryView> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
@@ -29,6 +57,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             method: .get([.init(name: "page", value: page)]),
             token: token
         )
+        
         let response: MovieResponse = try await Webservice().call(listsResource)
         
         let moviesForUI: Array<MovieForDiscoveryView> = response.data?
@@ -73,12 +102,16 @@ internal final class DiscoveryViewModel: ObservableObject {
         return genreForUI
     }
     
-    internal func prepareDataForDiscoverySelection(genre: String) async throws -> Array<Movie> {
+    internal func prepareDataForDiscoverySelection(genre: String, page: String) async throws -> Array<Movie> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let searchResource: Resource<SearchResponse> = .init(
             url: URL.SearchResponseURL,
-            method: .get([.init(name: "query", value: genre)]),
+            method: .get([
+                .init(name: "query", value: genre),
+                .init(name: "limit", value: "100"),
+                .init(name: "page", value: page)
+            ]),
             token: token
         )
         var response: SearchResponse = try await Webservice().call(searchResource)
@@ -126,30 +159,30 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func dateFromSearchEndpoint() async throws {
-        let todaySelectionData: [Movie] = try await prepareDataForDiscoverySelection(genre: filterGenres())
+        let todaySelectionData: [Movie] = try await prepareDataForDiscoverySelection(genre: filterGenres(), page: String(currentPage))
         await MainActor.run { [weak self] in
             self?.dataForFilteredMovies = todaySelectionData
         }
     }
     
-    internal func dateFromEndpoint() async throws {
-        let discoveryMovieData: [MovieForDiscoveryView] = try await prepareDataDiscoveryView(page: page)
-        await MainActor.run { [weak self] in
-            self?.dataForAllMovieTab = discoveryMovieData
-        }
-    }
+    //    internal func dateFromEndpoint() async throws {
+    //        let discoveryMovieData: [MovieForDiscoveryView] = try await prepareDataDiscoveryView(page: String(currentPage))
+    //        await MainActor.run { [weak self] in
+    //            self?.dataForAllMovieTab = discoveryMovieData
+    //        }
+    //    }
+    
+    //    internal func prepeareDataForAllMovies() async {
+    //        do {
+    //            try await dateFromEndpoint()
+    //        } catch {
+    //            print(error)
+    //        }
+    //    }
     
     internal func prepeareGenreForDiscoveryView() async {
         do {
             try await genreFromEndpoint()
-        } catch {
-            print(error)
-        }
-    }
-    
-    internal func prepeareDataForAllMovies() async {
-        do {
-            try await dateFromEndpoint()
         } catch {
             print(error)
         }
