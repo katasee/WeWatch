@@ -1,182 +1,182 @@
-////
-////  DatabaseManagerForDiscoveryView.swift
-////  WeWatch
-////
-////  Created by Anton on 17/02/2025.
-////
 //
-//import Foundation
-//import SQLite3
+//  DatabaseManagerForDiscoveryView.swift
+//  WeWatch
 //
-//internal final class DatabaseManagerForDiscoveryView {
-//    
-//    internal static let shared: DatabaseManagerForDiscoveryView = .init()
-//    
-//    internal enum DatabaseError: Error {
-//        
-//        case movieAddError
-//        case movieNotAdd
-//        case dublicateError
-//        case updateError
-//        case notUpdate
-//        case movieTableCreatioFailed
-//        case selectStatementFailed
-//        case movieNotDelete
-//        case movieDeleteNotPrepare
-//    }
-//    
-//    private init() {
-//        db = openDatabase()
-//        do {
-//            try createMovieTable()
-//        } catch {
-//            print("Error creating table: \(error)")
-//#warning("Handle error later")
-//        }
-//    }
-//    
-//    private let dataPath: String = "MyDB"
-//    private var db: OpaquePointer?
-//    
-//    internal func openDatabase() -> OpaquePointer? {
-//        let filePath: URL = try! FileManager.default.url(
-//            for: .documentDirectory,
-//            in: .userDomainMask,
-//            appropriateFor: nil,
-//            create: false
-//        ).appendingPathComponent(dataPath)
-//        var db: OpaquePointer? = nil
-//        
-//        if sqlite3_open(filePath.path, &db) != SQLITE_OK {
-//            return nil
-//        } else {
-//            return db
-//        }
-//    }
-//    
-//    internal func createMovieTable() throws {
-//        let createTableString: String = """
-//        CREATE TABLE IF NOT EXISTS Movie(
-//            movieId TEXT PRIMARY KEY UNIQUE,
-//            title TEXT,
-//            rating INTEGER,
-//            posterUrl TEXT
-//        );
-//"""
-//        
-//        var createTableStatement: OpaquePointer? = nil
-//        if sqlite3_prepare_v2(db, createTableString, -1, &createTableStatement, nil) == SQLITE_OK {
-//            if sqlite3_step(createTableStatement) == SQLITE_DONE {
-//            } else {
-//                throw DatabaseError.movieTableCreatioFailed
-//            }
-//        } else {
-//            throw DatabaseError.movieTableCreatioFailed
-//        }
-//        sqlite3_finalize(createTableStatement)
-//    }
-//    
-//    
-//    internal func insertMovie(
-//        movieId: String,
-//        title: String,
-//        rating: Int,
-//        posterUrl: String
-//    ) throws {
-//        let insertStatementString: String = "INSERT INTO Movie (movieId, title, rating, posterUrl) VALUES (?, ?, ?, ?);"
-//        var insertStatement: OpaquePointer? = nil
-//        if sqlite3_prepare_v2(db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
-//            sqlite3_bind_text(insertStatement, 1, (movieId as NSString).utf8String, -1, nil)
-//            sqlite3_bind_text(insertStatement, 2, (title as NSString).utf8String, -1, nil)
-//            sqlite3_bind_int(insertStatement, 3, Int32(rating))
-//            sqlite3_bind_text(insertStatement, 4, (posterUrl as NSString).utf8String, -1, nil)
-//            if sqlite3_step(insertStatement) == SQLITE_DONE {
-//                sqlite3_finalize(insertStatement)
-//            } else {
-//                throw DatabaseError.movieNotAdd
-//            }
-//        } else {
-//            throw DatabaseError.movieAddError
-//        }
-//    }
-//    
-//    internal func getAllMovies() throws -> Array<MovieForDiscoveryView> {
-//        let queryStatementString: String = "SELECT * FROM Movie;"
-//        var queryStatement: OpaquePointer? = nil
-//        var movies: [MovieForDiscoveryView] = []
-//        if sqlite3_prepare_v2(db, queryStatementString, -1, &queryStatement, nil) == SQLITE_OK {
-//            while sqlite3_step(queryStatement) == SQLITE_ROW {
-//                let movieId: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 0)))
-//                let title: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 1)))
-//                let rating: Int32 = sqlite3_column_int(queryStatement, 2)
-//                let posterUrl: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 3)))
-//                movies.append(MovieForDiscoveryView(
-//                    id: String(movieId),
-//                    title: title,
-//                    rating: Int(rating),
-//                    image: posterUrl
-//                ))
-//            }
-//        } else {
-//            throw DatabaseError.selectStatementFailed
-//        }
-//        sqlite3_finalize(queryStatement)
-//        return movies
-//    }
-//    
-//    internal func updateMovie(
-//        movieId: String,
-//        title: String,
-//        overview: String,
-//        releaseDate: String,
-//        rating: Int,
-//        posterUrl: String
-//    ) throws {
-//        let updateStatementString: String = "UPDATE Movie SET title = ?, rating = ?, posterUrl = ? WHERE movieId = ?;"
-//        var updateStatement: OpaquePointer? = nil
-//        if sqlite3_prepare_v2(db, updateStatementString, -1, &updateStatement, nil) == SQLITE_OK {
-//            sqlite3_bind_text(updateStatement, 1, (title as NSString).utf8String, -1, nil)
-//            sqlite3_bind_int(updateStatement, 2, Int32(rating))
-//            sqlite3_bind_text(updateStatement, 3, (posterUrl as NSString).utf8String, -1, nil)
-//            sqlite3_bind_text(updateStatement, 4, (movieId as NSString).utf8String, -1, nil)
-//            if sqlite3_step(updateStatement) == SQLITE_DONE {
-//                sqlite3_finalize(updateStatement)
-//            } else {
-//                throw DatabaseError.notUpdate
-//            }
-//        } else {
-//            throw DatabaseError.updateError
-//        }
-//    }
-//    
-//    internal func deleteMovie(by id: String) throws  {
-//        let deleteStatementString: String = "DELETE FROM Movie;"
-//        var deleteStatement: OpaquePointer? = nil
-//        if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
-//            sqlite3_bind_text(deleteStatement, 1, (id as NSString).utf8String, -1, nil)
-//            if sqlite3_step(deleteStatement) == SQLITE_DONE {
-//            } else {
-//                throw DatabaseError.movieNotDelete
-//            }
-//        } else {
-//            throw DatabaseError.movieDeleteNotPrepare
-//        }
-//        sqlite3_finalize(deleteStatement)
-//    }
-//    
-//    deinit {
-//        closeDatabase()
-//    }
-//    
-//    internal func closeDatabase() {
-//        if sqlite3_close(db) == SQLITE_OK {
-//            print("Database connection closed successfully.")
-//        } else {
-//            print("Error closing database connection.")
-//#warning("Handle error later")
-//        }
-//    }
-//}
+//  Created by Anton on 17/02/2025.
 //
-//
-//
+
+import Foundation
+import SQLite3
+
+internal final class DatabaseManagerForDiscoveryView {
+    
+    internal static let shared: DatabaseManagerForDiscoveryView = .init()
+    
+    internal enum DatabaseError: Error {
+        
+        case movieAddError
+        case movieNotAdd
+        case dublicateError
+        case updateError
+        case notUpdate
+        case movieTableCreatioFailed
+        case selectStatementFailed
+        case movieNotDelete
+        case movieDeleteNotPrepare
+    }
+    
+    private init() {
+        db = openDatabase()
+        do {
+            try createMovieTable()
+        } catch {
+            print("Error creating table: \(error)")
+#warning("Handle error later")
+        }
+    }
+    
+    private let dataPath: String = "MyDB"
+    private var db: OpaquePointer?
+    
+    internal func openDatabase() -> OpaquePointer? {
+        let filePath: URL = try! FileManager.default.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        ).appendingPathComponent(dataPath)
+        var db: OpaquePointer? = nil
+        
+        if sqlite3_open(filePath.path, &db) != SQLITE_OK {
+            return nil
+        } else {
+            return db
+        }
+    }
+    
+    internal func createMovieTable() throws {
+        let createTableString: String = """
+        CREATE TABLE IF NOT EXISTS DiscoveryMovie(
+            movieId INTEGER PRIMARY KEY UNIQUE,
+            title TEXT,
+            rating INTEGER,
+            posterUrl TEXT
+        );
+"""
+        
+        var createTableStatement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, createTableString, -1, &createTableStatement, nil) == SQLITE_OK {
+            if sqlite3_step(createTableStatement) == SQLITE_DONE {
+            } else {
+                throw DatabaseError.movieTableCreatioFailed
+            }
+        } else {
+            throw DatabaseError.movieTableCreatioFailed
+        }
+        sqlite3_finalize(createTableStatement)
+    }
+    
+    
+    internal func insertMovie(
+        movieId: Int,
+        title: String,
+        rating: Int,
+        posterUrl: String
+    ) throws {
+        let insertStatementString: String = "INSERT INTO DiscoveryMovie(movieId, title, rating, posterUrl) VALUES (?, ?, ?, ?);"
+        var insertStatement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
+            sqlite3_bind_int(insertStatement, 1, Int32(movieId))
+            sqlite3_bind_text(insertStatement, 2, (title as NSString).utf8String, -1, nil)
+            sqlite3_bind_int(insertStatement, 3, Int32(rating))
+            sqlite3_bind_text(insertStatement, 4, (posterUrl as NSString).utf8String, -1, nil)
+            if sqlite3_step(insertStatement) == SQLITE_DONE {
+                sqlite3_finalize(insertStatement)
+            } else {
+                throw DatabaseError.movieNotAdd
+            }
+        } else {
+            throw DatabaseError.movieAddError
+        }
+    }
+    
+    internal func getAllMovies() throws -> Array<MovieForDiscoveryView> {
+        let queryStatementString: String = "SELECT * FROM DiscoveryMovie;"
+        var queryStatement: OpaquePointer? = nil
+        var movies: [MovieForDiscoveryView] = []
+        if sqlite3_prepare_v2(db, queryStatementString, -1, &queryStatement, nil) == SQLITE_OK {
+            while sqlite3_step(queryStatement) == SQLITE_ROW {
+                let movieId: Int32 = sqlite3_column_int(queryStatement, 0)
+                let title: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 1)))
+                let rating: Int32 = sqlite3_column_int(queryStatement, 2)
+                let posterUrl: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 3)))
+                movies.append(MovieForDiscoveryView(
+                    id: Int(movieId),
+                    title: title,
+                    rating: Int(rating),
+                    image: posterUrl
+                ))
+            }
+        } else {
+            throw DatabaseError.selectStatementFailed
+        }
+        sqlite3_finalize(queryStatement)
+        return movies
+    }
+    
+    internal func updateMovie(
+        movieId: Int,
+        title: String,
+        overview: String,
+        releaseDate: String,
+        rating: Int,
+        posterUrl: String
+    ) throws {
+        let updateStatementString: String = "UPDATE DiscoveryMovie SET title = ?, rating = ?, posterUrl = ? WHERE movieId = ?;"
+        var updateStatement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, updateStatementString, -1, &updateStatement, nil) == SQLITE_OK {
+            sqlite3_bind_text(updateStatement, 1, (title as NSString).utf8String, -1, nil)
+            sqlite3_bind_int(updateStatement, 2, Int32(rating))
+            sqlite3_bind_text(updateStatement, 3, (posterUrl as NSString).utf8String, -1, nil)
+            sqlite3_bind_int(updateStatement, 4, Int32(movieId))
+            if sqlite3_step(updateStatement) == SQLITE_DONE {
+                sqlite3_finalize(updateStatement)
+            } else {
+                throw DatabaseError.notUpdate
+            }
+        } else {
+            throw DatabaseError.updateError
+        }
+    }
+    
+    internal func deleteMovie(by id: String) throws  {
+        let deleteStatementString: String = "DELETE FROM DiscoveryMovie;"
+        var deleteStatement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
+            sqlite3_bind_text(deleteStatement, 1, (id as NSString).utf8String, -1, nil)
+            if sqlite3_step(deleteStatement) == SQLITE_DONE {
+            } else {
+                throw DatabaseError.movieNotDelete
+            }
+        } else {
+            throw DatabaseError.movieDeleteNotPrepare
+        }
+        sqlite3_finalize(deleteStatement)
+    }
+    
+    deinit {
+        closeDatabase()
+    }
+    
+    internal func closeDatabase() {
+        if sqlite3_close(db) == SQLITE_OK {
+            print("Database connection closed successfully.")
+        } else {
+            print("Error closing database connection.")
+#warning("Handle error later")
+        }
+    }
+}
+
+
+

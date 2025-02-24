@@ -29,7 +29,7 @@ internal struct DiscoveryView: View {
                         .frame(minHeight: 1)
                         .foregroundColor(Color.clear)
                         .onAppear { viewModel.isFirstTimeLoad = false
-                            Task { viewModel.hasReachedEnd()}
+                            Task { await viewModel.withDb()}
                         }
                 }
             }

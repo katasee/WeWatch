@@ -26,6 +26,7 @@ internal struct BackButton: View {
                         title
                     }
                 }
+                .toolbarBackground(Color.black)
         }
     }
     
