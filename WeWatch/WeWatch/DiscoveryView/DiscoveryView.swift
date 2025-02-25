@@ -45,9 +45,6 @@ internal struct DiscoveryView: View {
     }
 }
 
-
-
-
 #Preview {
     DiscoveryView()
 }

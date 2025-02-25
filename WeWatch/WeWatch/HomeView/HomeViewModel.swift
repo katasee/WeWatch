@@ -9,7 +9,7 @@ import Foundation
 
 internal final class HomeViewModel: ObservableObject {
     
-    private let dbManager: DatabaseManager = .shared
+    //    private let dbManager: DatabaseManager = .shared
     @Published internal var dataForTodaysSelectionSectionView: Array<Movie> = []
     @Published internal var dataForDiscoveryPreviewModel: Array<MovieCardPreviewModel> = []
     
@@ -42,8 +42,7 @@ internal final class HomeViewModel: ObservableObject {
                       let title = details.name,
                       let overview = details.overview,
                       let releaseDate = details.year,
-                      let posterUrl = details.imageUrl,
-                      let genres = details.genres else {
+                      let posterUrl = details.imageUrl else {
                     return nil
                 }
                 return .init(
@@ -52,19 +51,16 @@ internal final class HomeViewModel: ObservableObject {
                     overview: overview,
                     releaseDate: releaseDate,
                     rating: 3,
-                    posterUrl: posterUrl,
-                    genres: genres
+                    posterUrl: posterUrl
                 )
             } ?? .init()
         for movie in moviesForUI {
-            try dbManager.insertMovie(
-                movieId: movie.movieId,
-                title: movie.title,
-                overview: movie.overview,
-                releaseDate: movie.releaseDate,
-                rating: movie.rating,
-                posterUrl: movie.posterUrl
-            )
+            do {
+                let dbManager = try DatabaseManager(dataBaseName: "myApp.sqlite")
+                try dbManager.createTable(for: TableForHomeView.self)
+                let newMovie = TableForHomeView(id: movie.id, title: movie.title, overview: movie.overview, releaseDate: movie.releaseDate, rating: movie.rating, posterUrl: movie.posterUrl)
+                try dbManager.insert(newMovie)
+            }
         }
         return moviesForUI
     }
@@ -78,7 +74,16 @@ internal final class HomeViewModel: ObservableObject {
     
     internal func dateFromDatabase() async throws {
         try await MainActor.run { [weak self] in
-            self?.dataForTodaysSelectionSectionView = try dbManager.getAllMovies()
+            self?.dataForTodaysSelectionSectionView = try DatabaseManager().fetch(TableForHomeView.self).compactMap { movie in
+                guard let movieId = movie.id else { return nil}
+                return Movie(
+                    movieId: movieId,
+                    title: movie.title,
+                    overview: movie.overview,
+                    releaseDate: movie.releaseDate,
+                    rating: movie.rating,
+                    posterUrl: movie.posterUrl
+                )}
         }
     }
     
