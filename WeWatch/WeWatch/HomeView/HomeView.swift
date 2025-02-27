@@ -23,7 +23,7 @@ internal struct HomeView: View {
                             chooseButtonAction: { isActive in }
                         )
                         DiscoverSectionView(
-                            data: viewModel.dataForDiscoveryPreviewModel,
+                            data: viewModel.dataForDiscoverySectionView,
                             seeMoreButtonAction: {},
                             chooseButtonAction: { isActive in }
                         )
@@ -31,6 +31,11 @@ internal struct HomeView: View {
                 }
                 .task {
                     await viewModel.dataForTodaySelection()
+                    do {
+                        try await viewModel.dateFromEndpointForDiscoverySection()
+                    } catch {
+                        print(error)
+                    }
                 }
                 .padding(16)
             }

@@ -14,13 +14,15 @@ struct TableForHomeView: SQLTable {
     let releaseDate: String
     let rating: Int
     let posterUrl: String
+    let genres: [String]
     init (
         id: String,
         title: String,
         overview: String,
         releaseDate: String,
         rating: Int,
-        posterUrl: String
+        posterUrl: String,
+        genres: [String]
     ) {
         self.id = id
         self.title = title
@@ -28,6 +30,7 @@ struct TableForHomeView: SQLTable {
         self.releaseDate = releaseDate
         self.rating = rating
         self.posterUrl = posterUrl
+        self.genres = genres
     }
     
     public static var tableName: String { "MovieForHomeView" }
@@ -40,7 +43,8 @@ struct TableForHomeView: SQLTable {
                     overview TEXT,
                     releaseDate TEXT,
                     rating INTEGER,
-                    posterUrl TEXT
+                    posterUrl TEXT,
+                    genres TEXT
                 );
         """
     }
@@ -51,7 +55,8 @@ struct TableForHomeView: SQLTable {
               let overview = row["overview"] as? String,
               let releaseDate = row["releaseDate"] as? String,
               let rating = row["rating"] as? Int,
-              let posterUrl = row["posterUrl"] as? String
+              let posterUrl = row["posterUrl"] as? String,
+              let genres = row["genres"] as? String
         else {
             throw DatabaseError.bind(message: "Missing required fields")
         }
@@ -60,6 +65,7 @@ struct TableForHomeView: SQLTable {
         self.releaseDate = releaseDate
         self.rating = rating
         self.posterUrl = posterUrl
+        self.genres = [genres]
     }
     
     public func toDictionary() -> [String : Any] {
@@ -69,7 +75,8 @@ struct TableForHomeView: SQLTable {
             "overview": overview,
             "releaseDate": releaseDate,
             "rating": rating,
-            "posterUrl": posterUrl
+            "posterUrl": posterUrl,
+            "genres": genres
         ]
     }
 }

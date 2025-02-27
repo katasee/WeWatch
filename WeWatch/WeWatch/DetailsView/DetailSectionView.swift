@@ -55,7 +55,7 @@ internal struct DetailSectionView: View {
     }
     
     private var genres: some View {
-        Text(movie.genres)
+        Text("\(movie.genres)")
             .foregroundColor(Color.whiteColor)
             .font(.poppinsRegular14px)
     }

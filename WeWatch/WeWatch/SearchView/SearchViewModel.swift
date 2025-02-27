@@ -20,7 +20,7 @@ internal final class SearchViewModel: ObservableObject {
     
     internal func allGenres() -> Array<Genre> {
         var availableGenres = MovieCardPreviewModel.mock()
-            .map { $0.genres.trimmingCharacters(in: .whitespaces) }
+            .flatMap { $0.genres.map {$0.trimmingCharacters(in: .whitespaces) }}
             .joined(separator: ",")
             .components(separatedBy: ",")
             .sorted()
@@ -45,9 +45,9 @@ internal final class SearchViewModel: ObservableObject {
         } else {
             dataForSearchView.filter {
                 $0.title.localizedStandardContains(searchText) ||
-                $0.genres.localizedStandardContains(searchText) ||
-                $0.storyline.localizedStandardContains(searchText) ||
-                $0.genres.localizedStandardContains(selectedGenre.title)
+//                $0.genres.localizedStandardContains(searchText) ||
+                $0.storyline.localizedStandardContains(searchText)
+//                $0.genres.localizedStandardContains(selectedGenre.title)
             }
         }
     }

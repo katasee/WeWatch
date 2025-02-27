@@ -90,6 +90,7 @@ internal final class Webservice {
         guard let response: HTTPURLResponse = response as? HTTPURLResponse else {
             throw AuthenticationError.invalidResponse
         }
+        print(response.statusCode)
         guard response.statusCode == 200 else {
             throw AuthenticationError.invalidStatusCode
         }

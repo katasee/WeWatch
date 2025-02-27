@@ -25,22 +25,26 @@ internal struct DiscoveryView: View {
                         setOfGenre: viewModel.genresForDiscoveryView,
                         selectGenreAction: { genre in viewModel.selectedGenre = genre }
                     )
-                    Rectangle()
-                        .frame(minHeight: 1)
-                        .foregroundColor(Color.clear)
-                        .onAppear { viewModel.isFirstTimeLoad = false
-                            Task { await viewModel.withDb()}
+                    if !viewModel.dataForAllMovieTab.isEmpty {
+                        if !viewModel.dataForFilteredMovies.isEmpty {
+                            Rectangle()
+                                .frame(minHeight: 1)
+                                .foregroundColor(Color.clear)
+                                .onAppear { viewModel.isFirstTimeLoad = false
+                                    Task { viewModel.chooseTab()}
+                                }
                         }
+                    }
                 }
             }
             .onChange(of: viewModel.selectedGenre) { change in Task {
                 viewModel.currentPage = 0
-                await viewModel.prepeareDataForFilteredMovies()
+                 await viewModel.filteredEndpoint()
             }
             }
         }
         .task {
-            await viewModel.prepeareGenreForDiscoveryView()
+            await viewModel.dateFromEndpointForGenreTabs()
         }
     }
 }

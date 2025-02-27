@@ -12,7 +12,7 @@ internal struct MovieCardPreviewModel: Identifiable, Sendable {
     internal var id: Int
     internal var title: String
     internal var rating: Double
-    internal var genres: String
+    internal var genres: [String]
     internal var storyline: String
     internal var image: URL?
     
@@ -20,7 +20,7 @@ internal struct MovieCardPreviewModel: Identifiable, Sendable {
         id: Int,
         title: String,
         rating: Double,
-        genres: String,
+        genres: [String],
         storyline: String,
         image: URL?
     ) {

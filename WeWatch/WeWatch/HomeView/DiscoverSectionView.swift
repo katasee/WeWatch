@@ -9,14 +9,14 @@ import SwiftUI
 
 internal struct DiscoverSectionView: View {
     
-    private let data: Array<MovieCardPreviewModel>
+    private let data: Array<Movie>
     private let seeMoreButtonAction: @MainActor () -> Void
-    private let chooseButtonAction: @MainActor (MovieCardPreviewModel) -> Void
+    private let chooseButtonAction: @MainActor (Movie) -> Void
     
     internal init(
-        data: Array<MovieCardPreviewModel>,
+        data: Array<Movie>,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
-        chooseButtonAction: @escaping @MainActor (MovieCardPreviewModel) -> Void
+        chooseButtonAction: @escaping @MainActor (Movie) -> Void
     ) {
         self.data = data
         self.seeMoreButtonAction = seeMoreButtonAction
@@ -61,14 +61,7 @@ internal struct DiscoverSectionView: View {
                 chooseButtonAction(model)
             } label: {
                 NavigationLink(destination: DetailsView()) {
-                    MovieCard(
-                        isActive: false, title: model.title,
-                        ranking: model.rating,
-                        genres: model.genres,
-                        storyline: model.storyline,
-                        imageUrl: model.image,
-                        didTap: { isActive in }
-                    )
+                    MovieCard(isActive: false, title: model.title, ranking: Double(model.rating), genres: model.genres, storyline: model.overview, imageUrl: URL(string: model.posterUrl), didTap: { isActive in })
                     .multilineTextAlignment(.leading)
                 }
             }

@@ -12,7 +12,7 @@ internal struct MovieCard: View {
     @State private var isActive: Bool
     private let title: String
     private let ranking: Double
-    private let genres: String
+    private let genres: [String]
     private let storyline: String
     private let image: URL?
     private var didTap: @MainActor (Bool) -> Void
@@ -21,7 +21,7 @@ internal struct MovieCard: View {
         isActive: Bool,
         title: String,
         ranking: Double,
-        genres: String,
+        genres: [String],
         storyline: String,
         imageUrl: URL?,
         didTap: @escaping @MainActor (Bool) -> Void
@@ -93,7 +93,7 @@ internal struct MovieCard: View {
     }
     
     private var filmGenres: some View {
-        Text(genres)
+        Text(genres.joined(separator: ", "))
             .font(.poppinsBold14px)
             .foregroundColor(.whiteColor)
     }
@@ -112,7 +112,7 @@ internal struct MovieCard: View {
         MovieCard(
             isActive: false, title: "Hitman’s Wife’s Bodyguard",
             ranking: 3.5,
-            genres: "Action, Comedy, Crime",
+            genres: ["Action, Comedy, Crime"],
             storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......", 
             imageUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"),
             didTap: { isActive in }
