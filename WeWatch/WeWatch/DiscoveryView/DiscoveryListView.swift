@@ -9,23 +9,20 @@ import SwiftUI
 
 internal struct DiscoveryListView: View {
     
-    private let dataForAllMovies: Array<MovieForDiscoveryView>
-    private let dataForFilteredMovies: Array<Movie>
-    private let chooseButtonAction: @MainActor (MovieForDiscoveryView) -> Void
+    private let dataForAllMovies: Array<Movie>
+    private let chooseButtonAction: @MainActor (Movie) -> Void
     private let selectedGenre: Genre
     private let setOfGenre: Array<Genre>
     private let selectGenreAction: (Genre) -> Void
     
     internal init(
-        data: Array<MovieForDiscoveryView>,
-        secondData: Array<Movie>,
-        chooseButtonAction: @escaping @MainActor (MovieForDiscoveryView) -> Void,
+        data: Array<Movie>,
+        chooseButtonAction: @escaping @MainActor (Movie) -> Void,
         selectedGenre: Genre,
         setOfGenre: Array<Genre>,
         selectGenreAction: @escaping (Genre) -> Void
     ) {
         self.dataForAllMovies = data
-        self.dataForFilteredMovies = secondData
         self.chooseButtonAction = chooseButtonAction
         self.selectedGenre = selectedGenre
         self.setOfGenre = setOfGenre
@@ -38,11 +35,7 @@ internal struct DiscoveryListView: View {
                 .ignoresSafeArea()
             VStack(alignment: .leading) {
                 categoryTabBar
-                if selectedGenre.title.starts(with: "All") {
-                    allMovie
-                } else {
-                    anotherTabs
-                }
+                allMovie
             }
         }
     }
@@ -67,26 +60,7 @@ internal struct DiscoveryListView: View {
                             isActive: false,
                             title: model.title,
                             ranking: Double(model.rating),
-                            imageUrl:URL(string: "https://artworks.thetvdb.com" + model.image),
-                            didTap: { isActive in }
-                        )
-                    }
-                }
-            }
-        }
-    }
-    
-    private var anotherTabs: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-            ForEach(dataForFilteredMovies) { model in
-                Button {
-                } label: {
-                    NavigationLink(destination: DetailsView()) {
-                        MovieCardDiscover(
-                            isActive: false,
-                            title: model.title,
-                            ranking: Double(model.rating),
-                            imageUrl: URL(string: model.posterUrl),
+                            imageUrl:URL(string: model.posterUrl),
                             didTap: { isActive in }
                         )
                     }

@@ -9,12 +9,12 @@ import Foundation
 
 internal struct MovieForDiscoveryView: Identifiable, Sendable {
     
-    internal var id: Int
+    internal var id: String
     internal var title: String
     internal var rating: Int
     internal var image: String
     init(
-        id: Int,
+        id: String,
         title: String,
         rating: Int,
         image: String

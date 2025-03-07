@@ -34,6 +34,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6E7F8BD42D70E97A00FA67AC /* ModelForDatabase */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ModelForDatabase;
+			sourceTree = "<group>";
+		};
 		6E8F774E2D4E973F00E2CEDF /* Response */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Response;
@@ -42,6 +47,11 @@
 		6EB5E7892D2DB16F008508B6 /* Database */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Database;
+			sourceTree = "<group>";
+		};
+		6EB6BF4F2D7BA72E00317E58 /* Service */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Service;
 			sourceTree = "<group>";
 		};
 		6ECE93CC2CF10C8300852DDD /* WeWatch */ = {
@@ -75,9 +85,11 @@
 				6ED883552CFB9232004A29AE /* KeychainManager.swift */,
 				6E39E5FF2D06ED8600516C00 /* JWTDecoder.swift */,
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
+				6E7F8BD42D70E97A00FA67AC /* ModelForDatabase */,
 				6ECE93CB2CF10C8300852DDD /* Products */,
 				6EB5E7892D2DB16F008508B6 /* Database */,
 				6E8F774E2D4E973F00E2CEDF /* Response */,
+				6EB6BF4F2D7BA72E00317E58 /* Service */,
 			);
 			sourceTree = "<group>";
 		};
@@ -105,8 +117,10 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6E7F8BD42D70E97A00FA67AC /* ModelForDatabase */,
 				6E8F774E2D4E973F00E2CEDF /* Response */,
 				6EB5E7892D2DB16F008508B6 /* Database */,
+				6EB6BF4F2D7BA72E00317E58 /* Service */,
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
 			);
 			name = WeWatch;

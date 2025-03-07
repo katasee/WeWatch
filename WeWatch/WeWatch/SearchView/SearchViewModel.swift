@@ -12,7 +12,7 @@ internal final class SearchViewModel: ObservableObject {
     @Published internal var setOfGenres: Array<Genre> = []
     @Published internal var dataForSearchView: Array<MovieCardPreviewModel> = []
     @Published internal var searchText: String = ""
-    @Published internal var selectedGenre: Genre = .init(title: "All")
+    @Published internal var selectedGenre: Genre = .init(id: "", title: "")
     
     internal func prepareDataSearchView() {
         dataForSearchView = MovieCardPreviewModel.mock()
@@ -20,7 +20,7 @@ internal final class SearchViewModel: ObservableObject {
     
     internal func allGenres() -> Array<Genre> {
         var availableGenres = MovieCardPreviewModel.mock()
-            .flatMap { $0.genres.map {$0.trimmingCharacters(in: .whitespaces) }}
+            .map { $0.genres.trimmingCharacters(in: .whitespaces) }
             .joined(separator: ",")
             .components(separatedBy: ",")
             .sorted()
@@ -29,7 +29,7 @@ internal final class SearchViewModel: ObservableObject {
         
         let uniqueGenres = Set(availableGenres)
         
-        return uniqueGenres.map { Genre(title: $0)}
+        return uniqueGenres.map { Genre(id: $0, title: $0)}
     }
     
     internal func prepareUniqGenres() {
@@ -45,9 +45,9 @@ internal final class SearchViewModel: ObservableObject {
         } else {
             dataForSearchView.filter {
                 $0.title.localizedStandardContains(searchText) ||
-//                $0.genres.localizedStandardContains(searchText) ||
-                $0.storyline.localizedStandardContains(searchText)
-//                $0.genres.localizedStandardContains(selectedGenre.title)
+                $0.genres.localizedStandardContains(searchText) ||
+                $0.storyline.localizedStandardContains(searchText) ||
+                $0.genres.localizedStandardContains(selectedGenre.title)
             }
         }
     }

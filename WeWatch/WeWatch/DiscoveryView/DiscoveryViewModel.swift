@@ -9,118 +9,64 @@ import Foundation
 
 internal final class DiscoveryViewModel: ObservableObject {
     
-    @Published internal var dataForAllMovieTab: Array<MovieForDiscoveryView> = []
-    @Published internal var dataForFilteredMovies: Array<Movie> = []
+    @Published internal var dataForAllMovieTab: Array<Movie> = []
     @Published internal var genresForDiscoveryView: Array<Genre> = []
-    @Published internal var selectedGenre: Genre = .init(title: "All")
-    internal var isFirstTimeLoad = true
-    internal var page: String = "0"
+    @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
+    internal var isFirstTimeLoad: Bool = true
     internal var currentPage: Int = 0
     internal var isBackEndDateEmpty: Bool = false
-    internal var isFirstTimeDatabaseLoad: Bool = true
-    internal var createTable: Bool = UserDefaults.standard.bool(forKey: "table")
-    internal var pageForFilteredMovies: Int = 0
     
-//    internal func withDb() async {
-//        do {
-////            if createTable == false {
-//                movieFromEndpoint()
-//
-//                createTable = true
-////                UserDefaults.standard.set(createTable, forKey: "table")
-////            } else {
-////                if isFirstTimeDatabaseLoad == true {
-////                    try await dataFromDatabase()
-////                    isFirstTimeDatabaseLoad = false
-////                }
-////                Task {
-////                    let discoveryMovieData: [MovieForDiscoveryView] = try await prepareDataDiscoveryView(page: String(currentPage))
-////                    let filterMovie: [Movie] = try await prepareDataForDiscoverySelection(genre: filterGenres(), page: String(currentPage))
-////                    currentPage += 1
-////                    if discoveryMovieData.isEmpty {
-////                        isBackEndDateEmpty = true
-////                    } else {
-////                        isBackEndDateEmpty = false
-////                        await MainActor.run { [weak self] in
-////                            self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
-////                            self?.dataForFilteredMovies.append(contentsOf: filterMovie)
-////                        }
-////                    }
-////                }
-////            }
-//        } catch {
-//            print(error)
-//        }
-//    }
-    
-    
-    
-    internal func prepareDataForAllMovie(page: String) async throws -> Array<MovieForDiscoveryView> {
-        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
-        let token: String = .init(decoding: tokenData, as: UTF8.self)
-        let listsResource: Resource<MovieResponse> = .init(
-            url: URL.MoviesResponseURL,
-            method: .get([.init(name: "page", value: page)]),
-            token: token
-        )
-        let response: MovieResponse = try await Webservice().call(listsResource)
-        currentPage += 1
-        let moviesForUI: Array<MovieForDiscoveryView> = response.data?
-            .compactMap { MovieDetails in
-                guard let movieId = MovieDetails.id,
-                      let title = MovieDetails.name,
-                      let image = MovieDetails.image else {
-                    return nil
+    internal func movieForDiscoveryView() async {
+        UserDefaults.standard.set(Date(), forKey: "TodayTime")
+        do {
+            let dbManager: DatabaseManager = try DatabaseManager(dataBaseName: "myApp.sqlite")
+            if let date: Date = UserDefaults.standard.object(forKey: "TodayTime") as? Date {
+                if try dbManager.fetchMovieByGenres(forGenre: filterGenres()).isEmpty {
+                    let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
+                        genre: filterGenres(),
+                        page: String(currentPage)
+                    )
+                    await MainActor.run { [weak self] in
+                        self?.dataForAllMovieTab = discoveryMovieData
+                        //DatefromEndpoinAllMovie
+                    }
+                } else {
+                    if let diff: Int = Calendar.current.dateComponents([.hour], from: date, to: Date()).hour, diff > 24 {
+                        let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
+                            genre: filterGenres(),
+                            page: String(currentPage)
+                        )
+                        await MainActor.run { [weak self] in
+                            self?.dataForAllMovieTab = discoveryMovieData
+                            //DatefromEndpoinAllMovie
+                        }
+                    } else {
+                        let moviesFromDb: Array<Movie> = try dbManager.fetchMovieByGenres(forGenre: filterGenres()).compactMap { movie in
+                            return .init(
+                                id: movie.id,
+                                title: movie.title,
+                                overview: movie.overview,
+                                rating: 3,
+                                posterUrl: movie.posterUrl,
+                                genres: movie.genres
+                            )
+                        }
+                        await MainActor.run { [weak self] in
+                            self?.dataForAllMovieTab = moviesFromDb
+                            //DateFromDatabaseAllMovie
+                        }
+                    }
                 }
-                return .init(
-                    id: movieId,
-                    title: title,
-                    rating: 3,
-                    image: image
-                )
-            } ?? .init()
-        if isFirstTimeDatabaseLoad == true {
-//            for movie in moviesForUI {
-//                do {
-//                    let dbManager = try DatabaseManager(dataBaseName: "myApp.sqlite")
-//                    try dbManager.createTable(for: TableForDiscoveryView.self)
-//                    let newMovie = TableForDiscoveryView(
-//                        id: movie.id,
-//                        title: movie.title,
-//                        rating: movie.rating,
-//                        posterUrl: movie.image
-//                    )
-//                    try dbManager.insert(newMovie)
-//                }
-//            }
+            }
+        } catch {
+            print(error)
         }
-        return moviesForUI
     }
     
-    internal func prepareGenreForDiscoveryView() async throws -> Array<Genre> {
+    internal func prepareDataForDiscoveryView(genre: String, page: String) async throws -> Array<Movie> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
-        let listsResource: Resource<MovieResponse> = .init(
-            url: URL.GenreResponseURL,
-            method: .get([.init(name: "", value: "")]),
-            token: token
-        )
-        let response: MovieResponse = try await Webservice().call(listsResource)
-        var genreForUI: Array<Genre> = response.data?
-            .compactMap { Genre in
-                guard let genre = Genre.name else {
-                    return nil
-                }
-                return .init(title: genre)
-            } ?? .init()
-        genreForUI.insert(Genre(title: "All"), at: 0)
-        return genreForUI
-    }
-    
-    internal func prepareDataForFiltredMovie(genre: String, page: String) async throws -> Array<Movie> {
-        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
-        let token: String = .init(decoding: tokenData, as: UTF8.self)
-        let searchResource: Resource<SearchResponse> = .init(
+        let listsResource: Resource<SearchResponse> = .init(
             url: URL.SearchResponseURL,
             method: .get([
                 .init(name: "query", value: genre),
@@ -129,50 +75,69 @@ internal final class DiscoveryViewModel: ObservableObject {
             ]),
             token: token
         )
-        var response: SearchResponse = try await Webservice().call(searchResource)
+        let response: SearchResponse = try await Webservice().call(listsResource)
         currentPage += 1
         let moviesForUI: Array<Movie> = response.data?
             .compactMap { details in
-                guard let movieId = details.id,
-                      let title = details.name,
-                      let overview = details.overview,
-                      let releaseDate = details.year,
-                      let posterUrl = details.imageUrl,
-                      let genres = details.genres
+                guard let movieId: String = details.id,
+                      let title: String = details.name,
+                      let overview: String = details.overview,
+                      let posterUrl: String = details.imageUrl
                 else {
                     return nil
                 }
                 return .init(
-                    movieId: movieId,
+                    id: movieId,
                     title: title,
                     overview: overview,
-                    releaseDate: releaseDate,
                     rating: 3,
                     posterUrl: posterUrl,
-                    genres: genres
+                    genres: genre
                 )
             } ?? .init()
-        //        for movie in moviesForUI {
-        //            try dbManager.insertMovie(
-        //                movieId: movie.movieId,
-        //                title: movie.title,
-        //                overview: movie.overview,
-        //                releaseDate: movie.releaseDate,
-        //                rating: movie.rating,
-        //                posterUrl: movie.posterUrl
-        //            )
-        //        }
+        let dbManager: DatabaseManager = try DatabaseManager(dataBaseName: "myApp.sqlite")
+        if try dbManager.fetchMovieByGenres(forGenre: selectedGenre.id).isEmpty {
+            let newMovie: Array<Movie> = response.data?
+                .compactMap { movie in
+                    guard let id: String = movie.id,
+                          let title: String = movie.name,
+                          let overview: String = movie.overview,
+                          let posterUrl: String = movie.imageUrl
+                    else {
+                        return nil
+                    }
+                    return .init(
+                        id: id,
+                        title: title,
+                        overview: overview,
+                        rating: 3,
+                        posterUrl: posterUrl,
+                        genres: genre
+                    )
+                } ?? .init()
+            for movie in newMovie {
+                try dbManager.insert(movie)
+                try dbManager.insertMovieGenre(
+                    movieId: movie.id,
+                    genreId: genre
+                )
+            }
+        }
         return moviesForUI
     }
     
-    internal func allMovieFromEndpoint() -> Bool {
+    internal func appendMovie() -> Bool {
         if isFirstTimeLoad == false {
             Task {
                 do {
-                    let discoveryMovieData: [MovieForDiscoveryView] = try await prepareDataForAllMovie(page: String(currentPage))
+                    let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
+                        genre: selectedGenre.title,
+                        page: String(currentPage)
+                    )
                     if discoveryMovieData.isEmpty {
                         isBackEndDateEmpty = true
                     } else {
+                        currentPage += 1
                         isBackEndDateEmpty = false
                         await MainActor.run { [weak self] in
                             self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
@@ -188,78 +153,71 @@ internal final class DiscoveryViewModel: ObservableObject {
         }
     }
     
-    internal func filteredMovieEndpoint() -> Bool {
-        if isFirstTimeLoad == false {
-            Task {
-                do {
-                    let filterMovie: [Movie] = try await prepareDataForFiltredMovie(genre: filterGenres(), page: String(currentPage))
-                    if filterMovie.isEmpty {
-                        isBackEndDateEmpty = true
-                    } else {
-                        isBackEndDateEmpty = false
-                        await MainActor.run { [weak self] in
-                            self?.dataForFilteredMovies.append(contentsOf: filterMovie)
-                        }
-                    }
-                } catch {
-                    print(error)
+    internal func dataFromDatabase() async throws {
+        let moviesFromDb: Array<Movie> = try DatabaseManager(dataBaseName: "myApp.sqlite").fetchMovieByGenres(forGenre: selectedGenre.id).compactMap { movie in
+            return .init(
+                id: movie.id,
+                title: movie.title,
+                overview: movie.overview,
+                rating: 3,
+                posterUrl: movie.posterUrl,
+                genres: movie.genres
+            )
+        }
+        await MainActor.run { [weak self] in
+            self?.dataForAllMovieTab = moviesFromDb
+        }
+    }
+    
+    internal func prepareGenreForDiscoveryView() async throws -> Array<Genre> {
+        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
+        let token: String = .init(decoding: tokenData, as: UTF8.self)
+        let listsResource: Resource<GenresResponse> = .init(
+            url: URL.GenreResponseURL,
+            method: .get([]),
+            token: token
+        )
+        let response: GenresResponse = try await Webservice().call(listsResource)
+        var genreForUI: Array<Genre> = response.data?
+            .compactMap { genre in
+                guard let genreId = genre.id,
+                      let title = genre.name
+                else {
+                    return nil
                 }
+                return .init(
+                    id: String(genreId),
+                    title: title
+                )
+            } ?? .init()
+        genreForUI.insert(Genre(id: "0", title: "All"), at: 0)
+        let dbManager: DatabaseManager = try DatabaseManager(dataBaseName: "myApp.sqlite")
+        for genre in genreForUI {
+            do {
+                let tabGenre = Genre(
+                    id: genre.id,
+                    title: genre.title
+                )
+                try dbManager.insert(tabGenre)
+                try dbManager.attachListOfGenre(
+                    genreId: genre.id,
+                    name: genre.title
+                )
             }
-            return true
-        } else {
-            return false
         }
+        return genreForUI
     }
     
-    internal func chooseTab() {
-        if selectedGenre.title == "All" {
-            allMovieFromEndpoint()
-        } else {
-            filteredMovieEndpoint()
-        }
-    }
-    
-    internal func filteredEndpoint() async {
-        if selectedGenre.title == "All" {
-            await dateFromEndpointForAllMovies()
-//            currentPage += 1
-
-        } else {
-            await dateFromEndpointForFilteredMovies()
-//            currentPage += 1
-
-        }
-    }
-    
-    internal func dateFromEndpointForAllMovies() async {
+    internal func dataFromEndpointForGenreTabs() async  {
         do {
-            let discoveryMovieData: [MovieForDiscoveryView] = try await prepareDataForAllMovie(page: String(currentPage))
-            await MainActor.run { [weak self] in
-                self?.dataForAllMovieTab = discoveryMovieData
-            }
-        } catch {
-            print(error)
-        }
-    }
-    
-    internal func dateFromEndpointForFilteredMovies() async {
-        do {
-            let filtredMovie: [Movie] = try await prepareDataForFiltredMovie(genre: filterGenres(), page: String(currentPage))
-            await MainActor.run { [weak self] in
-                self?.dataForFilteredMovies = filtredMovie
-            }
-        } catch {
-            print(error)
-        }
-    }
-    
-    internal func dateFromEndpointForGenreTabs() async  {
-        do {
-            let genre: [Genre] = try await prepareGenreForDiscoveryView()
-            await MainActor.run { [weak self] in
-                self?.genresForDiscoveryView = genre
-                if let firstGenre = genre.first {
-                    selectedGenre = firstGenre
+            if try DatabaseManager(dataBaseName: "myApp.sqlite").fetchGenresTab().isEmpty {
+                let genre: [Genre] = try await prepareGenreForDiscoveryView()
+                await MainActor.run { [weak self] in
+                    self?.genresForDiscoveryView = genre
+                }
+            } else {
+                try await MainActor.run { [weak self] in
+                    self?.genresForDiscoveryView = try DatabaseManager(dataBaseName: "myApp.sqlite").fetchGenresTab()
                 }
             }
         } catch {
@@ -268,24 +226,7 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func filterGenres() -> String {
-        let chooseGenre = selectedGenre.title
+        let chooseGenre: String = selectedGenre.title
         return chooseGenre
     }
 }
-
-
-
-//    internal func dataFromDatabase() async throws {
-//        try await MainActor.run { [weak self] in
-//            self?.dataForAllMovieTab = try DatabaseManager().fetch(TableForDiscoveryView.self).compactMap { movie in
-//                MovieForDiscoveryView (
-//                    id: movie.id,
-//                    title: movie.title,
-//                    rating: movie.rating,
-//                    image: movie.posterUrl
-//                )
-//            }
-//        }
-//    }
-
-

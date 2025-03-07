@@ -10,7 +10,7 @@ import SwiftUI
 internal struct BackButton: View {
     @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
     
-    var body: some View {
+    internal var body: some View {
         HStack {
             Spacer()
                 .navigationBarBackButtonHidden(true)

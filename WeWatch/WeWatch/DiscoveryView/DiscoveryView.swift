@@ -19,32 +19,28 @@ internal struct DiscoveryView: View {
             ScrollView {
                 LazyVStack {
                     DiscoveryListView(
-                        data: viewModel.dataForAllMovieTab, secondData: viewModel.dataForFilteredMovies,
+                        data: viewModel.dataForAllMovieTab,
                         chooseButtonAction: { isActive in },
                         selectedGenre: viewModel.selectedGenre,
                         setOfGenre: viewModel.genresForDiscoveryView,
                         selectGenreAction: { genre in viewModel.selectedGenre = genre }
                     )
-                    if !viewModel.dataForAllMovieTab.isEmpty {
-                        if !viewModel.dataForFilteredMovies.isEmpty {
-                            Rectangle()
-                                .frame(minHeight: 1)
-                                .foregroundColor(Color.clear)
-                                .onAppear { viewModel.isFirstTimeLoad = false
-                                    Task { viewModel.chooseTab()}
-                                }
+                    Rectangle()
+                        .frame(minHeight: 1)
+                        .foregroundColor(Color.clear)
+                        .onAppear { viewModel.isFirstTimeLoad = false
+                            Task { viewModel.appendMovie()}
                         }
-                    }
                 }
             }
             .onChange(of: viewModel.selectedGenre) { change in Task {
                 viewModel.currentPage = 0
-                 await viewModel.filteredEndpoint()
+                await viewModel.movieForDiscoveryView()
             }
             }
         }
         .task {
-            await viewModel.dateFromEndpointForGenreTabs()
+            await viewModel.dataFromEndpointForGenreTabs()
         }
     }
 }

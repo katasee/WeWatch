@@ -17,7 +17,7 @@ internal struct HomeView: View {
                 Color(.black)
                     .ignoresSafeArea()
                 ScrollView {
-                    VStack {
+                    LazyVStack {
                         TodaysSelectionSectionView(
                             data: viewModel.dataForTodaysSelectionSectionView,
                             chooseButtonAction: { isActive in }
@@ -27,14 +27,22 @@ internal struct HomeView: View {
                             seeMoreButtonAction: {},
                             chooseButtonAction: { isActive in }
                         )
+                        if !viewModel.dataForDiscoverySectionView.isEmpty {
+                            Rectangle()
+                                .frame(minHeight: 1)
+                                .foregroundColor(Color.clear)
+                                .onAppear { viewModel.isFirstTimeLoad = false
+                                    Task { try await viewModel.appendDateFromEndpoint()}
+                                }
+                        }
                     }
                 }
                 .task {
-                    await viewModel.dataForTodaySelection()
                     do {
-                        try await viewModel.dateFromEndpointForDiscoverySection()
+                        await viewModel.movieForDiscoveryView()
+                        try await viewModel.dataForTodaySelection()
                     } catch {
-                        print(error)
+                        
                     }
                 }
                 .padding(16)

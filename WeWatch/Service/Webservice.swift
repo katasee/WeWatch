@@ -86,7 +86,6 @@ internal final class Webservice {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         let (data, response) = try await session.data(for: request)
-
         guard let response: HTTPURLResponse = response as? HTTPURLResponse else {
             throw AuthenticationError.invalidResponse
         }

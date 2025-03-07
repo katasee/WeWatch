@@ -61,7 +61,14 @@ internal struct DiscoverSectionView: View {
                 chooseButtonAction(model)
             } label: {
                 NavigationLink(destination: DetailsView()) {
-                    MovieCard(isActive: false, title: model.title, ranking: Double(model.rating), genres: model.genres, storyline: model.overview, imageUrl: URL(string: model.posterUrl), didTap: { isActive in })
+                    MovieCard(
+                        isActive: false,
+                        title: model.title,
+                        ranking: Double(model.rating),
+                        genres: model.genres,
+                        storyline: model.overview,
+                        imageUrl: URL(string: model.posterUrl),
+                        didTap: { isActive in })
                     .multilineTextAlignment(.leading)
                 }
             }
