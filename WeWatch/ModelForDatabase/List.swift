@@ -8,19 +8,16 @@
 
 import Foundation
 
-internal struct List: SQLTable {
+public struct List: SQLTable {
     
-    internal let id: String
-    internal let title: String
-    let lastUpdated: Int?
-    init (
+    public let id: String
+    public let title: String
+    public init (
         id: String,
-        title: String,
-        lastUpdated: Int?
+        title: String
     ) {
         self.id = id
         self.title = title
-        self.lastUpdated = lastUpdated
     }
     
     public static var tableName: String { "lists" }
@@ -29,9 +26,7 @@ internal struct List: SQLTable {
                 """
                 CREATE TABLE IF NOT EXISTS \(tableName)(
                     id TEXT PRIMARY KEY,
-                    title TEXT NOT NULL,
-        last_updated INTEGER
-
+                    title TEXT NOT NULL
                 );
         """
     }
@@ -44,14 +39,12 @@ internal struct List: SQLTable {
         }
         self.id = id
         self.title = title
-        self.lastUpdated = row["last_updated"] as? Int
     }
     
     public func toDictionary() -> [String : Any] {
         [
             "id": id as Any,
-            "title": title,
-            "last_updated": lastUpdated as Any
+            "title": title
         ]
     }
 }

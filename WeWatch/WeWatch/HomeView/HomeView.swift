@@ -10,6 +10,7 @@ import SwiftUI
 internal struct HomeView: View {
     
     @StateObject private var viewModel: HomeViewModel = .init()
+//    internal var isFirstTimeLoad = true
     
     internal var body: some View {
         NavigationView {
@@ -19,19 +20,19 @@ internal struct HomeView: View {
                 ScrollView {
                     LazyVStack {
                         TodaysSelectionSectionView(
-                            data: viewModel.dataForTodaysSelectionSectionView,
+                            data: viewModel.todaySelection,
                             chooseButtonAction: { isActive in }
                         )
                         DiscoverSectionView(
-                            data: viewModel.dataForDiscoverySectionView,
+                            data: viewModel.discoverySection,
                             seeMoreButtonAction: {},
                             chooseButtonAction: { isActive in }
                         )
-                        if !viewModel.dataForDiscoverySectionView.isEmpty {
+                        if !viewModel.discoverySection.isEmpty {
                             Rectangle()
                                 .frame(minHeight: 1)
                                 .foregroundColor(Color.clear)
-                                .onAppear { viewModel.isFirstTimeLoad = false
+                                .onAppear { /*viewModel.isFirstTimeLoad = false*/
                                     Task { try await viewModel.appendDateFromEndpoint()}
                                 }
                         }
@@ -39,7 +40,7 @@ internal struct HomeView: View {
                 }
                 .task {
                     do {
-                        await viewModel.movieForDiscoveryView()
+                        try await viewModel.movieForDiscoveryView()
                         try await viewModel.dataForTodaySelection()
                     } catch {
                         

@@ -7,16 +7,16 @@
 
 import Foundation
 
-internal struct Movie: SQLTable, Identifiable, Sendable {
+public struct Movie: SQLTable, Identifiable, Sendable {
     
-    internal let id: String
-    internal let title: String
-    internal let overview: String
-    internal let rating: Double
-    internal let posterUrl: String
-    internal let genres: String
+    public let id: String
+    public let title: String
+    public let overview: String
+    public let rating: Double
+    public let posterUrl: String
+    public let genres: String
     
-    internal init(
+    public init(
         id: String,
         title: String,
         overview: String,
@@ -37,8 +37,8 @@ internal struct Movie: SQLTable, Identifiable, Sendable {
     public static var createTableStatement: String {
         """
         CREATE TABLE IF NOT EXISTS \(tableName)(
-        id TEXT PRIMARY KEY UNIQUE,
-        title TEXT NOT NULL ,
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
         overview TEXT,
         rating REAL,
         posterUrl TEXT,

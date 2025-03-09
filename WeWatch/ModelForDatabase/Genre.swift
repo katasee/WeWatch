@@ -7,12 +7,12 @@
 
 import Foundation
 
-internal struct Genre: SQLTable, Identifiable, Sendable, Hashable {
+public struct Genre: SQLTable, Identifiable, Sendable, Hashable {
     
-    internal let id: String
-    internal let title: String
+    public let id: String
+    public let title: String
     
-    internal init(
+    public init(
         id: String,
         title: String
     ) {
