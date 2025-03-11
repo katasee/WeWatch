@@ -47,7 +47,11 @@ internal struct DiscoverSectionView: View {
         Button() {
             
         } label: {
-            NavigationLink(destination: DiscoveryView()) {
+            NavigationLink(destination: DiscoveryView(
+                viewModel: DiscoveryViewModel(
+                    dbManager: DatabaseManager(
+                        dataBaseName: database.name
+                    )))) {
                 Text("home.see.more.button.title")
                     .font(.poppinsRegular16px)
                     .foregroundColor(.fieryRed)
@@ -60,7 +64,7 @@ internal struct DiscoverSectionView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                NavigationLink(destination: DetailsView()) {
+                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel())) {
                     MovieCard(
                         isActive: false,
                         title: model.title,

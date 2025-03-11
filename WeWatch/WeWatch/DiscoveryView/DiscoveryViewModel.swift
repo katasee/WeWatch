@@ -9,6 +9,11 @@ import Foundation
 
 internal final class DiscoveryViewModel: ObservableObject {
     
+    private let dbManager: DatabaseManager
+    init(dbManager: DatabaseManager) {
+        self.dbManager = dbManager
+    }
+    
     @Published internal var dataForAllMovieTab: Array<Movie> = []
     @Published internal var genresForDiscoveryView: Array<Genre> = []
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
@@ -21,10 +26,9 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func movieForDiscoveryView() async {
-        UserDefaults.standard.set(Date(), forKey: "TodayTime")
+        UserDefaults.standard.set(Date(), forKey: TimeKey.todayTime)
         do {
-            let dbManager: DatabaseManager = try DatabaseManager(dataBaseName: "WeWatch_v1.sqlite")
-            if let date: Date = UserDefaults.standard.object(forKey: "TodayTime") as? Date {
+            if let date: Date = UserDefaults.standard.object(forKey: TimeKey.todayTime) as? Date {
                 if try await dbManager.fetchMovieByGenres(forGenre: filterGenres()).isEmpty {
                     let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
                         genre: filterGenres(),
@@ -99,7 +103,6 @@ internal final class DiscoveryViewModel: ObservableObject {
                     genres: genre
                 )
             } ?? .init()
-        let dbManager: DatabaseManager = try DatabaseManager(dataBaseName: "WeWatch_v1.sqlite")
         if try await dbManager.fetchMovieByGenres(forGenre: selectedGenre.id).isEmpty {
             let newMovie: Array<Movie> = response.data?
                 .compactMap { movie in
@@ -130,7 +133,7 @@ internal final class DiscoveryViewModel: ObservableObject {
         return moviesForUI
     }
     
-    internal func appendMovie() -> Bool {
+    internal func fetchNextPage() -> Bool {
         if isFirstTimeLoad == false {
             Task {
                 do {
@@ -158,7 +161,7 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func dataFromDatabase() async throws {
-        let moviesFromDb: Array<Movie> = try await DatabaseManager(dataBaseName: "WeWatch_v1.sqlite").fetchMovieByGenres(forGenre: selectedGenre.id).compactMap { movie in
+        let moviesFromDb: Array<Movie> = try await dbManager.fetchMovieByGenres(forGenre: selectedGenre.id).compactMap { movie in
             return .init(
                 id: movie.id,
                 title: movie.title,
@@ -176,12 +179,12 @@ internal final class DiscoveryViewModel: ObservableObject {
     internal func prepareGenreForDiscoveryView() async throws -> Array<Genre> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
-        let listsResource: Resource<GenresResponse> = .init(
+        let listsResource: Resource<GenreResponse> = .init(
             url: URL.GenreResponseURL,
             method: .get([]),
             token: token
         )
-        let response: GenresResponse = try await Webservice().call(listsResource)
+        let response: GenreResponse = try await Webservice().call(listsResource)
         var genreForUI: Array<Genre> = response.data?
             .compactMap { genre in
                 guard let genreId = genre.id,
@@ -195,7 +198,6 @@ internal final class DiscoveryViewModel: ObservableObject {
                 )
             } ?? .init()
         genreForUI.insert(Genre(id: "0", title: "All"), at: 0)
-        let dbManager: DatabaseManager = try DatabaseManager(dataBaseName: "WeWatch_v1.sqlite")
         for genre in genreForUI {
             do {
                 let tabGenre = Genre(
@@ -214,15 +216,15 @@ internal final class DiscoveryViewModel: ObservableObject {
     
     internal func dataFromEndpointForGenreTabs() async  {
         do {
-            if try await DatabaseManager(dataBaseName: "WeWatch_v1.sqlite").fetchGenresTab().isEmpty {
+            if try await dbManager.fetchGenresTab().isEmpty {
                 let genre: [Genre] = try await prepareGenreForDiscoveryView()
                 await MainActor.run { [weak self] in
                     self?.genresForDiscoveryView = genre
                 }
             } else {
-                 await MainActor.run { [weak self] in
+                await MainActor.run { [weak self] in
                     Task {
-                        self?.genresForDiscoveryView = try await DatabaseManager(dataBaseName: "WeWatch_v1.sqlite").fetchGenresTab()
+                        self?.genresForDiscoveryView = try await dbManager.fetchGenresTab()
                     }
                 }
             }

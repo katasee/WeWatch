@@ -8,7 +8,9 @@
 import SwiftUI
 
 internal struct BackButton: View {
-    @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
+    
+    @SwiftUI.Environment(\.presentationMode)
+    private var presentationMode: Binding<PresentationMode>
     
     internal var body: some View {
         HStack {

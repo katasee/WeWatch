@@ -9,8 +9,12 @@ import SwiftUI
 
 internal struct SearchView: View {
     
-    @StateObject private var viewModel: SearchViewModel = .init()
+    @StateObject private var viewModel: SearchViewModel
     
+    internal init(viewModel: SearchViewModel) {
+        self._viewModel = .init(wrappedValue: viewModel)
+    }
+       
     internal var body: some View {
         NavigationView {
             ZStack {
@@ -37,8 +41,4 @@ internal struct SearchView: View {
             }
         }
     }
-}
-
-#Preview {
-    SearchView()
 }

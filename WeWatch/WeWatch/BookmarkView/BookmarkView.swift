@@ -9,7 +9,11 @@ import SwiftUI
 
 internal struct BookmarkView: View {
     
-    @StateObject private var viewModel: BookmarkViewModel = .init()
+    @StateObject private var viewModel: BookmarkViewModel
+    
+    internal init(viewModel: BookmarkViewModel) {
+        self._viewModel = .init(wrappedValue: viewModel)
+    }
     
     internal var body: some View {
         NavigationView {
@@ -32,8 +36,4 @@ internal struct BookmarkView: View {
             }
         }
     }
-}
-
-#Preview {
-    BookmarkView()
 }

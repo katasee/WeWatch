@@ -7,16 +7,16 @@
 
 import Foundation
 
-public struct Movie: SQLTable, Identifiable, Sendable {
+internal struct Movie: SQLTable, Identifiable, Sendable {
     
-    public let id: String
-    public let title: String
-    public let overview: String
-    public let rating: Double
-    public let posterUrl: String
-    public let genres: String
+    internal let id: String
+    internal let title: String
+    internal let overview: String
+    internal let rating: Double
+    internal let posterUrl: String
+    internal let genres: String
     
-    public init(
+    internal init(
         id: String,
         title: String,
         overview: String,
@@ -32,22 +32,13 @@ public struct Movie: SQLTable, Identifiable, Sendable {
         self.genres = genres
     }
     
-    public static var tableName: String { "movies" }
+    internal static var tableName: String { "movies" }
     
-    public static var createTableStatement: String {
-        """
-        CREATE TABLE IF NOT EXISTS \(tableName)(
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        overview TEXT,
-        rating REAL,
-        posterUrl TEXT,
-        genres TEXT
-    );
-"""
+    internal static var createTableStatement: String {
+        SQLStatements.movieSQL
     }
     
-    public init(row:[String: Any]) throws {
+    internal init(row: Dictionary<String, Any>) throws {
         guard let id = row["id"] as? String,
               let title = row["title"] as? String,
               let overview = row["overview"] as? String,
@@ -65,7 +56,7 @@ public struct Movie: SQLTable, Identifiable, Sendable {
         self.genres = genres
     }
     
-    public func toDictionary() -> [String: Any] {
+    internal func toDictionary() -> Dictionary<String, Any> {
         [
             "id": id,
             "title": title,

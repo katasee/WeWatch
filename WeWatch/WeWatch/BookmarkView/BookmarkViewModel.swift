@@ -22,7 +22,7 @@ internal final class BookmarkViewModel: ObservableObject {
         } else {
             dataForBookmarkView.filter {
                 $0.title.localizedStandardContains(searchText) ||
-//                $0.genres.localizedStandardContains(searchText) ||
+                $0.genres.localizedStandardContains(searchText) ||
                 $0.storyline.localizedStandardContains(searchText) 
             }
         }

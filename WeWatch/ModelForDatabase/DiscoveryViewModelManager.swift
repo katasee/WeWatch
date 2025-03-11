@@ -13,7 +13,8 @@ internal struct MovieForDiscoveryView: Identifiable, Sendable {
     internal var title: String
     internal var rating: Int
     internal var image: String
-    init(
+    
+    internal init(
         id: String,
         title: String,
         rating: Int,

@@ -5,14 +5,13 @@
 //  Created by Anton on 27/02/2025.
 //
 
-
 import Foundation
 
-public struct List: SQLTable {
+internal struct List: SQLTable {
     
-    public let id: String
-    public let title: String
-    public init (
+    internal let id: String
+    internal let title: String
+    internal init (
         id: String,
         title: String
     ) {
@@ -20,18 +19,13 @@ public struct List: SQLTable {
         self.title = title
     }
     
-    public static var tableName: String { "lists" }
+    internal static var tableName: String { "lists" }
     
-    public static var createTableStatement: String {
-                """
-                CREATE TABLE IF NOT EXISTS \(tableName)(
-                    id TEXT PRIMARY KEY,
-                    title TEXT NOT NULL
-                );
-        """
+    internal static var createTableStatement: String {
+        SQLStatements.listSQL
     }
     
-    public init(row: [String : Any]) throws {
+    internal init(row: Dictionary<String, Any>) throws {
         guard let id = row["id"] as? String,
               let title = row["title"] as? String
         else {
@@ -41,7 +35,7 @@ public struct List: SQLTable {
         self.title = title
     }
     
-    public func toDictionary() -> [String : Any] {
+    internal func toDictionary() -> Dictionary<String, Any> {
         [
             "id": id as Any,
             "title": title

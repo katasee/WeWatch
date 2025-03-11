@@ -9,8 +9,11 @@ import SwiftUI
 
 internal struct HomeView: View {
     
-    @StateObject private var viewModel: HomeViewModel = .init()
-//    internal var isFirstTimeLoad = true
+    @StateObject private var viewModel: HomeViewModel
+    
+    internal init(viewModel: HomeViewModel) {
+        self._viewModel = .init(wrappedValue: viewModel)
+    }
     
     internal var body: some View {
         NavigationView {
@@ -32,7 +35,7 @@ internal struct HomeView: View {
                             Rectangle()
                                 .frame(minHeight: 1)
                                 .foregroundColor(Color.clear)
-                                .onAppear { /*viewModel.isFirstTimeLoad = false*/
+                                .onAppear {
                                     Task { try await viewModel.appendDateFromEndpoint()}
                                 }
                         }
@@ -50,8 +53,4 @@ internal struct HomeView: View {
             }
         }
     }
-}
-
-#Preview {
-    HomeView()
 }

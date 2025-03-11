@@ -7,13 +7,13 @@
 
 import Foundation
 
-internal struct GenresResponse: Codable {
+internal struct GenreResponse: Codable {
  
-    internal let data: [DataForGenresResponse]?
+    internal let data: [GenreData]?
     internal let status: String?
 }
 
-internal struct DataForGenresResponse: Codable {
+internal struct GenreData: Codable {
     
     internal let id: Int?
     internal let name: String?

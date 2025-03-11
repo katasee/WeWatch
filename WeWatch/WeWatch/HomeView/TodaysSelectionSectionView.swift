@@ -51,7 +51,7 @@ internal struct TodaysSelectionSectionView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                NavigationLink(destination: DetailsView()) {
+                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel())) {
                     MovieCardTopFive(
                         title: model.title,
                         ranking: Double(model.rating),

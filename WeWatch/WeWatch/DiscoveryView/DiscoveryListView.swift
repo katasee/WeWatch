@@ -10,23 +10,25 @@ import SwiftUI
 internal struct DiscoveryListView: View {
     
     private let dataForAllMovies: Array<Movie>
-    private let chooseButtonAction: @MainActor (Movie) -> Void
     private let selectedGenre: Genre
     private let setOfGenre: Array<Genre>
     private let selectGenreAction: (Genre) -> Void
+    private let chooseButtonAction: @MainActor (Movie) -> Void
     
     internal init(
         data: Array<Movie>,
-        chooseButtonAction: @escaping @MainActor (Movie) -> Void,
         selectedGenre: Genre,
         setOfGenre: Array<Genre>,
-        selectGenreAction: @escaping (Genre) -> Void
+        selectGenreAction: @escaping @MainActor (Genre) -> Void,
+        chooseButtonAction: @escaping @MainActor (Movie) -> Void
+        
     ) {
         self.dataForAllMovies = data
-        self.chooseButtonAction = chooseButtonAction
         self.selectedGenre = selectedGenre
         self.setOfGenre = setOfGenre
         self.selectGenreAction = selectGenreAction
+        self.chooseButtonAction = chooseButtonAction
+        
     }
     
     internal var body: some View {
@@ -41,21 +43,26 @@ internal struct DiscoveryListView: View {
     }
     
     private var categoryTabBar: some View {
-        MovieCategoryView(genreTabs: Array(setOfGenre),
-                          selectedGenre: selectedGenre,
-                          action: { genre in
-            selectGenreAction(genre)
-        }
+        MovieCategoryView(
+            genreTabs: Array(setOfGenre),
+            selectedGenre: selectedGenre,
+            action: { genre in
+                selectGenreAction(genre)
+            }
         )
     }
     
     private var allMovie: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ]
+        ) {
             ForEach(dataForAllMovies) { model in
                 Button {
                     chooseButtonAction(model)
                 } label: {
-                    NavigationLink(destination: DetailsView()) {
+                    NavigationLink(destination: DetailsView(viewModel: DetailsViewModel())) {
                         MovieCardDiscover(
                             isActive: false,
                             title: model.title,

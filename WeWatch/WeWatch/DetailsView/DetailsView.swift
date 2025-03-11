@@ -9,7 +9,11 @@ import SwiftUI
 
 internal struct DetailsView: View {
     
-    @StateObject private var viewModel: DetailsViewModel = .init()
+    @StateObject private var viewModel: DetailsViewModel
+    
+    internal init(viewModel: DetailsViewModel) {
+        self._viewModel = .init(wrappedValue: viewModel)
+    }
         
     internal var body: some View {
         ZStack {
@@ -24,8 +28,4 @@ internal struct DetailsView: View {
         }
         .ignoresSafeArea()
     }
-}
-
-#Preview {
-    DetailsView()
 }
