@@ -10,18 +10,18 @@ import Foundation
 internal struct SearchResponse: Codable {
     
     internal let status: String?
-    internal let data: [Details]?
+    internal let data: Array<Details>?
 }
 
 internal struct Details: Codable {
     
     internal let objectID: String?
-    internal let aliases: [String]?
+    internal let aliases: Array<String>?
     internal let country: String?
     internal let director: String?
     internal let extendedTitle: String?
-    internal let genres: [String]?
-    internal let studios: [String]?
+    internal let genres: Array<String>?
+    internal let studios: Array<String>?
     internal let id: String?
     internal let imageUrl: String?
     internal let name: String?
@@ -34,9 +34,9 @@ internal struct Details: Codable {
     internal let tvdbID: String?
     internal let year: String?
     internal let slug: String?
-    internal let overviews: [String: String]?
-    internal let translations: [String: String]?
-    internal let remoteIDs: [RemoteID]?
+    internal let overviews: Dictionary<String, String>?
+    internal let translations: Dictionary<String, String>?
+    internal let remoteIDs: Array<RemoteID>?
     internal let thumbnail: String?
     
     internal enum CodingKeys: String, CodingKey {

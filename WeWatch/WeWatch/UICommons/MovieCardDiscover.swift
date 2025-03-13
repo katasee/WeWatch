@@ -77,13 +77,3 @@ internal struct MovieCardDiscover: View {
             )
     }
 }
-//
-//#Preview {
-//    ZStack {
-//        Color.black.ignoresSafeArea()
-//        MovieCardDiscover(
-//            title: "Hitman’s Wife’s Bodyguard",
-//            ranking: 3.5, imageUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg")
-//        )
-//    }
-//}

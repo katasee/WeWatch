@@ -9,19 +9,20 @@ import Foundation
 
 internal struct MovieResponse: Codable {
     
-    internal let data: [DataForMovieResponse]?
+    internal let data: Array<DataForMovieResponse>?
     internal let status: String?
     internal let links: Links?
 }
+
 internal struct DataForMovieResponse: Codable {
     
-    internal let aliases: [Aliases]?
+    internal let aliases: Array<Aliases>?
     internal let id: Int?
     internal let image: String?
     internal let lastUpdated: String?
     internal let name: String?
-    internal let nameTranslations: [String]?
-    internal let overviewTranslations: [String]?
+    internal let nameTranslations: Array<String>?
+    internal let overviewTranslations: Array<String>?
     internal let score: Int?
     internal let slug: String?
     internal let status: Status?

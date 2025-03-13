@@ -11,7 +11,10 @@ internal struct DiscoveryView: View {
     
     @StateObject private var viewModel: DiscoveryViewModel
     
-    internal init(viewModel: DiscoveryViewModel) {
+    internal init(
+        viewModel: DiscoveryViewModel
+
+    ) {
         self._viewModel = .init(wrappedValue: viewModel)
     }
     
@@ -20,13 +23,18 @@ internal struct DiscoveryView: View {
             BackButton()
             Color.black
                 .ignoresSafeArea()
+            VStack {
+                MovieCategoryView(
+                    genreTabs: viewModel.genresForDiscoveryView,
+                    selectedGenre: viewModel.selectedGenre,
+                    action: { genre in
+                    viewModel.selectedGenre = genre
+                    }
+                )
             ScrollView {
                 LazyVStack {
                     DiscoveryListView(
                         data: viewModel.dataForAllMovieTab,
-                        selectedGenre: viewModel.selectedGenre,
-                        setOfGenre: viewModel.genresForDiscoveryView,
-                        selectGenreAction: { genre in viewModel.selectedGenre = genre },
                         chooseButtonAction: { isActive in }
                     )
                     Rectangle()
@@ -39,10 +47,10 @@ internal struct DiscoveryView: View {
                             }
                         }
                 }
+                }
             }
             .onChange(of: viewModel.selectedGenre) { change in
                 Task {
-                    viewModel.currentPage = 0
                     await viewModel.movieForDiscoveryView()
                 }
             }

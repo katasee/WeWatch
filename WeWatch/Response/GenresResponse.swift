@@ -9,7 +9,7 @@ import Foundation
 
 internal struct GenreResponse: Codable {
  
-    internal let data: [GenreData]?
+    internal let data: Array<GenreData>?
     internal let status: String?
 }
 

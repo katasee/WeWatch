@@ -22,7 +22,7 @@ internal struct List: SQLTable {
     internal static var tableName: String { "lists" }
     
     internal static var createTableStatement: String {
-        SQLStatements.listSQL
+        SQLStatements.createListsTableSQL
     }
     
     internal init(row: Dictionary<String, Any>) throws {

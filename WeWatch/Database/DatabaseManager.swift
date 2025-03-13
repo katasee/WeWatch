@@ -22,16 +22,19 @@ internal enum DatabaseError: Error {
 }
 
 internal enum TimeKey {
-    static let todayTime: String = "TodayTime"
+    
+    internal static let todayTime: String = "TodayTime"
+    internal static let page: String = "CurrentPage"
 }
 
-internal enum database {
-    static let name: String = "WeWatch_v1.sqlite"
+internal enum DatabaseConfig {
+    
+    internal static let name: String = "WeWatch_v1.sqlite"
 }
 
 internal enum SQLStatements {
     
-    internal static let movieSQL: String = """
+    internal static let createMoviesTableSQL: String = """
      CREATE TABLE IF NOT EXISTS movies(
      id TEXT PRIMARY KEY,
      title TEXT NOT NULL,
@@ -41,19 +44,19 @@ internal enum SQLStatements {
      genres TEXT
      );
      """
-    internal static let listSQL: String = """
+    internal static let createListsTableSQL: String = """
      CREATE TABLE IF NOT EXISTS lists(
      id TEXT PRIMARY KEY,
      title TEXT NOT NULL
      );
      """
-    internal static let genreSQL: String = """
+    internal static let createGenresTableSQL: String = """
      CREATE TABLE IF NOT EXISTS genres(
      id TEXT PRIMARY KEY,
      title TEXT NOT NULL
      );
      """
-    internal static let movieGenreSQL: String = """
+    internal static let createMovieGenreTableSQL: String = """
      CREATE TABLE IF NOT EXISTS movie_genres (
      movie_id TEXT NOT NULL,
      genre_id TEXT NOT NULL,
@@ -62,7 +65,7 @@ internal enum SQLStatements {
      FOREIGN KEY(genre_id) REFERENCES genres(id) ON DELETE CASCADE
      );
      """
-    internal static let listMovieSQL: String = """
+    internal static let createdListMovieTableSQL: String = """
      CREATE TABLE IF NOT EXISTS list_movies (
      list_id TEXT NOT NULL,
      movie_id TEXT NOT NULL,
@@ -97,13 +100,13 @@ internal protocol SQLTable {
     static var tableName: String { get }
     static var createTableStatement: String { get }
     
-    init(row: [String: Any]) throws
-    func toDictionary() -> [String: Any]
+    init(row: Dictionary<String, Any>) throws
+    func toDictionary() -> Dictionary<String, Any>
 }
 
 internal enum SQLiteConstants {
     
-    static let sqliteTransient = unsafeBitCast(OpaquePointer(bitPattern: -1), to: sqlite3_destructor_type.self)
+    internal static let sqliteTransient: sqlite3_destructor_type = unsafeBitCast(OpaquePointer(bitPattern: -1), to: sqlite3_destructor_type.self)
 }
 
 internal actor DatabaseManager {
@@ -111,7 +114,7 @@ internal actor DatabaseManager {
     private var db: OpaquePointer?
     private let queue = DispatchQueue(label: "com.example.DatabaseManager")
     
-    internal init(dataBaseName: String = "WeWatch_v1.sqlite") {
+    internal init(dataBaseName: String = DatabaseConfig.name) {
         do {
             try openDatabase(named: dataBaseName)
             try createAllTables()
@@ -119,6 +122,7 @@ internal actor DatabaseManager {
             
         }
     }
+    
     deinit {
         sqlite3_close(db)
     }
@@ -140,11 +144,11 @@ internal actor DatabaseManager {
         try createTable(for: Movie.self)
         try createTable(for: Genre.self)
         try createTable(for: List.self)
-        if sqlite3_exec(db, SQLStatements.movieGenreSQL, nil, nil, nil) != SQLITE_OK {
+        if sqlite3_exec(db, SQLStatements.createMovieGenreTableSQL, nil, nil, nil) != SQLITE_OK {
             let errmsg: String = .init(cString: sqlite3_errmsg(db))
             throw DatabaseError.createTable(message: "Error creating movie_genres: \(errmsg)")
         }
-        if sqlite3_exec(db, SQLStatements.listMovieSQL, nil, nil, nil) != SQLITE_OK {
+        if sqlite3_exec(db, SQLStatements.createdListMovieTableSQL, nil, nil, nil) != SQLITE_OK {
             let errmsg: String = .init(cString: sqlite3_errmsg(db))
             throw DatabaseError.createTable(message: "Error creating list_movies: \(errmsg)")
         }
@@ -158,19 +162,19 @@ internal actor DatabaseManager {
         }
     }
     
-    internal func beginTransaction() {
+    private func beginTransaction() {
         sqlite3_exec(db, SQLStatements.beginTransaction, nil, nil, nil)
     }
     
-    internal func commitTransaction() {
+    private func commitTransaction() {
         sqlite3_exec(db, SQLStatements.saveAllChanges, nil, nil, nil)
     }
     
-    internal func rollbackTransaction() {
+    private func rollbackTransaction() {
         sqlite3_exec(db, SQLStatements.undoesChanges, nil, nil, nil)
     }
     
-    internal func transaction(_ transactionBlock: (DatabaseManager) throws -> ()) throws {
+    private func transaction(_ transactionBlock: (DatabaseManager) throws -> ()) throws {
         beginTransaction()
         do {
             try transactionBlock(self)
@@ -180,10 +184,12 @@ internal actor DatabaseManager {
             throw DatabaseError.transactionError
         }
     }
+   
     
     internal func insert<T: SQLTable>(_ item: T) throws {
-        try transaction { dbManager in
-            let dict: [String : Any] = item.toDictionary()
+        
+        try transaction {  dbManager in
+            let dict: Dictionary<String, Any> = item.toDictionary()
             let columns: String = dict.keys.joined(separator: ", ")
             let placeholders: String = dict.keys.map { _ in "?"}.joined(separator: ", ")
             let sql: String = "INSERT OR REPLACE INTO \(T.tableName)(\(columns)) VALUES (\(placeholders));"
@@ -208,11 +214,11 @@ internal actor DatabaseManager {
     
     internal func update<T: SQLTable>(_ item: T) throws {
         try transaction { dbManager in
-            let dict: [String : Any] = item.toDictionary()
+            let dict: Dictionary<String, Any> = item.toDictionary()
             guard let idValue: Any = dict["id"] else {
                 throw DatabaseError.missingId
             }
-            let filtered: [String : Any] = dict.filter { $0.key != "id" }
+            let filtered: Dictionary<String, Any> = dict.filter { $0.key != "id" }
             let assignments: String = filtered.map { "\($0.key) = ?" }.joined(separator: ", ")
             let sql: String = "UPDATE \(T.tableName) SET \(assignments) WHERE id = ?;"
             
@@ -272,7 +278,10 @@ internal actor DatabaseManager {
         genreId: String
     ) throws {
         try transaction { dbManager in
-            try executeSimpleQuery(sql: SQLStatements.insertGenreMovies, params: [movieId, genreId])
+            try executeSimpleQuery(
+                sql: SQLStatements.insertGenreMovies,
+                params: [movieId, genreId]
+            )
         }
     }
     
@@ -305,7 +314,7 @@ internal actor DatabaseManager {
                 throw DatabaseError.prepare(message: errmsg)
             }
             while sqlite3_step(stmt) == SQLITE_ROW {
-                let row: [String : Any] = mapRowToDict(stmt: stmt)
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
                 let item: T = try .init(row: row)
                 results.append(item)
             }
@@ -325,7 +334,7 @@ internal actor DatabaseManager {
             sqlite3_bind_text(stmt, 1, listId, -1, SQLiteConstants.sqliteTransient)
             
             while sqlite3_step(stmt) == SQLITE_ROW {
-                let row: [String : Any] = mapRowToDict(stmt: stmt)
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
                 let movie: Movie = try .init(row: row)
                 movies.append(movie)
             }
@@ -345,7 +354,7 @@ internal actor DatabaseManager {
             }
             sqlite3_bind_text(stmt, 1, genreId, -1, SQLiteConstants.sqliteTransient)
             while sqlite3_step(stmt) == SQLITE_ROW {
-                let row: [String : Any] = mapRowToDict(stmt: stmt)
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
                 let movie: Movie = try .init(row: row)
                 movies.append(movie)
             }
@@ -363,7 +372,7 @@ internal actor DatabaseManager {
                 throw DatabaseError.prepare(message: errmsg)
             }
             while sqlite3_step(stmt) == SQLITE_ROW {
-                let row: [String : Any] = mapRowToDict(stmt: stmt)
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
                 let genre: Genre = try .init(row: row)
                 genres.append(genre)
             }
@@ -373,7 +382,7 @@ internal actor DatabaseManager {
     
     internal func mapRowToDict(stmt: OpaquePointer?) -> [String: Any] {
         guard let stmt: OpaquePointer = stmt else { return [:] }
-        var row: [String: Any] = [:]
+        var row: Dictionary<String, Any> = [:]
         let columnCount: Int32 = sqlite3_column_count(stmt)
         for i in 0..<columnCount {
             guard let colNameCStr: UnsafePointer<CChar> = sqlite3_column_name(stmt, i) else { continue }

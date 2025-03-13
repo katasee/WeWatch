@@ -35,7 +35,7 @@ internal struct Movie: SQLTable, Identifiable, Sendable {
     internal static var tableName: String { "movies" }
     
     internal static var createTableStatement: String {
-        SQLStatements.movieSQL
+        SQLStatements.createMoviesTableSQL
     }
     
     internal init(row: Dictionary<String, Any>) throws {

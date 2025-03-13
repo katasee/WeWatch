@@ -47,11 +47,15 @@ internal struct DiscoverSectionView: View {
         Button() {
             
         } label: {
-            NavigationLink(destination: DiscoveryView(
-                viewModel: DiscoveryViewModel(
-                    dbManager: DatabaseManager(
-                        dataBaseName: database.name
-                    )))) {
+            NavigationLink(
+               destination: DiscoveryView(
+                   viewModel: DiscoveryViewModel(
+                       dbManager: DatabaseManager(
+                        dataBaseName: DatabaseConfig.name
+                       )
+                   )
+               )
+            ) {
                 Text("home.see.more.button.title")
                     .font(.poppinsRegular16px)
                     .foregroundColor(.fieryRed)

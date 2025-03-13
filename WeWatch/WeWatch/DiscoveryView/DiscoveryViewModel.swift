@@ -10,7 +10,8 @@ import Foundation
 internal final class DiscoveryViewModel: ObservableObject {
     
     private let dbManager: DatabaseManager
-    init(dbManager: DatabaseManager) {
+    
+    internal init(dbManager: DatabaseManager) {
         self.dbManager = dbManager
     }
     
@@ -25,44 +26,52 @@ internal final class DiscoveryViewModel: ObservableObject {
         static let refreshIntervalHours: Int = 24
     }
     
+    internal func movieDataFromEndpoint() async {
+        do {
+            let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
+                genre: filterGenres(),
+                page: String(currentPage)
+            )
+            await MainActor.run { [weak self] in
+                self?.dataForAllMovieTab = discoveryMovieData
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    internal func movieDataFromDatabase() async {
+        do {
+            let moviesFromDb: Array<Movie> = try await dbManager.fetchMovieByGenres(forGenre: filterGenres()).compactMap { movie in
+                return .init(
+                    id: movie.id,
+                    title: movie.title,
+                    overview: movie.overview,
+                    rating: 3,
+                    posterUrl: movie.posterUrl,
+                    genres: movie.genres
+                )
+            }
+            await MainActor.run { [weak self] in
+                self?.dataForAllMovieTab = moviesFromDb
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
     internal func movieForDiscoveryView() async {
+        currentPage = 0
         UserDefaults.standard.set(Date(), forKey: TimeKey.todayTime)
         do {
             if let date: Date = UserDefaults.standard.object(forKey: TimeKey.todayTime) as? Date {
                 if try await dbManager.fetchMovieByGenres(forGenre: filterGenres()).isEmpty {
-                    let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
-                        genre: filterGenres(),
-                        page: String(currentPage)
-                    )
-                    await MainActor.run { [weak self] in
-                        self?.dataForAllMovieTab = discoveryMovieData
-                        //DatefromEndpoinAllMovie
-                    }
+                    await movieDataFromEndpoint()
                 } else {
                     if let diff: Int = Calendar.current.dateComponents([.hour], from: date, to: Date()).hour, diff > Constans.refreshIntervalHours {
-                        let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
-                            genre: filterGenres(),
-                            page: String(currentPage)
-                        )
-                        await MainActor.run { [weak self] in
-                            self?.dataForAllMovieTab = discoveryMovieData
-                            //DatefromEndpoinAllMovie
-                        }
+                        await  movieDataFromEndpoint()
                     } else {
-                        let moviesFromDb: Array<Movie> = try await dbManager.fetchMovieByGenres(forGenre: filterGenres()).compactMap { movie in
-                            return .init(
-                                id: movie.id,
-                                title: movie.title,
-                                overview: movie.overview,
-                                rating: 3,
-                                posterUrl: movie.posterUrl,
-                                genres: movie.genres
-                            )
-                        }
-                        await MainActor.run { [weak self] in
-                            self?.dataForAllMovieTab = moviesFromDb
-                            //DateFromDatabaseAllMovie
-                        }
+                        await movieDataFromDatabase()
                     }
                 }
             }
@@ -84,7 +93,6 @@ internal final class DiscoveryViewModel: ObservableObject {
             token: token
         )
         let response: SearchResponse = try await Webservice().call(listsResource)
-        currentPage += 1
         let moviesForUI: Array<Movie> = response.data?
             .compactMap { details in
                 guard let movieId: String = details.id,
@@ -161,7 +169,7 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func dataFromDatabase() async throws {
-        let moviesFromDb: Array<Movie> = try await dbManager.fetchMovieByGenres(forGenre: selectedGenre.id).compactMap { movie in
+        let moviesFromDb: Array<Movie> = try await dbManager.fetchMovieByGenres(forGenre: filterGenres()).compactMap { movie in
             return .init(
                 id: movie.id,
                 title: movie.title,
@@ -200,11 +208,11 @@ internal final class DiscoveryViewModel: ObservableObject {
         genreForUI.insert(Genre(id: "0", title: "All"), at: 0)
         for genre in genreForUI {
             do {
-                let tabGenre = Genre(
-                    id: genre.id,
-                    title: genre.title
-                )
-                try await dbManager.insert(tabGenre)
+//                let tabGenre = Genre(
+//                    id: genre.id,
+//                    title: genre.title
+//                )
+                try await dbManager.insert(genre)
                 try await dbManager.attachListOfGenre(
                     genreId: genre.id,
                     name: genre.title
@@ -222,10 +230,9 @@ internal final class DiscoveryViewModel: ObservableObject {
                     self?.genresForDiscoveryView = genre
                 }
             } else {
+                let genreTabsFromDb = try await dbManager.fetchGenresTab()
                 await MainActor.run { [weak self] in
-                    Task {
-                        self?.genresForDiscoveryView = try await dbManager.fetchGenresTab()
-                    }
+                        self?.genresForDiscoveryView = genreTabsFromDb
                 }
             }
         } catch {
