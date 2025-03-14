@@ -13,7 +13,7 @@ internal struct DiscoveryView: View {
     
     internal init(
         viewModel: DiscoveryViewModel
-
+        
     ) {
         self._viewModel = .init(wrappedValue: viewModel)
     }
@@ -28,35 +28,37 @@ internal struct DiscoveryView: View {
                     genreTabs: viewModel.genresForDiscoveryView,
                     selectedGenre: viewModel.selectedGenre,
                     action: { genre in
-                    viewModel.selectedGenre = genre
+                        viewModel.selectedGenre = genre
                     }
                 )
-            ScrollView {
-                LazyVStack {
-                    DiscoveryListView(
-                        data: viewModel.dataForAllMovieTab,
-                        chooseButtonAction: { isActive in }
-                    )
-                    Rectangle()
-                        .frame(minHeight: 1)
-                        .foregroundColor(Color.clear)
-                        .onAppear {
-                            viewModel.isFirstTimeLoad = false
-                            Task {
-                                viewModel.fetchNextPage()
+                ScrollView {
+                    LazyVStack {
+                        DiscoveryListView(
+                            data: viewModel.dataForAllMovieTab,
+                            chooseButtonAction: { isActive in }
+                        )
+                        Rectangle()
+                            .frame(minHeight: 1)
+                            .foregroundColor(Color.clear)
+                            .onAppear {
+                                Task {
+                                    viewModel.fetchNextPage()
+                                    viewModel.isFirstTimeLoad = false
+                                }
                             }
-                        }
-                }
+                    }
                 }
             }
             .onChange(of: viewModel.selectedGenre) { change in
                 Task {
+                    viewModel.isFirstTimeLoad = true
                     await viewModel.movieForDiscoveryView()
                 }
             }
         }
         .task {
             await viewModel.dataFromEndpointForGenreTabs()
+            await viewModel.movieForDiscoveryView()
         }
     }
 }

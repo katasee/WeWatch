@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct List: SQLTable {
+internal struct List: SQLTable, Identifiable, Sendable {
     
     internal let id: String
     internal let title: String

@@ -60,7 +60,9 @@ internal final class DiscoveryViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     internal func movieForDiscoveryView() async {
+        await MainActor.run { dataForAllMovieTab = [] }
         currentPage = 0
         UserDefaults.standard.set(Date(), forKey: TimeKey.todayTime)
         do {
@@ -87,7 +89,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             url: URL.SearchResponseURL,
             method: .get([
                 .init(name: "query", value: genre),
-                .init(name: "limit", value: "100"),
+                .init(name: "limit", value: "20"),
                 .init(name: "page", value: page)
             ]),
             token: token
@@ -98,7 +100,8 @@ internal final class DiscoveryViewModel: ObservableObject {
                 guard let movieId: String = details.id,
                       let title: String = details.name,
                       let overview: String = details.overview,
-                      let posterUrl: String = details.imageUrl
+                      let posterUrl: String = details.imageUrl,
+                      let genres = details.genres?.joined(separator: ", ")
                 else {
                     return nil
                 }
@@ -108,7 +111,7 @@ internal final class DiscoveryViewModel: ObservableObject {
                     overview: overview,
                     rating: 3,
                     posterUrl: posterUrl,
-                    genres: genre
+                    genres: genres
                 )
             } ?? .init()
         if try await dbManager.fetchMovieByGenres(forGenre: selectedGenre.id).isEmpty {
@@ -117,7 +120,8 @@ internal final class DiscoveryViewModel: ObservableObject {
                     guard let id: String = movie.id,
                           let title: String = movie.name,
                           let overview: String = movie.overview,
-                          let posterUrl: String = movie.imageUrl
+                          let posterUrl: String = movie.imageUrl,
+                          let genres = movie.genres?.joined(separator: ", ")
                     else {
                         return nil
                     }
@@ -127,15 +131,17 @@ internal final class DiscoveryViewModel: ObservableObject {
                         overview: overview,
                         rating: 3,
                         posterUrl: posterUrl,
-                        genres: genre
+                        genres: genres
                     )
                 } ?? .init()
-            for movie in newMovie {
-                try await dbManager.insert(movie)
-                try await dbManager.insertMovieGenre(
-                    movieId: movie.id,
-                    genreId: genre
-                )
+            if currentPage < 1 {
+                for movie in newMovie {
+                    try await dbManager.insert(movie)
+                    try await dbManager.insertMovieGenre(
+                        movieId: movie.id,
+                        genreId: genre
+                    )
+                }
             }
         }
         return moviesForUI
@@ -145,6 +151,7 @@ internal final class DiscoveryViewModel: ObservableObject {
         if isFirstTimeLoad == false {
             Task {
                 do {
+                    currentPage += 1
                     let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
                         genre: selectedGenre.title,
                         page: String(currentPage)
@@ -152,7 +159,6 @@ internal final class DiscoveryViewModel: ObservableObject {
                     if discoveryMovieData.isEmpty {
                         isBackEndDateEmpty = true
                     } else {
-                        currentPage += 1
                         isBackEndDateEmpty = false
                         await MainActor.run { [weak self] in
                             self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
