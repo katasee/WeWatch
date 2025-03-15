@@ -38,13 +38,3 @@ internal struct PillButton: View {
         }
     }
 }
-
-#Preview {
-    ZStack {
-        Color.black.ignoresSafeArea()
-        PillButton(isActive: true, title: "Action", action: {
-            //nope
-        })
-    }
-}
-

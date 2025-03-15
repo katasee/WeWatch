@@ -18,7 +18,7 @@ internal struct SearchView: View {
     internal var body: some View {
         NavigationView {
             ZStack {
-                Color(.black)
+                Color.blackColor
                     .ignoresSafeArea()
                 ScrollView {
                     SearchListView(

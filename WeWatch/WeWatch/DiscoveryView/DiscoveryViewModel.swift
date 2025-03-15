@@ -22,21 +22,24 @@ internal final class DiscoveryViewModel: ObservableObject {
     internal var currentPage: Int = 0
     internal var isBackEndDateEmpty: Bool = false
     
-    fileprivate enum Constans {
-        static let refreshIntervalHours: Int = 24
-    }
+
     
     internal func movieDataFromEndpoint() async {
+        await MainActor.run { dataForAllMovieTab = [] }
+        currentPage = 0
         do {
             let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
                 genre: filterGenres(),
                 page: String(currentPage)
             )
-            await MainActor.run { [weak self] in
+            try await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = discoveryMovieData
+                if discoveryMovieData.isEmpty {
+                    throw EndpointResponce.dataFromEndpoint
+                }
             }
         } catch {
-            print(error)
+            await movieDataFromDatabase()
         }
     }
     
@@ -59,29 +62,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             print(error)
         }
     }
-    
-    @MainActor
-    internal func movieForDiscoveryView() async {
-        await MainActor.run { dataForAllMovieTab = [] }
-        currentPage = 0
-        UserDefaults.standard.set(Date(), forKey: TimeKey.todayTime)
-        do {
-            if let date: Date = UserDefaults.standard.object(forKey: TimeKey.todayTime) as? Date {
-                if try await dbManager.fetchMovieByGenres(forGenre: filterGenres()).isEmpty {
-                    await movieDataFromEndpoint()
-                } else {
-                    if let diff: Int = Calendar.current.dateComponents([.hour], from: date, to: Date()).hour, diff > Constans.refreshIntervalHours {
-                        await  movieDataFromEndpoint()
-                    } else {
-                        await movieDataFromDatabase()
-                    }
-                }
-            }
-        } catch {
-            print(error)
-        }
-    }
-    
+
     internal func prepareDataForDiscoveryView(genre: String, page: String) async throws -> Array<Movie> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
@@ -95,6 +76,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             token: token
         )
         let response: SearchResponse = try await Webservice().call(listsResource)
+        currentPage += 1
         let moviesForUI: Array<Movie> = response.data?
             .compactMap { details in
                 guard let movieId: String = details.id,
@@ -114,7 +96,7 @@ internal final class DiscoveryViewModel: ObservableObject {
                     genres: genres
                 )
             } ?? .init()
-        if try await dbManager.fetchMovieByGenres(forGenre: selectedGenre.id).isEmpty {
+//        if try await dbManager.fetchMovieByGenres(forGenre: selectedGenre.id).isEmpty {
             let newMovie: Array<Movie> = response.data?
                 .compactMap { movie in
                     guard let id: String = movie.id,
@@ -143,7 +125,6 @@ internal final class DiscoveryViewModel: ObservableObject {
                     )
                 }
             }
-        }
         return moviesForUI
     }
     
@@ -151,7 +132,6 @@ internal final class DiscoveryViewModel: ObservableObject {
         if isFirstTimeLoad == false {
             Task {
                 do {
-                    currentPage += 1
                     let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
                         genre: selectedGenre.title,
                         page: String(currentPage)
@@ -251,3 +231,26 @@ internal final class DiscoveryViewModel: ObservableObject {
         return chooseGenre
     }
 }
+
+
+
+//    internal func movieForDiscoveryView() async {
+//        await MainActor.run { dataForAllMovieTab = [] }
+//        currentPage = 0
+//        UserDefaults.standard.set(Date(), forKey: TimeKey.todayTime)
+//        do {
+//            if let date: Date = UserDefaults.standard.object(forKey: TimeKey.todayTime) as? Date {
+//                if try await dbManager.fetchMovieByGenres(forGenre: filterGenres()).isEmpty {
+//                    await movieDataFromEndpoint()
+//                } else {
+//                    if let diff: Int = Calendar.current.dateComponents([.hour], from: date, to: Date()).hour, diff > Constans.refreshIntervalHours {
+//                        await  movieDataFromEndpoint()
+//                    } else {
+//                        await movieDataFromDatabase()
+//                    }
+//                }
+//            }
+//        } catch {
+//            print(error)
+//        }
+//    }

@@ -17,7 +17,7 @@ internal struct SplashView: View {
     
     private var splashViewContent: some View {
         ZStack {
-            Color(.black)
+            Color.blackColor
                 .ignoresSafeArea()
             VStack{
                 HStack(spacing: 0) {

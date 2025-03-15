@@ -21,17 +21,15 @@ internal struct TodaysSelectionSectionView: View {
     }
     
     internal var body: some View {
-        ZStack {
-            Color.black
-            VStack {
-                HStack {
-                    title
-                    Spacer()
-                }
-                ScrollView(.horizontal, showsIndicators: true) {
-                    HStack(spacing: 20) {
-                        movieCardButton
-                    }
+        
+        VStack {
+            HStack {
+                title
+                Spacer()
+            }
+            ScrollView(.horizontal, showsIndicators: true) {
+                HStack(spacing: 20) {
+                    movieCardButton
                 }
             }
         }

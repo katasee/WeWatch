@@ -38,7 +38,7 @@ internal struct DiscoveryView: View {
                             chooseButtonAction: { isActive in }
                         )
                         Rectangle()
-                            .frame(minHeight: 1)
+                            .frame(minHeight: 16)
                             .foregroundColor(Color.clear)
                             .onAppear {
                                 Task {
@@ -47,18 +47,19 @@ internal struct DiscoveryView: View {
                                 }
                             }
                     }
+                    .id(UUID())
+                    .onChange(of: viewModel.selectedGenre) { change in
+                        Task {
+                            viewModel.isFirstTimeLoad = true
+                            await viewModel.movieDataFromEndpoint()
+                        }
+                    }
+                }
+                .task {
+                    await viewModel.dataFromEndpointForGenreTabs()
+                    await viewModel.movieDataFromEndpoint()
                 }
             }
-            .onChange(of: viewModel.selectedGenre) { change in
-                Task {
-                    viewModel.isFirstTimeLoad = true
-                    await viewModel.movieForDiscoveryView()
-                }
-            }
-        }
-        .task {
-            await viewModel.dataFromEndpointForGenreTabs()
-            await viewModel.movieForDiscoveryView()
         }
     }
 }

@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+//import Lottie
+
 
 internal struct MovieCardDiscover: View {
     
@@ -64,11 +66,18 @@ internal struct MovieCardDiscover: View {
     }
     
     private var filmImage: some View {
-        AsyncImage(url: imageUrl) {
-            image in
-            image
-                .image?.resizable()
-        }
+        AsyncImage(
+            url: imageUrl,
+            content: { image in
+                image
+                .resizable()
+            }, placeholder: {
+                ZStack {
+                    Rectangle()
+//                    LottieView(animation: .named("loader"))
+//                        .playbackMode(.playing(.toProgress(1, loopMode: .loop)))
+                }
+            })
             .cornerRadius(15)
             .frame(maxWidth: 182, maxHeight: 273)
             .background(

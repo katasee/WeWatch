@@ -11,31 +11,23 @@ internal struct DiscoveryListView: View {
     
     @MainActor private let dataForAllMovies: Array<Movie>
     private let chooseButtonAction: @MainActor (Movie) -> Void
-
+    
     internal init(
         data: Array<Movie>,
         chooseButtonAction: @escaping @MainActor (Movie) -> Void
-
+        
     ) {
         self.dataForAllMovies = data
         self.chooseButtonAction = chooseButtonAction
-
+        
     }
     
     internal var body: some View {
-        ZStack {
-            Color.blackColor
-                .ignoresSafeArea()
-            VStack(alignment: .leading) {
-//                categoryTabBar
-                    allMovie
-            }
+        VStack(alignment: .leading) {
+            allMovie
         }
     }
     
-//    private var categoryTabBar: some View {
-//
-//    }
     
     private let columns: Array<GridItem> = [
         GridItem(.flexible()),
@@ -52,14 +44,14 @@ internal struct DiscoveryListView: View {
                         destination: DetailsView(
                             viewModel: DetailsViewModel()
                         )) {
-                        MovieCardDiscover(
-                            isActive: false,
-                            title: model.title,
-                            ranking: Double(model.rating),
-                            imageUrl:URL(string: model.posterUrl),
-                            didTap: { isActive in }
-                        )
-                    }
+                            MovieCardDiscover(
+                                isActive: false,
+                                title: model.title,
+                                ranking: Double(model.rating),
+                                imageUrl:URL(string: model.posterUrl),
+                                didTap: { isActive in }
+                            )
+                        }
                 }
             }
         }

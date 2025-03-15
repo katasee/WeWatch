@@ -20,10 +20,3 @@ internal struct ImagePlaceholder: View {
         }
     }
 }
-
-#Preview {
-    ZStack {
-        Color.black.ignoresSafeArea()
-        ImagePlaceholder()
-    }
-}

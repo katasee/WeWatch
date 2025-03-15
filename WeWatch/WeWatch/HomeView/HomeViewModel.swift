@@ -64,8 +64,8 @@ internal final class HomeViewModel: ObservableObject {
             } ?? .init()
         if try await dbManager.fetchMovieByList(forList: Constans.discoveryList).isEmpty {
             for movie in moviesForUI {
-                  try await dbManager.insert(movie)
-                  try await dbManager.attachMovieToList(
+                try await dbManager.insert(movie)
+                try await dbManager.attachMovieToList(
                     listId: Constans.discoveryList,
                     movieId: movie.id
                 )
@@ -75,29 +75,20 @@ internal final class HomeViewModel: ObservableObject {
     }
     
     internal func movieForDiscoveryView() async throws {
-        UserDefaults.standard.set(Date(), forKey: TimeKey.todayTime)
-        if try await dbManager.fetchMovieByList(forList: Constans.discoveryList).isEmpty{
+        do {
             let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
-            await MainActor.run { [weak self] in
+            try await MainActor.run { [weak self] in
                 self?.discoverySection = discoveryMovieData
-            }
-        } else {
-            if let date: Date = UserDefaults.standard.object(forKey: TimeKey.todayTime) as? Date {
-                if let diff: Int = Calendar.current.dateComponents([.hour], from: date, to: Date()).hour, diff > Constans.refreshIntervalHours {
-                    let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
-                    await MainActor.run { [weak self] in
-                        self?.discoverySection = discoveryMovieData
-                    }
-                } else {
-                    currentPage += 1
-                    let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
-                    await MainActor.run { [weak self] in
-                            self?.discoverySection = fetchMovie
-                    }
+                if discoveryMovieData.isEmpty {
+                    throw EndpointResponce.dataFromEndpoint
                 }
             }
+        } catch {
+            let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
+            await MainActor.run { [weak self] in
+                self?.discoverySection = fetchMovie
+            }
         }
-        
     }
     
     internal func appendDateFromEndpoint() async throws {
@@ -153,15 +144,18 @@ internal final class HomeViewModel: ObservableObject {
     }
     
     internal func dataForTodaySelection() async throws {
-        if hasDateChanged() {
-            let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
+        do {
+        let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
             await MainActor.run { [weak self] in
                 self?.todaySelection = todaySelectionData
             }
-        } else {
+            if todaySelectionData.isEmpty {
+                throw EndpointResponce.dataFromEndpoint
+            }
+        } catch {
             let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
             await MainActor.run { [weak self] in
-                    self?.todaySelection = fetchMovie
+                self?.todaySelection = fetchMovie
             }
         }
     }
@@ -185,7 +179,7 @@ internal final class HomeViewModel: ObservableObject {
 }
 
 //extension Movie {
-//  
+//
 //            guard let movieId: String = details.id,
 //                  let title: String = details.name,
 //                  let image: String = details.imageUrl else {

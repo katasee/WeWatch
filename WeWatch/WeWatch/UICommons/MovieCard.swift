@@ -105,17 +105,3 @@ internal struct MovieCard: View {
             .lineLimit(4)
     }
 }
-
-#Preview {
-    ZStack {
-        Color.black.ignoresSafeArea()
-        MovieCard(
-            isActive: false, title: "Hitman’s Wife’s Bodyguard",
-            ranking: 3.5,
-            genres: "Action, Comedy, Crime",
-            storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......", 
-            imageUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"),
-            didTap: { isActive in }
-        )
-    }
-}

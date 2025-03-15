@@ -17,6 +17,11 @@ enum AuthenticationError: Error {
     case invalidStatusCode
 }
 
+enum EndpointResponce: Error {
+    
+    case dataFromEndpoint
+}
+
 internal struct LoginRequestBody: Encodable {
     
     internal let apikey: String
