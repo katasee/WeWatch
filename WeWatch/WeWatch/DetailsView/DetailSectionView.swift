@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 internal struct DetailSectionView: View {
     
@@ -25,9 +26,14 @@ internal struct DetailSectionView: View {
     }
     
     private var poster: some View {
-        AsyncImage(url: movie.image) { result in
-            result.image?
+        KFImage((movie.image))
                 .resizable()
+                .placeholder({
+                    ZStack {
+                        Rectangle()
+                            .loadingIndicator()
+                    }
+                })
                 .aspectRatio(contentMode: .fill)
                 .frame(minHeight: 932)
                 .overlay(LinearGradient(gradient: Gradient(colors: [
@@ -36,7 +42,6 @@ internal struct DetailSectionView: View {
                     Color.darkColor
                 ]), startPoint: .top, endPoint: .bottom))
         }
-    }
     
     private var title: some View {
         Text(movie.title)

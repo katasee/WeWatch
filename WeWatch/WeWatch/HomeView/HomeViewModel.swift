@@ -145,7 +145,7 @@ internal final class HomeViewModel: ObservableObject {
     
     internal func dataForTodaySelection() async throws {
         do {
-        let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
+            let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
             await MainActor.run { [weak self] in
                 self?.todaySelection = todaySelectionData
             }
@@ -177,21 +177,3 @@ internal final class HomeViewModel: ObservableObject {
         return alphabet.randomElement().map(String.init) ?? "A"
     }
 }
-
-//extension Movie {
-//
-//            guard let movieId: String = details.id,
-//                  let title: String = details.name,
-//                  let image: String = details.imageUrl else {
-//                return nil
-//            }
-//            return .init(
-//                id: movieId,
-//                title: title,
-//                overview: "",
-//                rating: 3,
-//                posterUrl: image,
-//                genres: ""
-//            )
-//        }
-

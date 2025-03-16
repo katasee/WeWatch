@@ -46,7 +46,7 @@ internal struct HomeView: View {
                         try await viewModel.movieForDiscoveryView()
                         try await viewModel.dataForTodaySelection()
                     } catch {
-                        
+                        print(error)
                     }
                 }
                 .padding(16)

@@ -45,16 +45,15 @@ internal struct DiscoverSectionView: View {
     
     private var seeMoreButton: some View {
         Button() {
-            
         } label: {
             NavigationLink(
-               destination: DiscoveryView(
-                   viewModel: DiscoveryViewModel(
-                       dbManager: DatabaseManager(
-                        dataBaseName: DatabaseConfig.name
-                       )
-                   )
-               )
+                destination: DiscoveryView(
+                    viewModel: DiscoveryViewModel(
+                        dbManager: DatabaseManager(
+                            dataBaseName: DatabaseConfig.name
+                        )
+                    )
+                )
             ) {
                 Text("home.see.more.button.title")
                     .font(.poppinsRegular16px)

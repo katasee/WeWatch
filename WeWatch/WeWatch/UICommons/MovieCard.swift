@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 internal struct MovieCard: View {
     
@@ -67,11 +68,14 @@ internal struct MovieCard: View {
     }
     
     private var filmImage: some View {
-        AsyncImage(url: image) {
-            image in
-            image
-                .image?.resizable()
-        }
+        KFImage((image))
+            .resizable()
+            .placeholder({
+                ZStack {
+                    Rectangle()
+                        .loadingIndicator()
+                }
+            })
             .cornerRadius(15)
             .frame(maxWidth: 182, maxHeight: 273)
             .background(

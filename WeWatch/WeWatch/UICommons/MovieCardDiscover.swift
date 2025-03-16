@@ -6,19 +6,19 @@
 //
 
 import SwiftUI
-//import Lottie
+import Kingfisher
 
 
 internal struct MovieCardDiscover: View {
     
     @State private var isActive: Bool
-    @State private var isLoading: Bool = false
+    @State private var isLoading: Bool = true
     private let title: String
     private let ranking: Double
     private let imageUrl: URL?
     private var didTap: @MainActor (Bool) -> Void
     
-
+    
     internal init(
         isActive: Bool,
         title: String,
@@ -68,15 +68,12 @@ internal struct MovieCardDiscover: View {
     }
     
     private var filmImage: some View {
-        AsyncImage(
-            url: imageUrl,
-            content: { image in
-                image
-                .resizable()
-            }, placeholder: {
+        KFImage((imageUrl))
+            .resizable()
+            .placeholder({
                 ZStack {
                     Rectangle()
-                    loader
+                        .loadingIndicator()
                 }
             })
             .cornerRadius(15)
@@ -86,23 +83,4 @@ internal struct MovieCardDiscover: View {
                     .fill(Color.darkGreyColor)
             )
     }
-    
-    var loader: some View {
-            Image(systemName: "arrow.2.circlepath")
-                .resizable()
-                .frame(
-                    width: 24,
-                    height: 24
-                )
-                .foregroundColor(Color.fieryRed)
-                .rotationEffect(Angle(degrees: isLoading ? 360.0 : 0.0))
-                .animation(
-                    Animation.linear(duration: 1.2)
-                        .repeatForever(autoreverses: false),
-                    value: isLoading
-                )
-                .onAppear {
-                    isLoading = true
-                }
-        }
 }
