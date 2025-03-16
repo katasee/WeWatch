@@ -12,10 +12,12 @@ import SwiftUI
 internal struct MovieCardDiscover: View {
     
     @State private var isActive: Bool
+    @State private var isLoading: Bool = false
     private let title: String
     private let ranking: Double
     private let imageUrl: URL?
     private var didTap: @MainActor (Bool) -> Void
+    
 
     internal init(
         isActive: Bool,
@@ -74,8 +76,7 @@ internal struct MovieCardDiscover: View {
             }, placeholder: {
                 ZStack {
                     Rectangle()
-//                    LottieView(animation: .named("loader"))
-//                        .playbackMode(.playing(.toProgress(1, loopMode: .loop)))
+                    loader
                 }
             })
             .cornerRadius(15)
@@ -85,4 +86,23 @@ internal struct MovieCardDiscover: View {
                     .fill(Color.darkGreyColor)
             )
     }
+    
+    var loader: some View {
+            Image(systemName: "arrow.2.circlepath")
+                .resizable()
+                .frame(
+                    width: 24,
+                    height: 24
+                )
+                .foregroundColor(Color.fieryRed)
+                .rotationEffect(Angle(degrees: isLoading ? 360.0 : 0.0))
+                .animation(
+                    Animation.linear(duration: 1.2)
+                        .repeatForever(autoreverses: false),
+                    value: isLoading
+                )
+                .onAppear {
+                    isLoading = true
+                }
+        }
 }

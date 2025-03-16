@@ -48,7 +48,7 @@ internal struct DiscoveryListView: View {
                                 isActive: false,
                                 title: model.title,
                                 ranking: Double(model.rating),
-                                imageUrl:URL(string: model.posterUrl),
+                                imageUrl: URL(string: model.posterUrl),
                                 didTap: { isActive in }
                             )
                         }
