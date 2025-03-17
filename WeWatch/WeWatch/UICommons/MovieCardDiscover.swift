@@ -6,18 +6,31 @@
 //
 
 import SwiftUI
+import Kingfisher
+
 
 internal struct MovieCardDiscover: View {
     
+    @State private var isActive: Bool
+    @State private var isLoading: Bool = true
     private let title: String
     private let ranking: Double
+    private let imageUrl: URL?
+    private var didTap: @MainActor (Bool) -> Void
+    
     
     internal init(
+        isActive: Bool,
         title: String,
-        ranking: Double
+        ranking: Double,
+        imageUrl: URL?,
+        didTap: @escaping @MainActor (Bool) -> Void
     ) {
+        self.isActive = isActive
         self.title = title
         self.ranking = ranking
+        self.imageUrl = imageUrl
+        self.didTap = didTap
     }
     
     internal var body: some View {
@@ -25,11 +38,21 @@ internal struct MovieCardDiscover: View {
             ZStack(alignment: .topTrailing) {
                 filmImage
                 Spacer()
-                Bookmark()
-                    .padding(16)
+                Button {
+                    isActive.toggle()
+                    didTap(isActive)
+                } label: {
+                    if isActive == true {
+                        Bookmark(isActive: true)
+                    } else {
+                        Bookmark(isActive: false)
+                    }
+                }
+                .padding(16)
             }
             Text(title)
                 .font(.poppinsBold18px)
+                .lineLimit(1)
             HStack {
                 filmRanking
                 Image("star-full-icon")
@@ -45,22 +68,19 @@ internal struct MovieCardDiscover: View {
     }
     
     private var filmImage: some View {
-        ImageComponent(image: Image(""))
+        KFImage(imageUrl)
+            .resizable()
+            .placeholder({
+                ZStack {
+                    Rectangle()
+                        .loadingIndicator()
+                }
+            })
             .cornerRadius(15)
             .frame(maxWidth: 182, maxHeight: 273)
             .background(
                 RoundedRectangle(cornerRadius: 15)
                     .fill(Color.darkGreyColor)
             )
-    }
-}
-
-#Preview {
-    ZStack {
-        Color.black.ignoresSafeArea()
-        MovieCardDiscover(
-            title: "Hitman’s Wife’s Bodyguard",
-            ranking: 3.5
-        )
     }
 }

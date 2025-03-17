@@ -21,17 +21,15 @@ internal struct TodaysSelectionSectionView: View {
     }
     
     internal var body: some View {
-        ZStack {
-            Color.black
-            VStack {
-                HStack {
-                    title
-                    Spacer()
-                }
-                ScrollView(.horizontal, showsIndicators: true) {
-                    HStack(spacing: 20) {
-                        movieCardButton
-                    }
+        
+        VStack {
+            HStack {
+                title
+                Spacer()
+            }
+            ScrollView(.horizontal, showsIndicators: true) {
+                HStack(spacing: 20) {
+                    movieCardButton
                 }
             }
         }
@@ -51,7 +49,7 @@ internal struct TodaysSelectionSectionView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                NavigationLink(destination: DetailsView()) {
+                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel())) {
                     MovieCardTopFive(
                         title: model.title,
                         ranking: Double(model.rating),

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 internal struct MovieCard: View {
     
@@ -67,11 +68,14 @@ internal struct MovieCard: View {
     }
     
     private var filmImage: some View {
-        AsyncImage(url: image) {
-            image in
-            image
-                .image?.resizable()
-        }
+        KFImage(image)
+            .resizable()
+            .placeholder({
+                ZStack {
+                    Rectangle()
+                        .loadingIndicator()
+                }
+            })
             .cornerRadius(15)
             .frame(maxWidth: 182, maxHeight: 273)
             .background(
@@ -103,19 +107,5 @@ internal struct MovieCard: View {
             .font(.poppinsRegular13px)
             .foregroundColor(.lightGreyColor)
             .lineLimit(4)
-    }
-}
-
-#Preview {
-    ZStack {
-        Color.black.ignoresSafeArea()
-        MovieCard(
-            isActive: false, title: "Hitman’s Wife’s Bodyguard",
-            ranking: 3.5,
-            genres: "Action, Comedy, Crime",
-            storyline: "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on anoth......", 
-            imageUrl: URL(string: "https://m.media-amazon.com/images/M/MV5BZjFhZmU5NzUtZTg4Zi00ZjRjLWI0YmQtODk2MzI4YjNhYTdkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"),
-            didTap: { isActive in }
-        )
     }
 }

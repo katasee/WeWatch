@@ -79,7 +79,7 @@ internal struct SearchListView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                NavigationLink(destination: DetailsView()) {
+                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel())) {
                     MovieCard(
                         isActive: false, title: model.title,
                         ranking: model.rating,

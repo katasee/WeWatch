@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 internal struct MovieCardTopFive: View {
     
@@ -32,14 +33,17 @@ internal struct MovieCardTopFive: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     ZStack(alignment: .topTrailing) {
-                        AsyncImage(url: imageUrl) {
-                            image in
-                            image
-                                .image?.resizable()
+                        KFImage(imageUrl)
+                            .resizable()
+                            .placeholder({
+                                ZStack {
+                                    Rectangle()
+                                        .loadingIndicator()
+                                }
+                            })
                                 .aspectRatio(contentMode: .fill)
                                 .frame(maxWidth: 300, maxHeight: 200)
                                 .clipped()
-                        }
                         Button {
                             isActive.toggle()
                             didTap(isActive)

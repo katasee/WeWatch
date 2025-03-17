@@ -9,35 +9,48 @@ import SwiftUI
 
 internal struct HomeView: View {
     
-    @StateObject private var viewModel: HomeViewModel = .init()
+    @StateObject private var viewModel: HomeViewModel
+    
+    internal init(viewModel: HomeViewModel) {
+        self._viewModel = .init(wrappedValue: viewModel)
+    }
     
     internal var body: some View {
         NavigationView {
             ZStack {
-                Color(.black)
+                Color.blackColor
                     .ignoresSafeArea()
                 ScrollView {
-                    VStack {
+                    LazyVStack {
                         TodaysSelectionSectionView(
-                            data: viewModel.dataForTodaysSelectionSectionView,
+                            data: viewModel.todaySelection,
                             chooseButtonAction: { isActive in }
                         )
                         DiscoverSectionView(
-                            data: viewModel.dataForDiscoveryPreviewModel,
+                            data: viewModel.discoverySection,
                             seeMoreButtonAction: {},
                             chooseButtonAction: { isActive in }
                         )
+                        if !viewModel.discoverySection.isEmpty {
+                            Rectangle()
+                                .frame(minHeight: 1)
+                                .foregroundColor(Color.clear)
+                                .onAppear {
+                                    Task { try await viewModel.appendDateFromEndpoint()}
+                                }
+                        }
                     }
                 }
                 .task {
-                    await viewModel.dataForTodaySelection()
+                    do {
+                        try await viewModel.movieForDiscoveryView()
+                        try await viewModel.dataForTodaySelection()
+                    } catch {
+                        print(error)
+                    }
                 }
                 .padding(16)
             }
         }
     }
-}
-
-#Preview {
-    HomeView()
 }

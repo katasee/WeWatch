@@ -17,6 +17,11 @@ enum AuthenticationError: Error {
     case invalidStatusCode
 }
 
+enum EndpointResponce: Error {
+    
+    case dataFromEndpoint
+}
+
 internal struct LoginRequestBody: Encodable {
     
     internal let apikey: String
@@ -75,12 +80,12 @@ internal final class Webservice {
                 throw AuthenticationError.invalidCredentials
             }
             request = URLRequest(url: url)
+            print(request)
         }
         
         let configuration: URLSessionConfiguration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = ["Content-Type": "application/json"]
         let session: URLSession = URLSession(configuration: configuration)
-        
         if let token = resource.token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
@@ -105,5 +110,9 @@ extension URL {
     
     static var SearchResponseURL: URL {
         return URL(string: "https://api4.thetvdb.com/v4/search")!
+    }
+    
+    static var GenreResponseURL: URL {
+        return URL(string: "https://api4.thetvdb.com/v4/genres")!
     }
 }

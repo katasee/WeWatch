@@ -9,186 +9,435 @@
 import Foundation
 import SQLite3
 
-internal final class DatabaseManager {
+internal enum DatabaseError: Error {
     
-    internal static let shared: DatabaseManager = .init()
+    case openDatabase(message: String)
+    case createTable(message: String)
+    case prepare(message: String)
+    case step(message: String)
+    case bind(message: String)
+    case missingId
+    case unknownError
+    case transactionError
+}
+
+internal enum TimeKey {
     
-    internal enum DatabaseError: Error {
-        
-        case movieAddError
-        case movieNotAdd
-        case dublicateError
-        case updateError
-        case notUpdate
-        case movieTableCreatioFailed
-        case selectStatementFailed
-        case movieNotDelete
-        case movieDeleteNotPrepare
-    }
+    internal static let todayTime: String = "TodayTime"
+    internal static let page: String = "CurrentPage"
+}
+
+internal enum DatabaseConfig {
     
-    private init() {
-        db = openDatabase()
+    internal static let name: String = "WeWatch_v1.sqlite"
+}
+
+internal enum SQLStatements {
+    
+    internal static let createMoviesTableSQL: String = """
+     CREATE TABLE IF NOT EXISTS movies(
+     id TEXT PRIMARY KEY,
+     title TEXT NOT NULL,
+     overview TEXT,
+     rating REAL,
+     posterUrl TEXT,
+     genres TEXT
+     );
+     """
+    internal static let createListsTableSQL: String = """
+     CREATE TABLE IF NOT EXISTS lists(
+     id TEXT PRIMARY KEY,
+     title TEXT NOT NULL
+     );
+     """
+    internal static let createGenresTableSQL: String = """
+     CREATE TABLE IF NOT EXISTS genres(
+     id TEXT PRIMARY KEY,
+     title TEXT NOT NULL
+     );
+     """
+    internal static let createMovieGenreTableSQL: String = """
+     CREATE TABLE IF NOT EXISTS movie_genres (
+     movie_id TEXT NOT NULL,
+     genre_id TEXT NOT NULL,
+     PRIMARY KEY(movie_id, genre_id),
+     FOREIGN KEY(movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+     FOREIGN KEY(genre_id) REFERENCES genres(id) ON DELETE CASCADE
+     );
+     """
+    internal static let createdListMovieTableSQL: String = """
+     CREATE TABLE IF NOT EXISTS list_movies (
+     list_id TEXT NOT NULL,
+     movie_id TEXT NOT NULL,
+     PRIMARY KEY(list_id, movie_id),
+     FOREIGN KEY(list_id) REFERENCES lists(id) ON DELETE CASCADE,
+     FOREIGN KEY(movie_id) REFERENCES movies(id) ON DELETE CASCADE
+     );
+     """
+    internal static let insertGenreMovies: String = "INSERT OR IGNORE INTO movie_genres (movie_id, genre_id) VALUES (?, ?);"
+    internal static let insertListMovies: String = "INSERT OR REPLACE INTO list_movies (list_id, movie_id) VALUES (?, ?);"
+    internal static let insertGenres: String = "INSERT OR REPLACE INTO genres (id, title) VALUES (?, ?);"
+    internal static let selectMovieByList: String = """
+     SELECT m.*
+     FROM movies m
+     JOIN list_movies lm ON lm.movie_id = m.id
+     WHERE lm.list_id = ?;
+     """
+    internal static let selectMovieByGenre: String = """
+     SELECT m.*
+     FROM movies m
+     JOIN movie_genres lm ON lm.movie_id = m.id
+     WHERE lm.genre_id = ?;
+     """
+    internal static let selectedGenres: String = "SELECT * FROM genres;"
+    internal static let beginTransaction: String = "BEGIN TRANSACTION;"
+    internal static let saveAllChanges: String = "COMMIT;"
+    internal static let undoesChanges: String = "ROLLBACK;"
+}
+
+internal protocol SQLTable {
+    
+    static var tableName: String { get }
+    static var createTableStatement: String { get }
+    
+    init(row: Dictionary<String, Any>) throws
+    func toDictionary() -> Dictionary<String, Any>
+}
+
+internal enum SQLiteConstants {
+    
+    internal static let sqliteTransient: sqlite3_destructor_type = unsafeBitCast(OpaquePointer(bitPattern: -1), to: sqlite3_destructor_type.self)
+}
+
+internal actor DatabaseManager {
+    
+    private var db: OpaquePointer?
+    private let queue = DispatchQueue(label: "com.example.DatabaseManager")
+    
+    internal init(dataBaseName: String = DatabaseConfig.name) {
         do {
-            try createMovieTable()
+            try openDatabase(named: dataBaseName)
+            try createAllTables()
         } catch {
-            print("Error creating table: \(error)")
-#warning("Handle error later")
+            
         }
     }
     
-    private let dataPath: String = "MyDB"
-    private var db: OpaquePointer?
+    deinit {
+        sqlite3_close(db)
+    }
     
-    internal func openDatabase() -> OpaquePointer? {
-        let filePath: URL = try! FileManager.default.url(
+    private func openDatabase(named dbName: String) throws {
+        let fileUrl: URL = try FileManager.default.url(
             for: .documentDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
             create: false
-        ).appendingPathComponent(dataPath)
-        var db: OpaquePointer? = nil
-        
-        if sqlite3_open(filePath.path, &db) != SQLITE_OK {
-            return nil
-        } else {
-            return db
+        ).appendingPathComponent(dbName)
+        if sqlite3_open(fileUrl.path, &db) != SQLITE_OK {
+            let errmsg: String = .init(cString: sqlite3_errmsg(db))
+            throw DatabaseError.openDatabase(message: errmsg)
         }
     }
     
-    internal func createMovieTable() throws {
-        let createTableString: String = """
-        CREATE TABLE IF NOT EXISTS Movie(
-            movieId TEXT PRIMARY KEY UNIQUE,
-            title TEXT,
-            overview TEXT,
-            releaseDate TEXT,
-            rating INTEGER,
-            posterUrl TEXT
-        );
-"""
+    private func createAllTables() throws {
+        try createTable(for: Movie.self)
+        try createTable(for: Genre.self)
+        try createTable(for: List.self)
+        if sqlite3_exec(db, SQLStatements.createMovieGenreTableSQL, nil, nil, nil) != SQLITE_OK {
+            let errmsg: String = .init(cString: sqlite3_errmsg(db))
+            throw DatabaseError.createTable(message: "Error creating movie_genres: \(errmsg)")
+        }
+        if sqlite3_exec(db, SQLStatements.createdListMovieTableSQL, nil, nil, nil) != SQLITE_OK {
+            let errmsg: String = .init(cString: sqlite3_errmsg(db))
+            throw DatabaseError.createTable(message: "Error creating list_movies: \(errmsg)")
+        }
+    }
+    
+    internal func createTable<T: SQLTable>(for type: T.Type) throws {
+        let sql = T.createTableStatement
+        if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK {
+            let errmsg: String = .init(cString: sqlite3_errmsg(db))
+            throw DatabaseError.createTable(message: "Error creating table \(T.tableName): \(errmsg)")
+        }
+    }
+    
+    private func beginTransaction() {
+        sqlite3_exec(db, SQLStatements.beginTransaction, nil, nil, nil)
+    }
+    
+    private func commitTransaction() {
+        sqlite3_exec(db, SQLStatements.saveAllChanges, nil, nil, nil)
+    }
+    
+    private func rollbackTransaction() {
+        sqlite3_exec(db, SQLStatements.undoesChanges, nil, nil, nil)
+    }
+    
+    private func transaction(_ transactionBlock: (DatabaseManager) throws -> ()) throws {
+        beginTransaction()
+        do {
+            try transactionBlock(self)
+            commitTransaction()
+        } catch {
+            rollbackTransaction()
+            throw DatabaseError.transactionError
+        }
+    }
+   
+    
+    internal func insert<T: SQLTable>(_ item: T) throws {
         
-        var createTableStatement: OpaquePointer? = nil
-        if sqlite3_prepare_v2(db, createTableString, -1, &createTableStatement, nil) == SQLITE_OK {
-            if sqlite3_step(createTableStatement) == SQLITE_DONE {
-            } else {
-                throw DatabaseError.movieTableCreatioFailed
+        try transaction {  dbManager in
+            let dict: Dictionary<String, Any> = item.toDictionary()
+            let columns: String = dict.keys.joined(separator: ", ")
+            let placeholders: String = dict.keys.map { _ in "?"}.joined(separator: ", ")
+            let sql: String = "INSERT OR REPLACE INTO \(T.tableName)(\(columns)) VALUES (\(placeholders));"
+            var stmt: OpaquePointer?
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
             }
-        } else {
-            throw DatabaseError.movieTableCreatioFailed
+            var index: Int32 = 1
+            for key in dict.keys {
+                let value: Any? = dict[key]
+                try bindValue(value, to: stmt, at: index)
+                index += 1
+            }
+            if sqlite3_step(stmt) != SQLITE_DONE {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.step(message: errmsg)
+            }
         }
-        sqlite3_finalize(createTableStatement)
     }
     
+    internal func update<T: SQLTable>(_ item: T) throws {
+        try transaction { dbManager in
+            let dict: Dictionary<String, Any> = item.toDictionary()
+            guard let idValue: Any = dict["id"] else {
+                throw DatabaseError.missingId
+            }
+            let filtered: Dictionary<String, Any> = dict.filter { $0.key != "id" }
+            let assignments: String = filtered.map { "\($0.key) = ?" }.joined(separator: ", ")
+            let sql: String = "UPDATE \(T.tableName) SET \(assignments) WHERE id = ?;"
+            
+            var stmt: OpaquePointer?
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
+            }
+            
+            var index: Int32 = 1
+            for key in filtered.keys {
+                let value: Any? = filtered[key]
+                try bindValue(value, to: stmt, at: index)
+                index += 1
+            }
+            
+            if let intId: Int = idValue as? Int {
+                sqlite3_bind_int(stmt,index, Int32(intId))
+            } else if let strId: String = idValue as? String {
+                sqlite3_bind_text(stmt, index, strId, -1, SQLiteConstants.sqliteTransient)
+            } else {
+                throw DatabaseError.bind(message: "Unsupported id type")
+            }
+            if sqlite3_step(stmt) != SQLITE_DONE {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.step(message: errmsg)
+            }
+        }
+    }
     
-    internal func insertMovie(
+    internal func delete<T: SQLTable>(from type: T.Type, id: Any) throws {
+        try transaction { dbManager in
+            let sql = "DELETE FROM \(T.tableName) WHERE id = ?;"
+            var stmt: OpaquePointer?
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
+            }
+            if let intId: Int = id as? Int {
+                sqlite3_bind_int(stmt, 1, Int32(intId))
+            } else if let strId: String = id as? String {
+                sqlite3_bind_text(stmt, 1, strId, -1, SQLiteConstants.sqliteTransient)
+            } else {
+                throw DatabaseError.bind(message: "Unsupported id type")
+            }
+            if sqlite3_step(stmt) != SQLITE_DONE {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.step(message: errmsg)
+            }
+        }
+    }
+    
+    internal func insertMovieGenre(
         movieId: String,
-        title: String,
-        overview: String,
-        releaseDate: String,
-        rating: Int,
-        posterUrl: String
+        genreId: String
     ) throws {
-        let insertStatementString: String = "INSERT INTO Movie (movieId, title, overview, releaseDate, rating, posterUrl) VALUES (?, ?, ?, ?, ?, ?);"
-        var insertStatement: OpaquePointer? = nil
-        if sqlite3_prepare_v2(db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
-            sqlite3_bind_text(insertStatement, 1, (movieId as NSString).utf8String, -1, nil)
-            sqlite3_bind_text(insertStatement, 2, (title as NSString).utf8String, -1, nil)
-            sqlite3_bind_text(insertStatement, 3, (overview as NSString).utf8String, -1, nil)
-            sqlite3_bind_text(insertStatement, 4, (releaseDate as NSString).utf8String, -1, nil)
-            sqlite3_bind_int(insertStatement, 5, Int32(rating))
-            sqlite3_bind_text(insertStatement, 6, (posterUrl as NSString).utf8String, -1, nil)
-            if sqlite3_step(insertStatement) == SQLITE_DONE {
-                sqlite3_finalize(insertStatement)
-            } else {
-                throw DatabaseError.movieNotAdd
-            }
-        } else {
-            throw DatabaseError.movieAddError
+        try transaction { dbManager in
+            try executeSimpleQuery(
+                sql: SQLStatements.insertGenreMovies,
+                params: [movieId, genreId]
+            )
         }
     }
     
-    internal func getAllMovies() throws -> Array<Movie> {
-        let queryStatementString: String = "SELECT * FROM Movie;"
-        var queryStatement: OpaquePointer? = nil
-        var movies: [Movie] = []
-        if sqlite3_prepare_v2(db, queryStatementString, -1, &queryStatement, nil) == SQLITE_OK {
-            while sqlite3_step(queryStatement) == SQLITE_ROW {
-                let movieId: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 0)))
-                let title: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 1)))
-                let overview: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 2)))
-                let releaseDate: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 3)))
-                let rating: Int32 = sqlite3_column_int(queryStatement, 4)
-                let posterUrl: String = String(describing: String(cString: sqlite3_column_text(queryStatement, 5)))
-                movies.append(Movie(
-                    movieId: String(movieId),
-                    title: title,
-                    overview: overview,
-                    releaseDate: releaseDate,
-                    rating: Int(rating),
-                    posterUrl: posterUrl
-                ))
-            }
-        } else {
-            throw DatabaseError.selectStatementFailed
+    internal func attachMovieToList(
+        listId: String,
+        movieId: String
+    ) throws {
+        try transaction { dbManager in
+            try executeSimpleQuery(sql: SQLStatements.insertListMovies, params: [listId, movieId])
         }
-        sqlite3_finalize(queryStatement)
+    }
+    
+    internal func attachListOfGenre(
+        genreId: String,
+        name: String
+    ) throws {
+        try transaction { dbManager in
+            try executeSimpleQuery(sql: SQLStatements.insertGenres, params: [genreId, name])
+        }
+    }
+    
+    internal func fetch<T: SQLTable>(_:T.Type) throws -> [T] {
+        var results: [T] = []
+        try transaction { dbManager in
+            let sql: String = "SELECT * FROM \(T.tableName);"
+            var stmt: OpaquePointer?
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
+            }
+            while sqlite3_step(stmt) == SQLITE_ROW {
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
+                let item: T = try .init(row: row)
+                results.append(item)
+            }
+        }
+        return results
+    }
+    
+    internal func fetchMovieByList(forList listId: String) throws -> [Movie] {
+        var stmt: OpaquePointer?
+        var movies: [Movie] = []
+        try transaction { dbManager in
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, SQLStatements.selectMovieByList, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
+            }
+            sqlite3_bind_text(stmt, 1, listId, -1, SQLiteConstants.sqliteTransient)
+            
+            while sqlite3_step(stmt) == SQLITE_ROW {
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
+                let movie: Movie = try .init(row: row)
+                movies.append(movie)
+            }
+        }
+        return movies
+        
+    }
+    
+    internal func fetchMovieByGenres(forGenre genreId: String) throws -> [Movie] {
+        var stmt: OpaquePointer?
+        var movies: [Movie] = []
+        try transaction { dbManager in
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, SQLStatements.selectMovieByGenre, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
+            }
+            sqlite3_bind_text(stmt, 1, genreId, -1, SQLiteConstants.sqliteTransient)
+            while sqlite3_step(stmt) == SQLITE_ROW {
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
+                let movie: Movie = try .init(row: row)
+                movies.append(movie)
+            }
+        }
         return movies
     }
     
-    internal func updateMovie(
-        movieId: String,
-        title: String,
-        overview: String,
-        releaseDate: String,
-        rating: Int,
-        posterUrl: String
-    ) throws {
-        let updateStatementString: String = "UPDATE Movie SET title = ?, overview = ?, releaseDate = ?, rating = ?, posterUrl = ? WHERE movieId = ?;"
-        var updateStatement: OpaquePointer? = nil
-        if sqlite3_prepare_v2(db, updateStatementString, -1, &updateStatement, nil) == SQLITE_OK {
-            sqlite3_bind_text(updateStatement, 1, (title as NSString).utf8String, -1, nil)
-            sqlite3_bind_text(updateStatement, 2, (overview as NSString).utf8String, -1, nil)
-            sqlite3_bind_text(updateStatement, 3, (releaseDate as NSString).utf8String, -1, nil)
-            sqlite3_bind_int(updateStatement, 4, Int32(rating))
-            sqlite3_bind_text(updateStatement, 5, (posterUrl as NSString).utf8String, -1, nil)
-            sqlite3_bind_text(updateStatement, 6, (movieId as NSString).utf8String, -1, nil)
-            if sqlite3_step(updateStatement) == SQLITE_DONE {
-                sqlite3_finalize(updateStatement)
-            } else {
-                throw DatabaseError.notUpdate
+    internal func fetchGenresTab() throws -> [Genre] {
+        var stmt: OpaquePointer?
+        var genres: [Genre] = []
+        try transaction { dbManager in
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, SQLStatements.selectedGenres, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
             }
+            while sqlite3_step(stmt) == SQLITE_ROW {
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
+                let genre: Genre = try .init(row: row)
+                genres.append(genre)
+            }
+        }
+        return genres
+    }
+    
+    internal func mapRowToDict(stmt: OpaquePointer?) -> [String: Any] {
+        guard let stmt: OpaquePointer = stmt else { return [:] }
+        var row: Dictionary<String, Any> = [:]
+        let columnCount: Int32 = sqlite3_column_count(stmt)
+        for i in 0..<columnCount {
+            guard let colNameCStr: UnsafePointer<CChar> = sqlite3_column_name(stmt, i) else { continue }
+            let colName: String = .init(cString: colNameCStr)
+            let colType: Int32 = sqlite3_column_type(stmt, i)
+            switch colType {
+            case SQLITE_INTEGER:
+                let intVal: Int32 = sqlite3_column_int(stmt, i)
+                row[colName] = Int(intVal)
+            case SQLITE_FLOAT:
+                let dblVal: Double = sqlite3_column_double(stmt, i)
+                row[colName] = Double(dblVal)
+            case SQLITE_TEXT:
+                if let cString: UnsafePointer<UInt8> = sqlite3_column_text(stmt, i) {
+                    row[colName] = String(cString: cString)
+                }
+            case SQLITE_NULL:
+                row[colName] = nil
+            default:
+                break
+            }
+        }
+        return row
+    }
+    
+    
+    private func bindValue(_ value: Any?, to stmt: OpaquePointer?, at index: Int32) throws {
+        if let intVal = value as? Int {
+            sqlite3_bind_int(stmt, index, Int32(intVal))
+        } else if let doubleVal = value as? Double {
+            sqlite3_bind_double(stmt, index, doubleVal)
+        } else if let strVal = value as? String {
+            let sqliteTransient = SQLiteConstants.sqliteTransient
+            sqlite3_bind_text(stmt, index, strVal, -1, sqliteTransient)
+        } else if value == nil {
+            sqlite3_bind_null(stmt, index)
         } else {
-            throw DatabaseError.updateError
+            throw DatabaseError.bind(message: "Unsupported type for index \(index)")
         }
     }
     
-    internal func deleteMovie(by id: String) throws  {
-        let deleteStatementString: String = "DELETE FROM Movie;"
-        var deleteStatement: OpaquePointer? = nil
-        if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
-            sqlite3_bind_text(deleteStatement, 1, (id as NSString).utf8String, -1, nil)
-            if sqlite3_step(deleteStatement) == SQLITE_DONE {
-            } else {
-                throw DatabaseError.movieNotDelete
-            }
-        } else {
-            throw DatabaseError.movieDeleteNotPrepare
+    private func executeSimpleQuery(sql: String, params: [String]) throws {
+        var stmt: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+            let errmsg: String = .init(cString: sqlite3_errmsg(db))
+            throw DatabaseError.prepare(message: errmsg)
         }
-        sqlite3_finalize(deleteStatement)
-    }
-    
-    deinit {
-        closeDatabase()
-    }
-    
-    internal func closeDatabase() {
-        if sqlite3_close(db) == SQLITE_OK {
-            print("Database connection closed successfully.")
-        } else {
-            print("Error closing database connection.")
-#warning("Handle error later")
+        defer { sqlite3_finalize(stmt) }
+        for (index, param) in params.enumerated() {
+            let sqliteTransient = SQLiteConstants.sqliteTransient
+            sqlite3_bind_text(stmt, Int32(index + 1), param, -1, sqliteTransient)
+        }
+        if sqlite3_step(stmt) != SQLITE_DONE {
+            let errmsg: String = .init(cString: sqlite3_errmsg(db))
+            throw DatabaseError.step(message: errmsg)
         }
     }
 }
-
-

@@ -24,7 +24,7 @@ internal struct MovieCategoryView: View {
     }
     
     internal var body: some View {
-        ScrollView(.horizontal) {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 ForEach(genreTabs, id: \.self) { tab in
                     PillButton(

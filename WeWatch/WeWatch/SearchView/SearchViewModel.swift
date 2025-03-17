@@ -12,7 +12,7 @@ internal final class SearchViewModel: ObservableObject {
     @Published internal var setOfGenres: Array<Genre> = []
     @Published internal var dataForSearchView: Array<MovieCardPreviewModel> = []
     @Published internal var searchText: String = ""
-    @Published internal var selectedGenre: Genre = .init(title: "")
+    @Published internal var selectedGenre: Genre = .init(id: "", title: "")
     
     internal func prepareDataSearchView() {
         dataForSearchView = MovieCardPreviewModel.mock()
@@ -29,7 +29,7 @@ internal final class SearchViewModel: ObservableObject {
         
         let uniqueGenres = Set(availableGenres)
         
-        return uniqueGenres.map { Genre(title: $0)}
+        return uniqueGenres.map { Genre(id: $0, title: $0)}
     }
     
     internal func prepareUniqGenres() {

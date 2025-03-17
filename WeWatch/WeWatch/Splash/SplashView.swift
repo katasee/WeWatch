@@ -9,11 +9,15 @@ import SwiftUI
 
 internal struct SplashView: View {
     
-    @StateObject private var viewModel: SplashViewModel = .init()
+    @StateObject private var viewModel: SplashViewModel
+    
+    internal init(viewModel: SplashViewModel) {
+        self._viewModel = .init(wrappedValue: viewModel)
+    }
     
     private var splashViewContent: some View {
         ZStack {
-            Color(.black)
+            Color.blackColor
                 .ignoresSafeArea()
             VStack{
                 HStack(spacing: 0) {
@@ -51,8 +55,4 @@ internal struct SplashView: View {
                 }
         }
     }
-}
-
-#Preview {
-     SearchView()
 }
