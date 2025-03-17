@@ -42,7 +42,7 @@ internal struct DiscoveryListView: View {
                 } label: {
                     NavigationLink(
                         destination: DetailsView(
-                            viewModel: DetailsViewModel()
+                            viewModel: DetailsViewModel(detailsForMovie: model, movieId: model.id)
                         )) {
                             MovieCardDiscover(
                                 isActive: false,

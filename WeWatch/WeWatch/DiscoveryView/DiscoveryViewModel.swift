@@ -30,7 +30,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             self?.currentPage = 0
         }
         do {
-            let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
+            let discoveryMovieData: Array<Movie> = try await prepareDataForDiscoveryView(
                 genre: filterGenres(),
                 page: String(currentPage)
             )

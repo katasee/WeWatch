@@ -14,15 +14,16 @@ internal struct DetailsView: View {
     internal init(viewModel: DetailsViewModel) {
         self._viewModel = .init(wrappedValue: viewModel)
     }
-        
+    
     internal var body: some View {
         ZStack {
             NavigationBarButtons(
-                movie: viewModel.dataForDetailsView, action: {_ in }
+                movie: viewModel.movieForDetailsView,
+                action: {_ in }
             )
             ScrollView {
                 VStack {
-                    DetailSectionView(movie: viewModel.dataForDetailsView)
+                    DetailSectionView(movie: viewModel.movieForDetailsView)
                 }
             }
         }

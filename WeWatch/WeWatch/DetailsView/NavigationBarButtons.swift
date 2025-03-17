@@ -10,11 +10,11 @@ import SwiftUI
 internal struct NavigationBarButtons: View {
     
     @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
-    internal var movie: MovieCardPreviewModel
-    private var action: (Int) -> Void
+    internal var movie: Movie
+    private var action: (String) -> Void
     init(
-        movie: MovieCardPreviewModel,
-        action: @escaping (Int) -> Void
+        movie: Movie,
+        action: @escaping (String) -> Void
     ) {
         self.movie = movie
         self.action = action

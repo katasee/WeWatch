@@ -10,7 +10,7 @@ import Kingfisher
 
 internal struct DetailSectionView: View {
     
-    internal var movie: MovieCardPreviewModel
+    internal var movie: Movie
     
     internal var body: some View {
         ZStack(alignment: .leading) {
@@ -26,22 +26,22 @@ internal struct DetailSectionView: View {
     }
     
     private var poster: some View {
-        KFImage(movie.image)
-                .resizable()
-                .placeholder({
-                    ZStack {
-                        Rectangle()
-                            .loadingIndicator()
-                    }
-                })
-                .aspectRatio(contentMode: .fill)
-                .frame(minHeight: 932)
-                .overlay(LinearGradient(gradient: Gradient(colors: [
-                    Color.clear,
-                    Color.darkColor,
-                    Color.darkColor
-                ]), startPoint: .top, endPoint: .bottom))
-        }
+        KFImage(URL(string: movie.posterUrl))
+            .resizable()
+            .placeholder({
+                ZStack {
+                    Rectangle()
+                        .loadingIndicator()
+                }
+            })
+            .aspectRatio(contentMode: .fill)
+            .frame(minHeight: 932)
+            .overlay(LinearGradient(gradient: Gradient(colors: [
+                Color.clear,
+                Color.darkColor,
+                Color.darkColor
+            ]), startPoint: .top, endPoint: .bottom))
+    }
     
     private var title: some View {
         Text(movie.title)

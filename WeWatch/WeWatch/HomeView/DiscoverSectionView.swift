@@ -67,7 +67,7 @@ internal struct DiscoverSectionView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel())) {
+                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel(detailsForMovie: model, movieId: model.id))) {
                     MovieCard(
                         isActive: false,
                         title: model.title,

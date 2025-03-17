@@ -13,11 +13,11 @@ internal struct ExpandableTextView: View {
     @State private var clipped: Bool = false
     
     internal let lineLimit: Int
-    internal let movie: MovieCardPreviewModel
+    internal let movie: Movie
     
     internal init(
         lineLimit: Int,
-        movie: MovieCardPreviewModel
+        movie: Movie
     ) {
         self.lineLimit = lineLimit
         self.movie = movie
@@ -44,15 +44,15 @@ internal struct ExpandableTextView: View {
     }
     
     private var text: some View {
-        Text(movie.storyline)
+        Text(movie.overview)
             .lineLimit(fullText ? nil : lineLimit)
     }
     
     private var verificateIfTextClipped: some View {
-        Text(movie.storyline).lineLimit(lineLimit)
+        Text(movie.overview).lineLimit(lineLimit)
             .background(GeometryReader { visibleTextGeometry in
                 ZStack {
-                    Text(movie.storyline)
+                    Text(movie.overview)
                         .background(GeometryReader { fullTextGeometry in
                             Color.clear.onAppear {
                                 self.clipped = fullTextGeometry.size.height > visibleTextGeometry.size.height
