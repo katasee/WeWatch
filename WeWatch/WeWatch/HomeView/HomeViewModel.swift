@@ -12,12 +12,14 @@ internal final class HomeViewModel: ObservableObject {
     @Published internal var todaySelection: Array<Movie> = []
     @Published internal var discoverySection: Array<Movie> = []
     internal var currentPage: Int = .init()
-    var dbManager: DatabaseManager = .init(dataBaseName: DatabaseConfig.name)
+    internal var dbManager: DatabaseManager = .init(dataBaseName: DatabaseConfig.name)
+    
     init(dbManager: DatabaseManager) {
         self.dbManager = dbManager
     }
     
     fileprivate enum Constans {
+        
         internal static let discoveryList: String = "DiscoverySection"
         internal static let todaySelectionList: String = "TodaySelection"
         internal static let refreshIntervalHours: Int = 24
