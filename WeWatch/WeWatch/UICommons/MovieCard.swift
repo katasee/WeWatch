@@ -68,7 +68,7 @@ internal struct MovieCard: View {
     }
     
     private var filmImage: some View {
-        KFImage((image))
+        KFImage(image)
             .resizable()
             .placeholder({
                 ZStack {

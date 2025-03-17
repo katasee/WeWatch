@@ -12,10 +12,8 @@ internal struct TabBar: View {
     @StateObject private var viewModel: TabBarViewModel = .init()
     
     internal var body: some View {
-        ZStack {
+        VStack(spacing: .zero) {
             viewForSeletedTab()
-        }
-        .overlay(alignment: .bottom) {
             CustomTabBar(activeTab: $viewModel.selectedTab)
         }
     }

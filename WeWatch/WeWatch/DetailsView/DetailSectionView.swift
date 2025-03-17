@@ -26,7 +26,7 @@ internal struct DetailSectionView: View {
     }
     
     private var poster: some View {
-        KFImage((movie.image))
+        KFImage(movie.image)
                 .resizable()
                 .placeholder({
                     ZStack {

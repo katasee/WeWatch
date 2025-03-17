@@ -33,7 +33,7 @@ internal struct MovieCardTopFive: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     ZStack(alignment: .topTrailing) {
-                        KFImage((imageUrl))
+                        KFImage(imageUrl)
                             .resizable()
                             .placeholder({
                                 ZStack {

@@ -35,18 +35,19 @@ internal struct DiscoveryView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
+                        Color.clear.frame(height: 16) 
                         LazyVStack {
                             DiscoveryListView(
                                 data: viewModel.dataForAllMovieTab,
                                 chooseButtonAction: { isActive in }
                             )
-                            Rectangle()
-                                .loadingIndicator()
-                                .frame(minHeight: 16)
-                                .foregroundColor(Color.clear)
-                                .onAppear {
-                                    viewModel.fetchNextPage()
-                                }
+                                Rectangle()
+                                .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
+                                    .frame(minHeight: 16)
+                                    .foregroundColor(Color.clear)
+                                    .onAppear {
+                                        viewModel.fetchNextPage()
+                                    }
                         }
                         .onChange(of: viewModel.selectedGenre) { change in
                             Task {

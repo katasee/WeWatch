@@ -8,15 +8,20 @@
 import SwiftUI
 
 extension View {
+    
     @ViewBuilder
-    func loadingIndicator() -> some View {
-        TimelineView(.animation) { timeline in
-            let angle = Double(timeline.date.timeIntervalSinceReferenceDate).truncatingRemainder(dividingBy: 1) * 360
-            Image(systemName: "gyroscope")
-                .resizable()
-                .frame(width: 24, height: 24)
-                .foregroundColor(Color.fieryRed)
-                .rotationEffect(Angle(degrees: angle))
+    func loadingIndicator(isLoading: Bool = true) -> some View {
+        if isLoading {
+            TimelineView(.animation) { timeline in
+                let angle = Double(timeline.date.timeIntervalSinceReferenceDate).truncatingRemainder(dividingBy: 1) * 360
+                Image(systemName: "gyroscope")
+                    .resizable()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(Color.fieryRed)
+                    .rotationEffect(Angle(degrees: angle))
+            }
+        } else {
+            self
         }
     }
 }

@@ -13,11 +13,11 @@ internal final class DiscoveryViewModel: ObservableObject {
     @Published internal var dataForAllMovieTab: Array<Movie> = []
     @Published internal var genresForDiscoveryView: Array<Genre> = []
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
-    @Published private var isFetchingNextPage = false
+    @Published internal var isFetchingNextPage = false
+    
     internal var isFirstTimeLoad: Bool = true
     internal var currentPage: Int = 0
     internal var isBackEndDateEmpty: Bool = false
-    internal var isGenreSwitching = false
     private let dbManager: DatabaseManager
     
     internal init(dbManager: DatabaseManager) {
@@ -36,7 +36,6 @@ internal final class DiscoveryViewModel: ObservableObject {
             )
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = discoveryMovieData
-                isFirstTimeLoad = false
             }
             if discoveryMovieData.isEmpty {
                 throw EndpointResponce.dataFromEndpoint
@@ -134,7 +133,8 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func fetchNextPage() {
-        if isFirstTimeLoad || isFetchingNextPage || isGenreSwitching {
+        if isFirstTimeLoad || isFetchingNextPage {
+            isFirstTimeLoad = false
             return
         }
         Task { @MainActor in
