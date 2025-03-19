@@ -347,7 +347,7 @@ internal actor DatabaseManager {
         return movies
     }
     
-    internal func fetchMovieById(by id: String) throws -> Movie {
+    internal func fetchMovie(by id: String) throws -> Movie {
         var stmt: OpaquePointer?
         var movie: Movie?
         try transaction { dbManager in

@@ -11,9 +11,9 @@ internal final class DetailsViewModel: ObservableObject {
     
     @Published internal var movieForDetailsView: Movie?
     private let dbManager: DatabaseManager
-    internal var movieId: String
+    private var movieId: String
     
-    init(
+    internal init(
         dbManager: DatabaseManager,
         movieId: String
     ) {
@@ -21,7 +21,7 @@ internal final class DetailsViewModel: ObservableObject {
         self.movieId = movieId
     }
     
-    internal func prepeareDetailsFromEndpoint(id: String) async throws -> Array<Movie> {
+    internal func prepareDetailsFromEndpoint(id: String) async throws -> Array<Movie> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let detailResource: Resource<SearchResponse> = .init(
@@ -57,11 +57,12 @@ internal final class DetailsViewModel: ObservableObject {
     
     internal func dataFromEndpoint() async {
         do {
-            let allMovieByDetailsView: Array<Movie> = try await prepeareDetailsFromEndpoint(id: movieId)
-            guard let movieById: Movie = allMovieByDetailsView.first else { return }
+            guard let movie: Movie = try await prepareDetailsFromEndpoint(id: movieId).first else {
+                return
+            }
             try await MainActor.run { [weak self] in
-                self?.movieForDetailsView = movieById
-                if allMovieByDetailsView.isEmpty {
+                self?.movieForDetailsView = movie
+                if movieId.isEmpty {
                     throw EndpointResponce.dataFromEndpoint
                 }
             }
@@ -72,7 +73,7 @@ internal final class DetailsViewModel: ObservableObject {
     
     private func dateFromDatabase() async {
         do {
-            let movie: Movie = try await dbManager.fetchMovieById(by: movieId)
+            let movie: Movie = try await dbManager.fetchMovie(by: movieId)
             await MainActor.run { [weak self] in
                 self?.movieForDetailsView = movie
             }
