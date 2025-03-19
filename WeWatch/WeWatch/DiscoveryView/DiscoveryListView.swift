@@ -42,15 +42,20 @@ internal struct DiscoveryListView: View {
                 } label: {
                     NavigationLink(
                         destination: DetailsView(
-                            viewModel: DetailsViewModel()
-                        )) {
-                            MovieCardDiscover(
-                                isActive: false,
-                                title: model.title,
-                                ranking: Double(model.rating),
-                                imageUrl: URL(string: model.posterUrl),
-                                didTap: { isActive in }
-                            )}
+                            viewModel: DetailsViewModel(
+                                dbManager: DatabaseManager(
+                                    dataBaseName: DatabaseConfig.name
+                                ), movieId: model.id
+                            )
+                        )
+                    ) {
+                        MovieCardDiscover(
+                            isActive: false,
+                            title: model.title,
+                            ranking: Double(model.rating),
+                            imageUrl: URL(string: model.posterUrl),
+                            didTap: { isActive in }
+                        )}
                 }
             }
         }

@@ -126,16 +126,21 @@ internal final class HomeViewModel: ObservableObject {
             .compactMap { details in
                 guard let movieId: String = details.id,
                       let title: String = details.name,
-                      let image: String = details.imageUrl else {
+                      let image: String = details.imageUrl,
+                      let overview: String = details.overview,
+                      let genreses: Array<String> = details.genres
+                else {
                     return nil
                 }
+                let genres: String = genreses
+                    .joined(separator: ", ")
                 return .init(
                     id: movieId,
                     title: title,
-                    overview: "",
+                    overview: overview,
                     rating: 3,
                     posterUrl: image,
-                    genres: ""
+                    genres: genres
                 )
             } ?? .init()
         for movie in moviesForUI {

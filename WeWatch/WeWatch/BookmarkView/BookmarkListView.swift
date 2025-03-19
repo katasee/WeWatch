@@ -51,9 +51,9 @@ internal struct BookmarkListView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                NavigationLink(destination: DetailsView(
-                    viewModel: DetailsViewModel()
-                )) {
+//                NavigationLink(destination: DetailsView(
+//                    viewModel: DetailsViewModel()
+//                )) {
                     MovieCard(
                         isActive: true,
                         title: model.title,
@@ -68,4 +68,4 @@ internal struct BookmarkListView: View {
             }
         }
     }
-}
+//}
