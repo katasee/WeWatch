@@ -9,16 +9,14 @@ import Foundation
 
 internal final class DetailsViewModel: ObservableObject {
     
-    @Published internal var movieForDetailsView: Movie
+    @Published internal var movieForDetailsView: Movie?
     private let dbManager: DatabaseManager
     internal var movieId: String
     
     init(
-        movieForDetailsView: Movie,
         dbManager: DatabaseManager,
         movieId: String
     ) {
-        self.movieForDetailsView = movieForDetailsView
         self.dbManager = dbManager
         self.movieId = movieId
     }
@@ -68,11 +66,18 @@ internal final class DetailsViewModel: ObservableObject {
                 }
             }
         } catch {
-            do {
-                try await dbManager.fetchMovieById(forId: movieId)
-            } catch {
-                DatabaseError.fetchError
+            await dateFromDatabase()
+        }
+    }
+    
+    private func dateFromDatabase() async {
+        do {
+            let movie: Movie = try await dbManager.fetchMovieById(by: movieId)
+            await MainActor.run { [weak self] in
+                self?.movieForDetailsView = movie
             }
+        } catch {
+            DatabaseError.fetchError(message: "Error fetch movie by id")
         }
     }
 }

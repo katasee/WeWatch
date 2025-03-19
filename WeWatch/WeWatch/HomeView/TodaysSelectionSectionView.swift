@@ -49,7 +49,16 @@ internal struct TodaysSelectionSectionView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel(detailsForMovie: model, movieId: model.id))) {
+                NavigationLink(
+                    destination: DetailsView(
+                        viewModel: DetailsViewModel(
+                            dbManager: DatabaseManager(
+                                dataBaseName: DatabaseConfig.name
+                            ),
+                            movieId: model.id
+                        )
+                    )
+                ) {
                     MovieCardTopFive(
                         title: model.title,
                         ranking: Double(model.rating),

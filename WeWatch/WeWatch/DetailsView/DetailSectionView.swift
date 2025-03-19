@@ -36,11 +36,19 @@ internal struct DetailSectionView: View {
             })
             .aspectRatio(contentMode: .fill)
             .frame(minHeight: 932)
-            .overlay(LinearGradient(gradient: Gradient(colors: [
-                Color.clear,
-                Color.darkColor,
-                Color.darkColor
-            ]), startPoint: .top, endPoint: .bottom))
+            .overlay(
+                LinearGradient(
+                    gradient: Gradient(
+                        colors: [
+                            Color.clear,
+                            Color.darkColor,
+                            Color.darkColor
+                        ]
+                    ),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
     }
     
     private var title: some View {

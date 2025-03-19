@@ -17,15 +17,21 @@ internal struct DetailsView: View {
     
     internal var body: some View {
         ZStack {
-            NavigationBarButtons(
-                movie: viewModel.movieForDetailsView,
-                action: {_ in }
-            )
-            ScrollView {
-                VStack {
-                    DetailSectionView(movie: viewModel.movieForDetailsView)
+            if let movie = viewModel.movieForDetailsView {
+                NavigationBarButtons(
+                    movie: movie,
+                    action: {_ in }
+                )
+                ScrollView {
+                    VStack {
+                        DetailSectionView(movie: movie)
+                    }
                 }
             }
+               
+        }
+        .task {
+            await viewModel.dataFromEndpoint()
         }
         .ignoresSafeArea()
     }

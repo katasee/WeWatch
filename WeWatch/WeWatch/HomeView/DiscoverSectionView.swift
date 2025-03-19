@@ -67,17 +67,24 @@ internal struct DiscoverSectionView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel(detailsForMovie: model, movieId: model.id))) {
-                    MovieCard(
-                        isActive: false,
-                        title: model.title,
-                        ranking: Double(model.rating),
-                        genres: model.genres,
-                        storyline: model.overview,
-                        imageUrl: URL(string: model.posterUrl),
-                        didTap: { isActive in })
-                    .multilineTextAlignment(.leading)
-                }
+                NavigationLink(
+                    destination: DetailsView(
+                        viewModel: DetailsViewModel(
+                            dbManager: DatabaseManager(
+                                dataBaseName: DatabaseConfig.name
+                            ),
+                            movieId: model.id
+                        ))) {
+                            MovieCard(
+                                isActive: false,
+                                title: model.title,
+                                ranking: Double(model.rating),
+                                genres: model.genres,
+                                storyline: model.overview,
+                                imageUrl: URL(string: model.posterUrl),
+                                didTap: { isActive in })
+                            .multilineTextAlignment(.leading)
+                        }
             }
         }
     }
