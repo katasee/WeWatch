@@ -13,22 +13,22 @@ internal struct SearchListView: View {
     private let didTap: Bool
     private let selectedGenre: Genre
     private let setOfGenre: Array<Genre>
-    private let data: Array<MovieCardPreviewModel>
+    private let data: Array<Movie>
     private var isActive: Bool
     private let selectGenreAction: (Genre) -> Void
     private let seeMoreButtonAction: @MainActor () -> Void
-    private let chooseButtonAction: @MainActor (MovieCardPreviewModel) -> Void
+    private let chooseButtonAction: @MainActor (Movie) -> Void
     
     internal init(
         searchText: Binding<String>,
         didTap: Bool,
         selectedGenre: Genre,
         setOfGenre: Array<Genre>,
-        data: Array<MovieCardPreviewModel>,
+        data: Array<Movie>,
         isActive: Bool,
         selectGenreAction: @escaping (Genre) -> Void,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
-        chooseButtonAction: @escaping @MainActor (MovieCardPreviewModel) -> Void
+        chooseButtonAction: @escaping @MainActor (Movie) -> Void
     ) {
         self._searchText = searchText
         self.didTap = didTap
@@ -79,20 +79,27 @@ internal struct SearchListView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-//                NavigationLink(destination: DetailsView(viewModel: DetailsViewModel())) {
+                NavigationLink(destination: DetailsView(
+                    viewModel: DetailsViewModel(
+                        dbManager: DatabaseManager(
+                            dataBaseName: DatabaseConfig.name
+                        ), movieId: model.id
+                    )
+                )
+                ) {
                     MovieCard(
                         isActive: false, title: model.title,
                         ranking: model.rating,
                         genres: model.genres,
-                        storyline: model.storyline,
-                        imageUrl: model.image,
+                        storyline: model.overview,
+                        imageUrl: URL(string: model.posterUrl),
                         didTap: { isActive in }
                     )
                     .multilineTextAlignment(.leading)
                 }
             }
         }
-//    }
+    }
     
     private var categoryTabBar: some View {
         MovieCategoryView(

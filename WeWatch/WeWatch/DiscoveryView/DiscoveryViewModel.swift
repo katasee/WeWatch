@@ -101,27 +101,8 @@ internal final class DiscoveryViewModel: ObservableObject {
                     genres: genres
                 )
             } ?? .init()
-        let newMovie: Array<Movie> = response.data?
-            .compactMap { movie in
-                guard let id: String = movie.id,
-                      let title: String = movie.name,
-                      let overview: String = movie.overview,
-                      let posterUrl: String = movie.imageUrl,
-                      let genres = movie.genres?.joined(separator: ", ")
-                else {
-                    return nil
-                }
-                return .init(
-                    id: id,
-                    title: title,
-                    overview: overview,
-                    rating: 3,
-                    posterUrl: posterUrl,
-                    genres: genres
-                )
-            } ?? .init()
         if currentPage < 2 {
-            for movie in newMovie {
+            for movie in moviesForUI {
                 try await dbManager.insert(movie)
                 try await dbManager.insertMovieGenre(
                     movieId: movie.id,

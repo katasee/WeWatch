@@ -26,7 +26,7 @@ internal struct TabBar: View {
         case .homeView:
             HomeView(viewModel: HomeViewModel(dbManager: DatabaseManager(dataBaseName: DatabaseConfig.name)))
         case .searchView:
-            SearchView(viewModel: SearchViewModel())
+            SearchView(viewModel: SearchViewModel(dbManager: DatabaseManager(dataBaseName: DatabaseConfig.name)))
         }
     }
 }
