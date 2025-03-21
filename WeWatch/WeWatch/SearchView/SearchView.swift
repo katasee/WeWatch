@@ -10,35 +10,85 @@ import SwiftUI
 internal struct SearchView: View {
     
     @StateObject private var viewModel: SearchViewModel
+    @State private var isLoading = false
     
     internal init(viewModel: SearchViewModel) {
         self._viewModel = .init(wrappedValue: viewModel)
     }
-       
+    
     internal var body: some View {
         NavigationView {
             ZStack {
                 Color.blackColor
                     .ignoresSafeArea()
-                ScrollView {
-                    SearchListView(
-                        searchText: $viewModel.searchText,
-                        didTap: true,
-                        selectedGenre: viewModel.selectedGenre,
-                        setOfGenre: viewModel.setOfGenres,
-                        data: viewModel.filteredMovie,
-                        isActive: true,
-                        selectGenreAction: { genre in viewModel.selectedGenre = genre },
-                        seeMoreButtonAction: {},
-                        chooseButtonAction: { isActive in }
-                    )
-                    .padding(16)
-                }
-                .onAppear {
-                    viewModel.prepareDataSearchView()
-                    viewModel.prepareUniqGenres()
+                VStack(spacing: 20) {
+                    HStack {
+                        Text("search.title")
+                            .foregroundColor(.whiteColor)
+                            .font(.poppinsBold30px)
+                        + Text(".")
+                            .foregroundColor(.fieryRed)
+                            .font(.poppinsBold30px)
+                        Spacer()
+                    }
+                    VStack(alignment: .leading) {
+                        SearchBar(searchText: $viewModel.searchText)
+                        MovieCategoryView(
+                            genreTabs: viewModel.genresForSearchView,
+                            selectedGenre: viewModel.selectedGenre,
+                            action: { genre in viewModel.selectedGenre = genre }
+                        )
+                        Text("search.result")
+                            .font(.poppinsBold18px)
+                            .foregroundColor(.whiteColor)
+                        + Text(" \(viewModel.searchText.count)")
+                            .font(.poppinsBold18px)
+                            .foregroundColor(.whiteColor)
+                    }
+                    GeometryReader { proxy in
+                        ScrollView {
+                            LazyVStack {
+                                if viewModel.dataForSearchView.isEmpty {
+                                    Spacer()
+                                    ContentUnavailableView.search(text: viewModel.searchText)
+                                        .foregroundColor(.whiteColor)
+                                    Spacer()
+                                } else {
+                                    SearchListView(
+                                        didTap: true,
+                                        data: viewModel.filteredMovie,
+                                        isActive: true,
+                                        seeMoreButtonAction: {},
+                                        chooseButtonAction: { isActive in }
+                                    )
+                                    .padding(16)
+                                    Rectangle()
+                                        .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
+                                        .frame(minHeight: 1)
+                                        .foregroundColor(Color.clear)
+                                        .onAppear {
+                                            Task { try await viewModel.appendDateFromEndpoint()}
+                                        }
+                                }
+                            }
+                        }
+                        .frame(minHeight: proxy.size.height)
+                    }
+                    .onChange(of: viewModel.searchText) { change in
+                        Task {
+                            await viewModel.dataFromEndpoint()
+                        }
+                    }
+                    .onChange(of: viewModel.selectedGenre) { change in
+                        Task {
+                            await viewModel.dataFromEndpoint()
+                        }
+                    }
                 }
             }
+        }
+        .task {
+            await viewModel.dataFromEndpointForGenreTabs()
         }
     }
 }

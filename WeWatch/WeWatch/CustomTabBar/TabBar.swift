@@ -24,9 +24,21 @@ internal struct TabBar: View {
         case .bookmark:
             BookmarkView(viewModel: BookmarkViewModel())
         case .homeView:
-            HomeView(viewModel: HomeViewModel(dbManager: DatabaseManager(dataBaseName: DatabaseConfig.name)))
+            HomeView(
+                viewModel: HomeViewModel(
+                    dbManager: DatabaseManager(
+                        dataBaseName: DatabaseConfig.name
+                    )
+                )
+            )
         case .searchView:
-            SearchView(viewModel: SearchViewModel())
+            SearchView(
+                viewModel: SearchViewModel(
+                    dbManager: DatabaseManager(
+                        dataBaseName: DatabaseConfig.name
+                    )
+                )
+            )
         }
     }
 }

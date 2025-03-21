@@ -94,6 +94,10 @@ internal enum SQLStatements {
     SELECT * FROM movies
     WHERE id = ?;
     """
+    internal static let selectMovieByTitle: String = """
+    SELECT * FROM movies
+    WHERE title = ?;
+    """
     internal static let selectedGenres: String = "SELECT * FROM genres;"
     internal static let beginTransaction: String = "BEGIN TRANSACTION;"
     internal static let saveAllChanges: String = "COMMIT;"
@@ -308,8 +312,8 @@ internal actor DatabaseManager {
         }
     }
     
-    internal func fetch<T: SQLTable>(_:T.Type) throws -> [T] {
-        var results: [T] = []
+    internal func fetch<T: SQLTable>(_:T.Type) throws -> Array<T> {
+        var results: Array<T> = []
         try transaction { dbManager in
             let sql: String = "SELECT * FROM \(T.tableName);"
             var stmt: OpaquePointer?
@@ -327,9 +331,9 @@ internal actor DatabaseManager {
         return results
     }
     
-    internal func fetchMovieByList(forList listId: String) throws -> [Movie] {
+    internal func fetchMovieByList(forList listId: String) throws -> Array<Movie> {
         var stmt: OpaquePointer?
-        var movies: [Movie] = []
+        var movies: Array<Movie> = []
         try transaction { dbManager in
             defer { sqlite3_finalize(stmt) }
             guard sqlite3_prepare_v2(db, SQLStatements.selectMovieByList, -1, &stmt, nil) == SQLITE_OK else {
@@ -337,7 +341,6 @@ internal actor DatabaseManager {
                 throw DatabaseError.prepare(message: errmsg)
             }
             sqlite3_bind_text(stmt, 1, listId, -1, SQLiteConstants.sqliteTransient)
-            
             while sqlite3_step(stmt) == SQLITE_ROW {
                 let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
                 let movie: Movie = try .init(row: row)
@@ -346,6 +349,25 @@ internal actor DatabaseManager {
         }
         return movies
     }
+    
+    internal func searchMovie(by title: String) throws -> Array<Movie> {
+        var stmt: OpaquePointer?
+        var movies: Array<Movie> = []
+        try transaction { dbManager in
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, SQLStatements.selectMovieByTitle, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
+            }
+        sqlite3_bind_text(stmt, 1, title, -1, SQLiteConstants.sqliteTransient)
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
+            let movie: Movie = try .init(row: row)
+            movies.append(movie)
+        }
+    }
+    return movies
+}
     
     internal func fetchMovie(by id: String) throws -> Movie {
         var stmt: OpaquePointer?
@@ -368,9 +390,9 @@ internal actor DatabaseManager {
         return unwrapMovie
     }
     
-    internal func fetchMovieByGenres(forGenre genreId: String) throws -> [Movie] {
+    internal func fetchMovieByGenres(forGenre genreId: String) throws -> Array<Movie> {
         var stmt: OpaquePointer?
-        var movies: [Movie] = []
+        var movies: Array<Movie> = []
         try transaction { dbManager in
             defer { sqlite3_finalize(stmt) }
             guard sqlite3_prepare_v2(db, SQLStatements.selectMovieByGenre, -1, &stmt, nil) == SQLITE_OK else {
@@ -387,9 +409,9 @@ internal actor DatabaseManager {
         return movies
     }
     
-    internal func fetchGenresTab() throws -> [Genre] {
+    internal func fetchGenresTab() throws -> Array<Genre> {
         var stmt: OpaquePointer?
-        var genres: [Genre] = []
+        var genres: Array<Genre> = []
         try transaction { dbManager in
             defer { sqlite3_finalize(stmt) }
             guard sqlite3_prepare_v2(db, SQLStatements.selectedGenres, -1, &stmt, nil) == SQLITE_OK else {
