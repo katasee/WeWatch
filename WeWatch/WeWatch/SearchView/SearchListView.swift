@@ -9,69 +9,30 @@ import SwiftUI
 
 internal struct SearchListView: View {
     
-    @Binding private var searchText: String
     private let didTap: Bool
-    private let selectedGenre: Genre
-    private let setOfGenre: Array<Genre>
     private let data: Array<Movie>
     private var isActive: Bool
-    private let selectGenreAction: (Genre) -> Void
     private let seeMoreButtonAction: @MainActor () -> Void
     private let chooseButtonAction: @MainActor (Movie) -> Void
     
     internal init(
-        searchText: Binding<String>,
         didTap: Bool,
-        selectedGenre: Genre,
-        setOfGenre: Array<Genre>,
         data: Array<Movie>,
         isActive: Bool,
-        selectGenreAction: @escaping (Genre) -> Void,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
         chooseButtonAction: @escaping @MainActor (Movie) -> Void
     ) {
-        self._searchText = searchText
         self.didTap = didTap
-        self.selectedGenre = selectedGenre
-        self.setOfGenre = setOfGenre
         self.data = data
         self.isActive = isActive
-        self.selectGenreAction = selectGenreAction
         self.seeMoreButtonAction = seeMoreButtonAction
         self.chooseButtonAction = chooseButtonAction
     }
     
     internal var body: some View {
-        VStack(spacing: 20) {
-            titleView
-            VStack(alignment: .leading) {
-                SearchBar(searchText: $searchText)
-                categoryTabBar
-                searchResult
-                movieCardButton
-            }
+        VStack(alignment: .leading) {
+            movieCardButton
         }
-    }
-    
-    private var titleView: some View {
-        HStack {
-            Text("search.title")
-                .foregroundColor(.whiteColor)
-                .font(.poppinsBold30px)
-            + Text(".")
-                .foregroundColor(.fieryRed)
-                .font(.poppinsBold30px)
-            Spacer()
-        }
-    }
-    
-    private var searchResult: some View {
-        Text("search.result")
-            .font(.poppinsBold18px)
-            .foregroundColor(.whiteColor)
-        + Text(" \(data.count)")
-            .font(.poppinsBold18px)
-            .foregroundColor(.whiteColor)
     }
     
     private var movieCardButton: some View {
@@ -99,15 +60,5 @@ internal struct SearchListView: View {
                 }
             }
         }
-    }
-    
-    private var categoryTabBar: some View {
-        MovieCategoryView(
-            genreTabs: Array(setOfGenre),
-            selectedGenre: selectedGenre,
-            action: { genre in
-                selectGenreAction(genre)
-            }
-        )
     }
 }

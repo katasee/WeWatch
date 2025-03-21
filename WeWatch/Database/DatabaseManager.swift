@@ -94,7 +94,7 @@ internal enum SQLStatements {
     SELECT * FROM movies
     WHERE id = ?;
     """
-    internal static let selectedMovieTitle: String = """
+    internal static let selectMovieByTitle: String = """
     SELECT * FROM movies
     WHERE title = ?;
     """
@@ -355,7 +355,7 @@ internal actor DatabaseManager {
         var movies: Array<Movie> = []
         try transaction { dbManager in
             defer { sqlite3_finalize(stmt) }
-            guard sqlite3_prepare_v2(db, SQLStatements.selectedMovieTitle, -1, &stmt, nil) == SQLITE_OK else {
+            guard sqlite3_prepare_v2(db, SQLStatements.selectMovieByTitle, -1, &stmt, nil) == SQLITE_OK else {
                 let errmsg: String = .init(cString: sqlite3_errmsg(db))
                 throw DatabaseError.prepare(message: errmsg)
             }

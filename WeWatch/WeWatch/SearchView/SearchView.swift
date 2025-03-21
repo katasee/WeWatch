@@ -10,6 +10,7 @@ import SwiftUI
 internal struct SearchView: View {
     
     @StateObject private var viewModel: SearchViewModel
+    @State private var isLoading = false
     
     internal init(viewModel: SearchViewModel) {
         self._viewModel = .init(wrappedValue: viewModel)
@@ -20,47 +21,74 @@ internal struct SearchView: View {
             ZStack {
                 Color.blackColor
                     .ignoresSafeArea()
-                ScrollView {
-                    LazyVStack {
-                        SearchListView(
-                            searchText: $viewModel.searchText,
-                            didTap: true,
+                VStack(spacing: 20) {
+                    HStack {
+                        Text("search.title")
+                            .foregroundColor(.whiteColor)
+                            .font(.poppinsBold30px)
+                        + Text(".")
+                            .foregroundColor(.fieryRed)
+                            .font(.poppinsBold30px)
+                        Spacer()
+                    }
+                    VStack(alignment: .leading) {
+                        SearchBar(searchText: $viewModel.searchText)
+                        MovieCategoryView(
+                            genreTabs: viewModel.genresForSearchView,
                             selectedGenre: viewModel.selectedGenre,
-                            setOfGenre: viewModel.genresForSearchView,
-                            data: viewModel.filteredMovie,
-                            isActive: true,
-                            selectGenreAction: { genre in viewModel.selectedGenre = genre },
-                            seeMoreButtonAction: {},
-                            chooseButtonAction: { isActive in }
+                            action: { genre in viewModel.selectedGenre = genre }
                         )
-                        .padding(16)
-                        Rectangle()
-                            .frame(minHeight: 1)
-                            .foregroundColor(Color.clear)
-                            .onAppear {
-                                Task { try await viewModel.appendDateFromEndpoint()}
+                        Text("search.result")
+                            .font(.poppinsBold18px)
+                            .foregroundColor(.whiteColor)
+                        + Text(" \(viewModel.searchText.count)")
+                            .font(.poppinsBold18px)
+                            .foregroundColor(.whiteColor)
+                    }
+                    GeometryReader { proxy in
+                        ScrollView {
+                            LazyVStack {
+                                if viewModel.dataForSearchView.isEmpty {
+                                    Spacer()
+                                    ContentUnavailableView.search(text: viewModel.searchText)
+                                        .foregroundColor(.whiteColor)
+                                    Spacer()
+                                } else {
+                                    SearchListView(
+                                        didTap: true,
+                                        data: viewModel.filteredMovie,
+                                        isActive: true,
+                                        seeMoreButtonAction: {},
+                                        chooseButtonAction: { isActive in }
+                                    )
+                                    .padding(16)
+                                    Rectangle()
+                                        .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
+                                        .frame(minHeight: 1)
+                                        .foregroundColor(Color.clear)
+                                        .onAppear {
+                                            Task { try await viewModel.appendDateFromEndpoint()}
+                                        }
+                                }
                             }
-                        if viewModel.dataForSearchView.isEmpty {
-                            ContentUnavailableView.search(text: viewModel.searchText)
-                                .foregroundColor(.whiteColor)
-                            
+                        }
+                        .frame(minHeight: proxy.size.height)
+                    }
+                    .onChange(of: viewModel.searchText) { change in
+                        Task {
+                            await viewModel.dataFromEndpoint()
+                        }
+                    }
+                    .onChange(of: viewModel.selectedGenre) { change in
+                        Task {
+                            await viewModel.dataFromEndpoint()
                         }
                     }
                 }
-                .onChange(of: viewModel.searchText) { change in
-                    Task {
-                        await viewModel.dataFromEndpoint()
-                    }
-                }
-                .onChange(of: viewModel.selectedGenre) { change in
-                    Task {
-                        await viewModel.dataFromEndpoint()
-                    }
-                }
-                .task {
-                    await viewModel.dataFromEndpointForGenreTabs()
-                }
             }
+        }
+        .task {
+            await viewModel.dataFromEndpointForGenreTabs()
         }
     }
 }

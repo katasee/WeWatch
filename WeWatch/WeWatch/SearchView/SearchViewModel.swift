@@ -13,7 +13,9 @@ internal final class SearchViewModel: ObservableObject {
     @Published internal var dataForSearchView: Array<Movie> = []
     @Published internal var searchText: String = ""
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
+    @Published internal var isFetchingNextPage = false
     internal var currentPage: Int = 0
+    
     
     
     private let dbManager: DatabaseManager
@@ -159,12 +161,13 @@ internal final class SearchViewModel: ObservableObject {
     
     internal func appendDateFromEndpoint() async throws {
         currentPage += 1
-        let searchMovieData: [Movie] = try await prepareDataForSearchView(
+        let searchMovieData: Array<Movie> = try await prepareDataForSearchView(
             searchQuery: searchText,
             genre: selectedGenre.title,
             page: String(currentPage)
         )
         await MainActor.run { [weak self] in
+        isFetchingNextPage = true
             self?.dataForSearchView.append(contentsOf: searchMovieData)
         }
     }
