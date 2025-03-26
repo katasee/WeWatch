@@ -10,8 +10,8 @@ import Foundation
 
 internal final class DiscoveryViewModel: ObservableObject {
     
-    @Published internal var dataForAllMovieTab: Array<Movie> = []
-    @Published internal var genresForDiscoveryView: Array<Genre> = []
+    @Published internal var dataForAllMovieTab: Array<Movie> = .init()
+    @Published internal var genresForDiscoveryView: Array<Genre> = .init()
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
     @Published internal var isFetchingNextPage = false
     
@@ -26,7 +26,7 @@ internal final class DiscoveryViewModel: ObservableObject {
     
     internal func dataFromEndpoint() async {
         await MainActor.run { [weak self] in
-            self?.dataForAllMovieTab = []
+            self?.dataForAllMovieTab = .init()
             self?.currentPage = 0
         }
         do {
@@ -221,5 +221,24 @@ internal final class DiscoveryViewModel: ObservableObject {
     internal func filterGenres() -> String {
         let chooseGenre: String = selectedGenre.title
         return chooseGenre
+    }
+    
+    internal func inserToDatabase(movieId: String) async {
+        do {
+            try await dbManager.attachMovieToList(
+                listId: Constans.bookmarkList,
+                movieId: movieId
+            )
+        } catch {
+            print(error)
+        }
+    }
+    
+    internal func removeFromDatabase(movieId: String) async {
+        do {
+            try await dbManager.delete(from: Movie.self, id: movieId)
+        } catch {
+            print(error)
+        }
     }
 }

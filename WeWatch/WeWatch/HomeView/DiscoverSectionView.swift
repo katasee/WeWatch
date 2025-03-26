@@ -12,15 +12,24 @@ internal struct DiscoverSectionView: View {
     private let data: Array<Movie>
     private let seeMoreButtonAction: @MainActor () -> Void
     private let chooseButtonAction: @MainActor (Movie) -> Void
+    private let refreshBookmart: @MainActor (Movie) async -> Void
+    private let bookmarkAddAction: @MainActor (Movie) async -> Void
+    private let bookmarkRemoveAction: @MainActor (Movie) async -> Void
     
     internal init(
         data: Array<Movie>,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
-        chooseButtonAction: @escaping @MainActor (Movie) -> Void
+        chooseButtonAction: @escaping @MainActor (Movie) -> Void,
+        refreshBookmart: @escaping @MainActor (Movie) async -> Void,
+        bookmarkAddAction: @escaping @MainActor (Movie) async -> Void,
+        bookmarkRemoveAction: @escaping @MainActor (Movie) async -> Void
     ) {
         self.data = data
         self.seeMoreButtonAction = seeMoreButtonAction
         self.chooseButtonAction = chooseButtonAction
+        self.refreshBookmart = refreshBookmart
+        self.bookmarkAddAction = bookmarkAddAction
+        self.bookmarkRemoveAction = bookmarkRemoveAction
     }
     
     internal var body: some View {
@@ -75,15 +84,18 @@ internal struct DiscoverSectionView: View {
                             ),
                             movieId: model.id
                         ))) {
-                            MovieCard(
-                                isActive: false,
-                                title: model.title,
-                                ranking: Double(model.rating),
-                                genres: model.genres,
-                                storyline: model.overview,
-                                imageUrl: URL(string: model.posterUrl),
-                                didTap: { isActive in })
-                            .multilineTextAlignment(.leading)
+                                MovieCard(
+                                    movie: model,
+                                    didTap: { isActive in
+                                        Task {
+                                            await refreshBookmart(model)
+                                        }
+                                    },
+                                    refreshBookmart: refreshBookmart,
+                                    bookmarkAddAction: bookmarkAddAction,
+                                    bookmarkRemoveAction: bookmarkRemoveAction
+                                )
+                                .multilineTextAlignment(.leading)
                         }
             }
         }

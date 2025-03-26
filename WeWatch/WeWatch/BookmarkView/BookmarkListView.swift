@@ -10,26 +10,51 @@ import SwiftUI
 internal struct BookmarkListView: View {
     
     @Binding private var searchText: String
-    private let data: Array<MovieCardPreviewModel>
-    private let chooseButtonAction: @MainActor (MovieCardPreviewModel) -> Void
+    private let data: Array<Movie>
+    private let chooseButtonAction: @MainActor(Movie) -> Void
+    private let bookmarkAddAction: @MainActor(Movie) async -> Void
+    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
+    private let bookmarkRemoveAllMovie: @MainActor() async -> Void
     
     internal init(
         searchText: Binding<String>,
-        data: Array<MovieCardPreviewModel>,
-        chooseButtonAction: @escaping @MainActor (MovieCardPreviewModel) -> Void
+        data: Array<Movie>,
+        chooseButtonAction: @escaping @MainActor(Movie) -> Void,
+        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
+        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void,
+        bookmarkRemoveAllMovie: @escaping @MainActor() async -> Void
     ) {
         self._searchText = searchText
         self.data = data
         self.chooseButtonAction = chooseButtonAction
+        self.bookmarkAddAction = bookmarkAddAction
+        self.bookmarkRemoveAction = bookmarkRemoveAction
+        self.bookmarkRemoveAllMovie = bookmarkRemoveAllMovie
     }
     
     internal var body: some View {
         VStack(spacing: 20) {
             bookmarkTitle
             SearchBar(searchText: $searchText)
+            HStack {
+                Spacer()
+                cleareAllButton
+            }
             movieCardButton
             Spacer()
         }
+    }
+    
+    private var cleareAllButton: some View {
+        Button {
+            Task {
+                await bookmarkRemoveAllMovie()
+            }
+        } label: {
+            Text("Clear.all.button")
+            Image(systemName: "trash")
+        }
+        .foregroundColor(.fieryRed)
     }
     
     private var bookmarkTitle: some View {
@@ -51,21 +76,26 @@ internal struct BookmarkListView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-//                NavigationLink(destination: DetailsView(
-//                    viewModel: DetailsViewModel()
-//                )) {
+                NavigationLink(
+                    destination: DetailsView(
+                        viewModel: DetailsViewModel(
+                            dbManager: DatabaseManager(
+                                dataBaseName: DatabaseConfig.name
+                            ),
+                            movieId: model.id
+                        )
+                    )
+                )
+                {
                     MovieCard(
-                        isActive: true,
-                        title: model.title,
-                        ranking: model.rating,
-                        genres: model.genres,
-                        storyline: model.storyline,
-                        imageUrl: model.image,
-                        didTap: { isActive in }
+                        movie: model,
+                        didTap: { isActive in }, refreshBookmart: {_ in},
+                        bookmarkAddAction: bookmarkAddAction,
+                        bookmarkRemoveAction: bookmarkRemoveAction
                     )
                     .multilineTextAlignment(.leading)
                 }
             }
         }
     }
-//}
+}

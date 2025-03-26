@@ -39,7 +39,13 @@ internal struct DiscoveryView: View {
                         LazyVStack {
                             DiscoveryListView(
                                 data: viewModel.dataForAllMovieTab,
-                                chooseButtonAction: { isActive in }
+                                chooseButtonAction: { isActive in },
+                                bookmarkAddAction: { movie in
+                                    await viewModel.inserToDatabase(movieId: movie.id)
+                                },
+                                bookmarkRemoveAction: { movie in
+                                    await viewModel.removeFromDatabase(movieId: movie.id)
+                                }
                             )
                                 Rectangle()
                                 .loadingIndicator(isLoading: viewModel.isFetchingNextPage)

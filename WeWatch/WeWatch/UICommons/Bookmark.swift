@@ -25,7 +25,3 @@ internal struct Bookmark: View {
         }
     }
 }
-
-#Preview {
-    Bookmark()
-}

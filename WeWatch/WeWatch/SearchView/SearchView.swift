@@ -57,9 +57,12 @@ internal struct SearchView: View {
                                     SearchListView(
                                         didTap: true,
                                         data: viewModel.filteredMovie,
-                                        isActive: true,
                                         seeMoreButtonAction: {},
-                                        chooseButtonAction: { isActive in }
+                                        chooseButtonAction: { isActive in },
+                                        bookmarkAddAction: { movie in
+                                            await viewModel.inserToDatabase(movieId: movie.id)},
+                                        bookmarkRemoveAction: { movie in
+                                           await viewModel.removeFromDatabase(movieId: movie.id)}
                                     )
                                     .padding(16)
                                     Rectangle()

@@ -81,4 +81,23 @@ internal final class DetailsViewModel: ObservableObject {
             DatabaseError.fetchError(message: "Error fetch movie by id")
         }
     }
+    
+    internal func inserToDatabase(movieId: String) async {
+        do {
+            try await dbManager.attachMovieToList(
+                listId: Constans.bookmarkList,
+                movieId: movieId
+            )
+        } catch {
+            print(error)
+        }
+    }
+    
+    internal func removeFromDatabase(movieId: String) async {
+        do {
+            try await dbManager.delete(from: Movie.self, id: movieId)
+        } catch {
+            print(error)
+        }
+    }
 }

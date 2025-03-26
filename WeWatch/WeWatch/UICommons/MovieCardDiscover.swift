@@ -13,24 +13,23 @@ internal struct MovieCardDiscover: View {
     
     @State private var isActive: Bool
     @State private var isLoading: Bool = true
-    private let title: String
-    private let ranking: Double
-    private let imageUrl: URL?
-    private var didTap: @MainActor (Bool) -> Void
-    
+    private let movie: Movie
+    private var didTap: @MainActor(Bool) -> Void
+    private let bookmarkAddAction: @MainActor(Movie) async -> Void
+    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
     
     internal init(
         isActive: Bool,
-        title: String,
-        ranking: Double,
-        imageUrl: URL?,
-        didTap: @escaping @MainActor (Bool) -> Void
+        movie: Movie,
+        didTap: @escaping @MainActor(Bool) -> Void,
+        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
+        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void
     ) {
         self.isActive = isActive
-        self.title = title
-        self.ranking = ranking
-        self.imageUrl = imageUrl
+        self.movie = movie
         self.didTap = didTap
+        self.bookmarkAddAction = bookmarkAddAction
+        self.bookmarkRemoveAction = bookmarkRemoveAction
     }
     
     internal var body: some View {
@@ -41,6 +40,15 @@ internal struct MovieCardDiscover: View {
                 Button {
                     isActive.toggle()
                     didTap(isActive)
+                    if isActive == true {
+                        Task {
+                            await bookmarkAddAction(movie)
+                        }
+                    } else {
+                        Task {
+                            await bookmarkRemoveAction(movie)
+                        }
+                    }
                 } label: {
                     if isActive == true {
                         Bookmark(isActive: true)
@@ -50,7 +58,7 @@ internal struct MovieCardDiscover: View {
                 }
                 .padding(16)
             }
-            Text(title)
+            Text(movie.title)
                 .font(.poppinsBold18px)
                 .lineLimit(1)
             HStack {
@@ -63,12 +71,12 @@ internal struct MovieCardDiscover: View {
     }
     
     private var filmRanking: some View {
-        Text("\(ranking, specifier: "%.1f")")
+        Text("\(movie.rating, specifier: "%.1f")")
             .font(.poppinsRegular18px)
     }
     
     private var filmImage: some View {
-        KFImage(imageUrl)
+        KFImage(URL(string: movie.posterUrl))
             .resizable()
             .placeholder({
                 ZStack {

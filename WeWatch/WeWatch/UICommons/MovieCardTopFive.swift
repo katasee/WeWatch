@@ -11,21 +11,21 @@ import Kingfisher
 internal struct MovieCardTopFive: View {
     
     @State private var isActive: Bool = false
-    private let title: String
-    private let ranking: Double
-    private let imageUrl: URL?
+    private let movie: Movie
     private var didTap: @MainActor (Bool) -> Void
+    private let bookmarkAddAction: @MainActor (Movie) async -> Void
+    private let bookmarkRemoveAction: @MainActor (Movie) async -> Void
     
     internal init(
-        title: String,
-        ranking: Double,
-        image: URL?,
-        didTap: @escaping @MainActor (Bool) -> Void
+        movie: Movie,
+        didTap: @escaping @MainActor (Bool) -> Void,
+        bookmarkAddAction: @escaping @MainActor (Movie) async -> Void,
+        bookmarkRemoveAction: @escaping @MainActor (Movie) async -> Void
     ) {
-        self.title = title
-        self.ranking = ranking
-        self.imageUrl = image
+        self.movie = movie
         self.didTap = didTap
+        self.bookmarkAddAction = bookmarkAddAction
+        self.bookmarkRemoveAction = bookmarkRemoveAction
     }
     
     internal var body: some View {
@@ -33,7 +33,7 @@ internal struct MovieCardTopFive: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     ZStack(alignment: .topTrailing) {
-                        KFImage(imageUrl)
+                        KFImage(URL(string: movie.posterUrl))
                             .resizable()
                             .placeholder({
                                 ZStack {
@@ -47,8 +47,18 @@ internal struct MovieCardTopFive: View {
                         Button {
                             isActive.toggle()
                             didTap(isActive)
+                            if isActive == true {
+                                Task {
+                                    await bookmarkAddAction(movie)
+                                }
+                            } else {
+                                Task {
+                                    await bookmarkRemoveAction(movie)
+                                }
+                            }
                         } label: {
                             if isActive == true {
+                                
                                 Bookmark(isActive: true)
                             } else {
                                 Bookmark(isActive: false)
@@ -64,7 +74,7 @@ internal struct MovieCardTopFive: View {
             }
             HStack {
                 filmRanking
-                RatingView(ranking: ranking)
+                RatingView(ranking: movie.rating)
             }
         }
         .frame(width: 300)
@@ -73,13 +83,13 @@ internal struct MovieCardTopFive: View {
     }
     
     private var filmRanking: some View {
-        Text("\(ranking, specifier: "%.1f")")
+        Text("\(movie.rating, specifier: "%.1f")")
             .font(.poppinsRegular22px)
             .foregroundColor(.whiteColor)
     }
     
     private var filmTitle: some View {
-        Text(title)
+        Text(movie.title)
             .font(.poppinsBold20px)
             .foregroundColor(.whiteColor)
     }

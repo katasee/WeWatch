@@ -11,22 +11,28 @@ internal struct SearchListView: View {
     
     private let didTap: Bool
     private let data: Array<Movie>
-    private var isActive: Bool
     private let seeMoreButtonAction: @MainActor () -> Void
     private let chooseButtonAction: @MainActor (Movie) -> Void
+    private let bookmarkAddAction: @MainActor (Movie) async -> Void
+    private let bookmarkRemoveAction: @MainActor (Movie) async -> Void
+
     
     internal init(
         didTap: Bool,
         data: Array<Movie>,
-        isActive: Bool,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
-        chooseButtonAction: @escaping @MainActor (Movie) -> Void
+        chooseButtonAction: @escaping @MainActor (Movie) -> Void,
+        bookmarkAddAction: @escaping @MainActor (Movie) async -> Void,
+        bookmarkRemoveAction: @escaping @MainActor (Movie) async -> Void
+
+
     ) {
         self.didTap = didTap
         self.data = data
-        self.isActive = isActive
         self.seeMoreButtonAction = seeMoreButtonAction
         self.chooseButtonAction = chooseButtonAction
+        self.bookmarkAddAction = bookmarkAddAction
+        self.bookmarkRemoveAction = bookmarkRemoveAction
     }
     
     internal var body: some View {
@@ -49,12 +55,10 @@ internal struct SearchListView: View {
                 )
                 ) {
                     MovieCard(
-                        isActive: false, title: model.title,
-                        ranking: model.rating,
-                        genres: model.genres,
-                        storyline: model.overview,
-                        imageUrl: URL(string: model.posterUrl),
-                        didTap: { isActive in }
+                        movie: model,
+                        didTap: { isActive in }, refreshBookmart: {_ in},
+                        bookmarkAddAction: bookmarkAddAction,
+                        bookmarkRemoveAction: bookmarkRemoveAction
                     )
                     .multilineTextAlignment(.leading)
                 }

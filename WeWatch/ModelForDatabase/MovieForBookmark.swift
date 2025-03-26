@@ -1,15 +1,13 @@
 //
-//  Movies.swift
+//  movieForBookmark.swift
 //  WeWatch
 //
-//  Created by Anton on 25/02/2025.
+//  Created by Anton on 21/03/2025.
 //
 
 import Foundation
 
-internal struct Movie: SQLTable, Identifiable, Sendable {
-    
-    var isBookmarked: Bool = false
+internal struct BookmarkMovie: SQLTable, Identifiable, Sendable {
     
     internal let id: String
     internal let title: String
@@ -34,10 +32,10 @@ internal struct Movie: SQLTable, Identifiable, Sendable {
         self.genres = genres
     }
     
-    internal static var tableName: String { "movies" }
+    internal static var tableName: String { "bookmark" }
     
     internal static var createTableStatement: String {
-        SQLStatements.createMoviesTableSQL
+        SQLStatements.createBookmarksTableSQL
     }
     
     internal init(row: Dictionary<String, Any>) throws {
@@ -69,3 +67,4 @@ internal struct Movie: SQLTable, Identifiable, Sendable {
         ]
     }
 }
+

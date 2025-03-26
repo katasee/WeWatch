@@ -10,16 +10,20 @@ import SwiftUI
 internal struct DiscoveryListView: View {
     
     @MainActor private let dataForAllMovies: Array<Movie>
-    private let chooseButtonAction: @MainActor (Movie) -> Void
-    
+    private let chooseButtonAction: @MainActor(Movie) -> Void
+    private let bookmarkAddAction: @MainActor(Movie) async -> Void
+    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
+
     internal init(
         data: Array<Movie>,
-        chooseButtonAction: @escaping @MainActor (Movie) -> Void
-        
+        chooseButtonAction: @escaping @MainActor(Movie) -> Void,
+        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
+        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void
     ) {
         self.dataForAllMovies = data
         self.chooseButtonAction = chooseButtonAction
-        
+        self.bookmarkAddAction = bookmarkAddAction
+        self.bookmarkRemoveAction = bookmarkRemoveAction
     }
     
     internal var body: some View {
@@ -51,10 +55,10 @@ internal struct DiscoveryListView: View {
                     ) {
                         MovieCardDiscover(
                             isActive: false,
-                            title: model.title,
-                            ranking: Double(model.rating),
-                            imageUrl: URL(string: model.posterUrl),
-                            didTap: { isActive in }
+                            movie: model,
+                            didTap: { isActive in },
+                            bookmarkAddAction: bookmarkAddAction,
+                            bookmarkRemoveAction: bookmarkRemoveAction
                         )}
                 }
             }

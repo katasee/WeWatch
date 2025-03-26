@@ -35,6 +35,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6E30B0B52D8F03B1002619D3 /* CustomTabBar */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CustomTabBar;
+			sourceTree = "<group>";
+		};
 		6E7F8BD42D70E97A00FA67AC /* ModelForDatabase */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ModelForDatabase;
@@ -84,6 +89,7 @@
 			children = (
 				6E33D0CC2D184B45004C376C /* Development.xcconfig */,
 				6E8E31182CFA24F800B5894A /* Environment.swift */,
+				6E30B0B52D8F03B1002619D3 /* CustomTabBar */,
 				6ED883552CFB9232004A29AE /* KeychainManager.swift */,
 				6E39E5FF2D06ED8600516C00 /* JWTDecoder.swift */,
 				6ECE93CC2CF10C8300852DDD /* WeWatch */,
@@ -119,6 +125,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6E30B0B52D8F03B1002619D3 /* CustomTabBar */,
 				6E7F8BD42D70E97A00FA67AC /* ModelForDatabase */,
 				6E8F774E2D4E973F00E2CEDF /* Response */,
 				6EB5E7892D2DB16F008508B6 /* Database */,

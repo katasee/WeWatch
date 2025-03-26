@@ -24,12 +24,25 @@ internal struct HomeView: View {
                     LazyVStack {
                         TodaysSelectionSectionView(
                             data: viewModel.todaySelection,
-                            chooseButtonAction: { isActive in }
+                            chooseButtonAction: { isActive in },
+                            bookmarkAddAction: {_ in },
+                            bookmarkRemoveAction: {_ in }
                         )
                         DiscoverSectionView(
                             data: viewModel.discoverySection,
                             seeMoreButtonAction: {},
-                            chooseButtonAction: { isActive in }
+                            chooseButtonAction: { isActive in },
+                            refreshBookmart: { movie in
+                                await viewModel.refreshBookmarked(
+                                    active: !movie.isBookmarked,
+                                    movieId: movie.id
+                                )
+                            },
+                            bookmarkAddAction: { movie in
+                                await viewModel.inserToDatabase(movieId: movie.id)},
+                            bookmarkRemoveAction: { movie in
+                                await viewModel.removeFromDatabase(movieId: movie.id)
+                            }
                         )
                         if !viewModel.discoverySection.isEmpty {
                             Rectangle()

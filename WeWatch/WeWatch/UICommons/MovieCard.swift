@@ -10,30 +10,29 @@ import Kingfisher
 
 internal struct MovieCard: View {
     
-    @State private var isActive: Bool
-    private let title: String
-    private let ranking: Double
-    private let genres: String
-    private let storyline: String
-    private let image: URL?
-    private var didTap: @MainActor (Bool) -> Void
+    //    private var active: Bool
+    private let movie: Movie
+    private var didTap: @MainActor(Bool) -> Void
+    private let refreshBookmart: @MainActor(Movie) async -> Void
+    private let bookmarkAddAction: @MainActor(Movie) async -> Void
+    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
     
     internal init(
-        isActive: Bool,
-        title: String,
-        ranking: Double,
-        genres: String,
-        storyline: String,
-        imageUrl: URL?,
-        didTap: @escaping @MainActor (Bool) -> Void
+        movie: Movie,
+        //        active: Bool,
+        didTap: @escaping @MainActor(Bool) -> Void,
+        refreshBookmart: @escaping @MainActor(Movie) async -> Void,
+        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
+        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void
+        
     ) {
-        self.isActive = isActive
-        self.title = title
-        self.ranking = ranking
-        self.genres = genres
-        self.storyline = storyline
-        self.image = imageUrl
+        self.movie = movie
+        //        self.active = active
         self.didTap = didTap
+        self.refreshBookmart = refreshBookmart
+        self.bookmarkAddAction = bookmarkAddAction
+        self.bookmarkRemoveAction = bookmarkRemoveAction
+        
     }
     
     internal var body: some View {
@@ -43,23 +42,27 @@ internal struct MovieCard: View {
                     filmImage
                     Spacer()
                     Button {
-                        isActive.toggle()
-                        didTap(isActive)
-                    } label: {
-                        if isActive == true {
-                            Bookmark(isActive: true)
-                        } else {
-                            Bookmark(isActive: false)
+                        let movieSelected = !movie.isBookmarked
+                        didTap(movieSelected)
+                        Task {
+                            if movieSelected {
+                                await bookmarkAddAction(movie)
+                            } else {
+                                await bookmarkRemoveAction(movie)
+                            }
+                            await refreshBookmart(movie)
                         }
+                    } label: {
+                        Bookmark(isActive: movie.isBookmarked)
                     }
-                        .padding(16)
+                    .padding(16)
                 }
             }
             VStack(alignment: .leading, spacing: 10) {
                 filmTitle
                 HStack {
                     filmRanking
-                    RatingView(ranking: ranking)
+                    RatingView(ranking: movie.rating)
                 }
                 filmGenres
                 storyLine
@@ -68,7 +71,7 @@ internal struct MovieCard: View {
     }
     
     private var filmImage: some View {
-        KFImage(image)
+        KFImage(URL(string: movie.posterUrl))
             .resizable()
             .placeholder({
                 ZStack {
@@ -85,25 +88,25 @@ internal struct MovieCard: View {
     }
     
     private var filmTitle: some View {
-        Text(title)
+        Text(movie.title)
             .font(.poppinsBold20px)
             .foregroundColor(.whiteColor)
     }
     
     private var filmRanking: some View {
-        Text("\(ranking, specifier: "%.1f")")
+        Text("\(movie.rating, specifier: "%.1f")")
             .font(.poppinsBold16px)
             .foregroundColor(.whiteColor)
     }
     
     private var filmGenres: some View {
-        Text(genres)
+        Text(movie.genres)
             .font(.poppinsBold14px)
             .foregroundColor(.whiteColor)
     }
     
     private var storyLine: some View {
-        Text(storyline)
+        Text(movie.overview)
             .font(.poppinsRegular13px)
             .foregroundColor(.lightGreyColor)
             .lineLimit(4)

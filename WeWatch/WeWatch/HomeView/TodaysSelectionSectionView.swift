@@ -9,15 +9,22 @@ import SwiftUI
 
 internal struct TodaysSelectionSectionView: View {
     
-    private let data: [Movie]
+    private let data: Array<Movie>
     private let chooseButtonAction: @MainActor (Movie) -> Void
+    private let bookmarkAddAction: @MainActor (Movie) async -> Void
+    private let bookmarkRemoveAction: @MainActor (Movie) async -> Void
     
     internal init(
-        data: [Movie],
-        chooseButtonAction: @escaping @MainActor (Movie) -> Void
+        data: Array<Movie>,
+        chooseButtonAction: @escaping @MainActor (Movie) -> Void,
+        bookmarkAddAction: @escaping @MainActor (Movie) async -> Void,
+        bookmarkRemoveAction: @escaping @MainActor (Movie) async -> Void
+        
     ) {
         self.data = data
         self.chooseButtonAction = chooseButtonAction
+        self.bookmarkAddAction = bookmarkAddAction
+        self.bookmarkRemoveAction = bookmarkRemoveAction
     }
     
     internal var body: some View {
@@ -60,10 +67,10 @@ internal struct TodaysSelectionSectionView: View {
                     )
                 ) {
                     MovieCardTopFive(
-                        title: model.title,
-                        ranking: Double(model.rating),
-                        image: URL(string: model.posterUrl),
-                        didTap: { isActive in }
+                        movie: model,
+                        didTap: { isActive in },
+                        bookmarkAddAction: bookmarkAddAction,
+                        bookmarkRemoveAction: bookmarkRemoveAction
                     )
                 }
             }

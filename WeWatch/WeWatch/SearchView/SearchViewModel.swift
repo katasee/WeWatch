@@ -9,15 +9,12 @@ import Foundation
 
 internal final class SearchViewModel: ObservableObject {
     
-    @Published internal var genresForSearchView: Array<Genre> = []
-    @Published internal var dataForSearchView: Array<Movie> = []
+    @Published internal var genresForSearchView: Array<Genre> = .init()
+    @Published internal var dataForSearchView: Array<Movie> = .init()
     @Published internal var searchText: String = ""
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
     @Published internal var isFetchingNextPage = false
     internal var currentPage: Int = 0
-    
-    
-    
     private let dbManager: DatabaseManager
     
     internal init(dbManager: DatabaseManager) {
@@ -127,7 +124,7 @@ internal final class SearchViewModel: ObservableObject {
         currentPage = 0
         if searchText.isEmpty {
             await MainActor.run { [weak self] in
-                self?.dataForSearchView = []
+                self?.dataForSearchView = .init()
             }
         } else {
             do {
@@ -169,6 +166,25 @@ internal final class SearchViewModel: ObservableObject {
         await MainActor.run { [weak self] in
         isFetchingNextPage = true
             self?.dataForSearchView.append(contentsOf: searchMovieData)
+        }
+    }
+    
+    internal func inserToDatabase(movieId: String) async {
+        do {
+            try await dbManager.attachMovieToList(
+                listId: Constans.bookmarkList,
+                movieId: movieId
+            )
+        } catch {
+            print(error)
+        }
+    }
+    
+    internal func removeFromDatabase(movieId: String) async {
+        do {
+            try await dbManager.delete(from: Movie.self, id: movieId)
+        } catch {
+            print(error)
         }
     }
 }

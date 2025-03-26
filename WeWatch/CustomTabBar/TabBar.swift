@@ -22,7 +22,13 @@ internal struct TabBar: View {
     internal func viewForSeletedTab() -> some View {
         switch viewModel.selectedTab {
         case .bookmark:
-            BookmarkView(viewModel: BookmarkViewModel())
+            BookmarkView(
+                viewModel: BookmarkViewModel(
+                dbManager: DatabaseManager(
+                    dataBaseName: DatabaseConfig.name
+                )
+            )
+        )
         case .homeView:
             HomeView(
                 viewModel: HomeViewModel(
