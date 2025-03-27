@@ -10,26 +10,24 @@ import Kingfisher
 
 internal struct MovieCard: View {
     
-    //    private var active: Bool
+    private let refreshBookmark: @MainActor(Movie) async -> Void
     private let movie: Movie
     private var didTap: @MainActor(Bool) -> Void
-    private let refreshBookmart: @MainActor(Movie) async -> Void
     private let bookmarkAddAction: @MainActor(Movie) async -> Void
     private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
     
     internal init(
+        
+        refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         movie: Movie,
-        //        active: Bool,
         didTap: @escaping @MainActor(Bool) -> Void,
-        refreshBookmart: @escaping @MainActor(Movie) async -> Void,
         bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
         bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void
         
     ) {
+        self.refreshBookmark = refreshBookmark
         self.movie = movie
-        //        self.active = active
         self.didTap = didTap
-        self.refreshBookmart = refreshBookmart
         self.bookmarkAddAction = bookmarkAddAction
         self.bookmarkRemoveAction = bookmarkRemoveAction
         
@@ -50,7 +48,7 @@ internal struct MovieCard: View {
                             } else {
                                 await bookmarkRemoveAction(movie)
                             }
-                            await refreshBookmart(movie)
+                            await refreshBookmark(movie)
                         }
                     } label: {
                         Bookmark(isActive: movie.isBookmarked)

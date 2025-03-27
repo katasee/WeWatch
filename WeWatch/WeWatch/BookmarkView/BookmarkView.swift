@@ -24,10 +24,15 @@ internal struct BookmarkView: View {
                     VStack {
                         BookmarkListView(
                             searchText: $viewModel.searchText,
+                            refreshBookmark: { movie in
+                                await viewModel.refreshBookmarked(
+                                    active: !movie.isBookmarked,
+                                    movieId: movie.id
+                                )
+                            },
                             data: viewModel.filteredBookmarkedMovie,
                             chooseButtonAction: { isActive in },
-                            bookmarkAddAction: { movie in
-                                await viewModel.dataFromDatabase() },
+                            bookmarkAddAction: { _ in },
                             bookmarkRemoveAction: { movie in
                                 await viewModel.removeFromDatabase(movieId: movie.id)
                             },

@@ -37,6 +37,13 @@ internal enum DatabaseConfig {
 
 internal enum SQLStatements {
     
+    internal static let createBookmarkIdsTableSQL: String = """
+     CREATE TABLE IF NOT EXISTS bookmark(
+     id TEXT PRIMARY KEY
+     );
+     """
+    internal static let insertBookmarkIds: String = "INSERT OR REPLACE INTO bookmark id VALUES ?;"
+    internal static let selectedBookmarkIds: String = "SELECT * FROM bookmark;"
     internal static let createMoviesTableSQL: String = """
      CREATE TABLE IF NOT EXISTS movies(
      id TEXT PRIMARY KEY,
@@ -47,16 +54,6 @@ internal enum SQLStatements {
      genres TEXT
      );
      """
-    internal static let createBookmarksTableSQL: String = """
-    CREATE TABLE IF NOT EXISTS bookmark(
-    id TEXT PRIMARY KEY,
-    title TEXT NOT NULL,
-    overview TEXT,
-    rating REAL,
-    posterUrl TEXT,
-    genres TEXT
-    );
-    """
     internal static let createListsTableSQL: String = """
      CREATE TABLE IF NOT EXISTS lists(
      id TEXT PRIMARY KEY,
@@ -90,8 +87,6 @@ internal enum SQLStatements {
     internal static let insertGenreMovies: String = "INSERT OR IGNORE INTO movie_genres (movie_id, genre_id) VALUES (?, ?);"
     internal static let insertListMovies: String = "INSERT OR REPLACE INTO list_movies (list_id, movie_id) VALUES (?, ?);"
     internal static let insertGenres: String = "INSERT OR REPLACE INTO genres (id, title) VALUES (?, ?);"
-//    internal static let insertBookmarkMovie = "INSERT OR REPLACE INTO bookmark (id, title) VALUES (?, ?);"
-//    internal static let selectedAllMovieFromBookmark = "SELECT * FROM bookmark;"
     internal static let selectMovieByList: String = """
      SELECT m.*
      FROM movies m
@@ -292,10 +287,11 @@ internal actor DatabaseManager {
             if sqlite3_step(stmt) != SQLITE_DONE {
                 let errmsg: String = .init(cString: sqlite3_errmsg(db))
                 throw DatabaseError.step(message: errmsg)
+
             }
         }
     }
-    
+
     internal func deleteAll<T: SQLTable>(from type: T.Type) throws {
         try transaction { dbManager in
             let sql = "DELETE FROM \(T.tableName);"
@@ -342,6 +338,14 @@ internal actor DatabaseManager {
         }
     }
     
+    internal func attachBookmarkIds(
+        bookmarkId: String
+    ) throws {
+        try transaction { dbManager in
+            try executeSimpleQuery(sql: SQLStatements.insertBookmarkIds, params: [bookmarkId])
+        }
+    }
+    
     internal func fetch<T: SQLTable>(_:T.Type) throws -> Array<T> {
         var results: Array<T> = .init()
         try transaction { dbManager in
@@ -380,26 +384,7 @@ internal actor DatabaseManager {
         return movies
     }
     
-//    internal func fetchMovieByListAndId(forList listId: String, id: String) throws -> Array<Movie> {
-//        var stmt: OpaquePointer?
-//        var movies: Array<Movie> = .init()
-//        try transaction { dbManager in
-//            defer { sqlite3_finalize(stmt) }
-//            guard sqlite3_prepare_v2(db, SQLStatements.selectMovieByList, -1, &stmt, nil) == SQLITE_OK else {
-//                let errmsg: String = .init(cString: sqlite3_errmsg(db))
-//                throw DatabaseError.prepare(message: errmsg)
-//            }
-//            sqlite3_bind_text(stmt, 1, listId, -1, SQLiteConstants.sqliteTransient)
-//            sqlite3_bind_text(stmt, 2, id, -1, SQLiteConstants.sqliteTransient)
-//
-//            while sqlite3_step(stmt) == SQLITE_ROW {
-//                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
-//                let movie: Movie = try .init(row: row)
-//                movies.append(movie)
-//            }
-//        }
-//        return movies
-//    }
+
     
     internal func searchMovie(by title: String) throws -> Array<Movie> {
         var stmt: OpaquePointer?
@@ -476,6 +461,24 @@ internal actor DatabaseManager {
             }
         }
         return genres
+    }
+    
+    internal func fetchBookmarkIds() throws -> Array<BookmarkIds> {
+        var stmt: OpaquePointer?
+        var ids: Array<BookmarkIds> = .init()
+        try transaction { dbManager in
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, SQLStatements.selectedBookmarkIds, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
+            }
+            while sqlite3_step(stmt) == SQLITE_ROW {
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
+                let id: BookmarkIds = try .init(row: row)
+                ids.append(id)
+            }
+        }
+        return ids
     }
     
     internal func mapRowToDict(stmt: OpaquePointer?) -> [String: Any] {

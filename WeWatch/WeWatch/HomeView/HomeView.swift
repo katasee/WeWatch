@@ -31,8 +31,8 @@ internal struct HomeView: View {
                         DiscoverSectionView(
                             data: viewModel.discoverySection,
                             seeMoreButtonAction: {},
-                            chooseButtonAction: { isActive in },
-                            refreshBookmart: { movie in
+//                            chooseButtonAction: { isActive in },
+                            refreshBookmark: { movie in
                                 await viewModel.refreshBookmarked(
                                     active: !movie.isBookmarked,
                                     movieId: movie.id

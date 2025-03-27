@@ -10,14 +10,16 @@ import SwiftUI
 internal struct BookmarkListView: View {
     
     @Binding private var searchText: String
+    private let refreshBookmark: @MainActor (Movie) async -> Void
     private let data: Array<Movie>
     private let chooseButtonAction: @MainActor(Movie) -> Void
     private let bookmarkAddAction: @MainActor(Movie) async -> Void
     private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
     private let bookmarkRemoveAllMovie: @MainActor() async -> Void
-    
+
     internal init(
         searchText: Binding<String>,
+        refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         data: Array<Movie>,
         chooseButtonAction: @escaping @MainActor(Movie) -> Void,
         bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
@@ -25,6 +27,7 @@ internal struct BookmarkListView: View {
         bookmarkRemoveAllMovie: @escaping @MainActor() async -> Void
     ) {
         self._searchText = searchText
+        self.refreshBookmark = refreshBookmark
         self.data = data
         self.chooseButtonAction = chooseButtonAction
         self.bookmarkAddAction = bookmarkAddAction
@@ -88,8 +91,13 @@ internal struct BookmarkListView: View {
                 )
                 {
                     MovieCard(
+                        refreshBookmark: refreshBookmark,
                         movie: model,
-                        didTap: { isActive in }, refreshBookmart: {_ in},
+                        didTap: { isActive in
+                            Task {
+                                await refreshBookmark(model)
+                            }
+                        },
                         bookmarkAddAction: bookmarkAddAction,
                         bookmarkRemoveAction: bookmarkRemoveAction
                     )

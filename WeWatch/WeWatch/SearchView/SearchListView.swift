@@ -55,8 +55,8 @@ internal struct SearchListView: View {
                 )
                 ) {
                     MovieCard(
-                        movie: model,
-                        didTap: { isActive in }, refreshBookmart: {_ in},
+                        refreshBookmark: {_ in}, movie: model,
+                        didTap: { isActive in },
                         bookmarkAddAction: bookmarkAddAction,
                         bookmarkRemoveAction: bookmarkRemoveAction
                     )
