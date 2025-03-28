@@ -41,10 +41,10 @@ internal struct DiscoveryView: View {
                                 data: viewModel.dataForAllMovieTab,
                                 chooseButtonAction: { isActive in },
                                 bookmarkAddAction: { movie in
-                                    await viewModel.inserToDatabase(movieId: movie.id)
+                                    await viewModel.addBookmark(movieId: movie.id)
                                 },
                                 bookmarkRemoveAction: { movie in
-                                    await viewModel.removeFromDatabase(movieId: movie.id)
+                                    await viewModel.removeBookmark(movieId: movie.id)
                                 }
                             )
                                 Rectangle()

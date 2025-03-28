@@ -169,7 +169,7 @@ internal final class SearchViewModel: ObservableObject {
         }
     }
     
-    internal func inserToDatabase(movieId: String) async {
+    internal func addBookmark(movieId: String) async {
         do {
             try await dbManager.attachMovieToList(
                 listId: Constans.bookmarkList,
@@ -180,7 +180,7 @@ internal final class SearchViewModel: ObservableObject {
         }
     }
     
-    internal func removeFromDatabase(movieId: String) async {
+    internal func removeBookmark(movieId: String) async {
         do {
             try await dbManager.delete(from: Movie.self, id: movieId)
         } catch {

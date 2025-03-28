@@ -124,7 +124,11 @@ internal protocol SQLTable {
 
 internal enum SQLiteConstants {
     
-    internal static let sqliteTransient: sqlite3_destructor_type = unsafeBitCast(OpaquePointer(bitPattern: -1), to: sqlite3_destructor_type.self)
+    internal static let sqliteTransient: sqlite3_destructor_type = unsafeBitCast(
+        OpaquePointer(
+            bitPattern: -1),
+        to: sqlite3_destructor_type.self
+    )
 }
 
 internal actor DatabaseManager {
@@ -287,11 +291,29 @@ internal actor DatabaseManager {
             if sqlite3_step(stmt) != SQLITE_DONE {
                 let errmsg: String = .init(cString: sqlite3_errmsg(db))
                 throw DatabaseError.step(message: errmsg)
-
+                
             }
         }
     }
-
+    
+    internal func detachMovieFromList(listId: String, movieId: String) throws {
+        try transaction { dbManager in
+            let sql = "DELETE FROM list_movies WHERE list_id = ? AND movie_id = ?;"
+            var stmt: OpaquePointer?
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.prepare(message: errmsg)
+            }
+            sqlite3_bind_text(stmt, 1, listId, -1, SQLiteConstants.sqliteTransient)
+            sqlite3_bind_text(stmt, 2, movieId, -1, SQLiteConstants.sqliteTransient)
+            if sqlite3_step(stmt) != SQLITE_DONE {
+                let errmsg: String = .init(cString: sqlite3_errmsg(db))
+                throw DatabaseError.step(message: errmsg)
+            }
+        }
+    }
+    
     internal func deleteAll<T: SQLTable>(from type: T.Type) throws {
         try transaction { dbManager in
             let sql = "DELETE FROM \(T.tableName);"
@@ -319,7 +341,7 @@ internal actor DatabaseManager {
             )
         }
     }
-
+    
     internal func attachMovieToList(
         listId: String,
         movieId: String
@@ -384,7 +406,7 @@ internal actor DatabaseManager {
         return movies
     }
     
-
+    
     
     internal func searchMovie(by title: String) throws -> Array<Movie> {
         var stmt: OpaquePointer?
@@ -395,15 +417,15 @@ internal actor DatabaseManager {
                 let errmsg: String = .init(cString: sqlite3_errmsg(db))
                 throw DatabaseError.prepare(message: errmsg)
             }
-        sqlite3_bind_text(stmt, 1, title, -1, SQLiteConstants.sqliteTransient)
-        while sqlite3_step(stmt) == SQLITE_ROW {
-            let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
-            let movie: Movie = try .init(row: row)
-            movies.append(movie)
+            sqlite3_bind_text(stmt, 1, title, -1, SQLiteConstants.sqliteTransient)
+            while sqlite3_step(stmt) == SQLITE_ROW {
+                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
+                let movie: Movie = try .init(row: row)
+                movies.append(movie)
+            }
         }
+        return movies
     }
-    return movies
-}
     
     internal func fetchMovie(by id: String) throws -> Movie {
         var stmt: OpaquePointer?
@@ -425,7 +447,7 @@ internal actor DatabaseManager {
         }
         return unwrapMovie
     }
-
+    
     internal func fetchMovieByGenres(forGenre genreId: String) throws -> Array<Movie> {
         var stmt: OpaquePointer?
         var movies: Array<Movie> = .init()

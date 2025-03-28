@@ -13,23 +13,23 @@ internal struct MovieCard: View {
     private let refreshBookmark: @MainActor(Movie) async -> Void
     private let movie: Movie
     private var didTap: @MainActor(Bool) -> Void
-    private let bookmarkAddAction: @MainActor(Movie) async -> Void
-    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
+//    private let bookmarkAddAction: @MainActor(Movie) async -> Void
+//    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
     
     internal init(
         
         refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         movie: Movie,
-        didTap: @escaping @MainActor(Bool) -> Void,
-        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
-        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void
+        didTap: @escaping @MainActor(Bool) -> Void
+//        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
+//        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void
         
     ) {
         self.refreshBookmark = refreshBookmark
         self.movie = movie
         self.didTap = didTap
-        self.bookmarkAddAction = bookmarkAddAction
-        self.bookmarkRemoveAction = bookmarkRemoveAction
+//        self.bookmarkAddAction = bookmarkAddAction
+//        self.bookmarkRemoveAction = bookmarkRemoveAction
         
     }
     
@@ -43,11 +43,6 @@ internal struct MovieCard: View {
                         let movieSelected = !movie.isBookmarked
                         didTap(movieSelected)
                         Task {
-                            if movieSelected {
-                                await bookmarkAddAction(movie)
-                            } else {
-                                await bookmarkRemoveAction(movie)
-                            }
                             await refreshBookmark(movie)
                         }
                     } label: {

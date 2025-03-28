@@ -60,9 +60,9 @@ internal struct SearchView: View {
                                         seeMoreButtonAction: {},
                                         chooseButtonAction: { isActive in },
                                         bookmarkAddAction: { movie in
-                                            await viewModel.inserToDatabase(movieId: movie.id)},
+                                            await viewModel.addBookmark(movieId: movie.id)},
                                         bookmarkRemoveAction: { movie in
-                                           await viewModel.removeFromDatabase(movieId: movie.id)}
+                                           await viewModel.removeBookmark(movieId: movie.id)}
                                     )
                                     .padding(16)
                                     Rectangle()

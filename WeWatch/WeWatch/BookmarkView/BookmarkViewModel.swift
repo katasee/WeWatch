@@ -18,17 +18,18 @@ internal final class BookmarkViewModel: ObservableObject {
         self.dbManager = dbManager
     }
     
-    func idFromDatabase() async throws {
+    func refreshBookmarkedIDs() async throws {
         let movieIds = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList).map { $0.id }
          await MainActor.run { [weak self] in
             self?.bookmarkedMovieIds = Set(movieIds)
         }
     }
     
-    internal func dataFromDatabase() async {
+    internal func loadBookmarkData() async {
         do {
-            try await idFromDatabase()
+            try await refreshBookmarkedIDs()
             let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
+            print(fetchMovie.count)
             let filtredMovie = fetchMovie.map { movie in
                  var mutableMovie = movie
                  mutableMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
@@ -43,16 +44,19 @@ internal final class BookmarkViewModel: ObservableObject {
         }
     }
     
-    internal func removeFromDatabase(movieId: String) async {
+    internal func refreshBookmarked(active: Bool, movieId: String) async {
         do {
-            try await dbManager.delete(from: Movie.self, id: movieId)
+            try await dbManager.detachMovieFromList(listId: Constans.bookmarkList, movieId: movieId)
             await MainActor.run { [weak self] in
-                self?.dataForBookmarkView.removeAll { $0.id == movieId }
+                self?.bookmarkedMovieIds.remove(movieId)
+                print(bookmarkedMovieIds)
             }
+            await loadBookmarkData()
         } catch {
             print(error)
         }
     }
+    
     internal func removeAllMovie() async {
         do {
             try await dbManager.deleteAll(from: Movie.self)
@@ -67,24 +71,7 @@ internal final class BookmarkViewModel: ObservableObject {
                 self?.dataForBookmarkView = updateData
             }
         } catch {
-            
-        }
-    }
-    
-    internal func refreshBookmarked(active: Bool, movieId: String) async {
-            if active {
-                bookmarkedMovieIds.insert(movieId)
-            } else {
-                bookmarkedMovieIds.remove(movieId)
-            }
-        await MainActor.run {
-            dataForBookmarkView = dataForBookmarkView.map { movie in
-                var updatedMovie = movie
-                if movie.id == movieId {
-                    updatedMovie.isBookmarked = active
-                }
-                return updatedMovie
-            }
+            print(error)
         }
     }
     

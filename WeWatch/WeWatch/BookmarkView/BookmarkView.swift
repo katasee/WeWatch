@@ -25,23 +25,30 @@ internal struct BookmarkView: View {
                         BookmarkListView(
                             searchText: $viewModel.searchText,
                             refreshBookmark: { movie in
-                                await viewModel.refreshBookmarked(
+                                    await viewModel.refreshBookmarked(
+                                        active: !movie.isBookmarked,
+                                        movieId: movie.id
+                                    )
+                                Task {
+                                    await viewModel.refreshBookmarked(
                                     active: !movie.isBookmarked,
                                     movieId: movie.id
-                                )
+                                    )
+                                }
                             },
                             data: viewModel.filteredBookmarkedMovie,
                             chooseButtonAction: { isActive in },
-                            bookmarkAddAction: { _ in },
-                            bookmarkRemoveAction: { movie in
-                                await viewModel.removeFromDatabase(movieId: movie.id)
-                            },
-                            bookmarkRemoveAllMovie: { await viewModel.removeAllMovie()}
+                            bookmarkRemoveAllMovie: {
+                                Task {
+                                    await viewModel.removeAllMovie()
+                                }
+                            }
                         )
                         .padding(16)
                     }
                     .onAppear {
-                        Task { try await viewModel.dataFromDatabase()
+                        Task {
+                            await viewModel.loadBookmarkData()
                         }
                     }
                 }
@@ -49,4 +56,3 @@ internal struct BookmarkView: View {
         }
     }
 }
-

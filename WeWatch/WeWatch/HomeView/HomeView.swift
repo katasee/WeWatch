@@ -33,15 +33,10 @@ internal struct HomeView: View {
                             seeMoreButtonAction: {},
 //                            chooseButtonAction: { isActive in },
                             refreshBookmark: { movie in
-                                await viewModel.refreshBookmarked(
-                                    active: !movie.isBookmarked,
-                                    movieId: movie.id
-                                )
-                            },
-                            bookmarkAddAction: { movie in
-                                await viewModel.inserToDatabase(movieId: movie.id)},
-                            bookmarkRemoveAction: { movie in
-                                await viewModel.removeFromDatabase(movieId: movie.id)
+                                    await viewModel.refreshBookmarked(
+                                        active: !movie.isBookmarked,
+                                        movieId: movie.id
+                                    )
                             }
                         )
                         if !viewModel.discoverySection.isEmpty {

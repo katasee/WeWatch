@@ -13,8 +13,7 @@ internal struct BookmarkListView: View {
     private let refreshBookmark: @MainActor (Movie) async -> Void
     private let data: Array<Movie>
     private let chooseButtonAction: @MainActor(Movie) -> Void
-    private let bookmarkAddAction: @MainActor(Movie) async -> Void
-    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
+
     private let bookmarkRemoveAllMovie: @MainActor() async -> Void
 
     internal init(
@@ -22,16 +21,14 @@ internal struct BookmarkListView: View {
         refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         data: Array<Movie>,
         chooseButtonAction: @escaping @MainActor(Movie) -> Void,
-        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
-        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void,
+
         bookmarkRemoveAllMovie: @escaping @MainActor() async -> Void
     ) {
         self._searchText = searchText
         self.refreshBookmark = refreshBookmark
         self.data = data
         self.chooseButtonAction = chooseButtonAction
-        self.bookmarkAddAction = bookmarkAddAction
-        self.bookmarkRemoveAction = bookmarkRemoveAction
+
         self.bookmarkRemoveAllMovie = bookmarkRemoveAllMovie
     }
     
@@ -97,9 +94,7 @@ internal struct BookmarkListView: View {
                             Task {
                                 await refreshBookmark(model)
                             }
-                        },
-                        bookmarkAddAction: bookmarkAddAction,
-                        bookmarkRemoveAction: bookmarkRemoveAction
+                        }
                     )
                     .multilineTextAlignment(.leading)
                 }

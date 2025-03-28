@@ -56,9 +56,7 @@ internal struct SearchListView: View {
                 ) {
                     MovieCard(
                         refreshBookmark: {_ in}, movie: model,
-                        didTap: { isActive in },
-                        bookmarkAddAction: bookmarkAddAction,
-                        bookmarkRemoveAction: bookmarkRemoveAction
+                        didTap: { isActive in }
                     )
                     .multilineTextAlignment(.leading)
                 }
