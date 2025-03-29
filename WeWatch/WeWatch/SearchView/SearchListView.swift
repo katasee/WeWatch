@@ -12,9 +12,8 @@ internal struct SearchListView: View {
     private let data: Array<Movie>
     private let seeMoreButtonAction: @MainActor () -> Void
     private let refreshBookmark: @MainActor (Movie) async -> Void
-
+    
     internal init(
- 
         data: Array<Movie>,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
         refreshBookmark: @escaping @MainActor (Movie) async -> Void

@@ -11,7 +11,6 @@ internal struct ExpandableTextView: View {
     
     @State private var fullText: Bool = false
     @State private var clipped: Bool = false
-    
     internal let lineLimit: Int
     internal let movie: Movie
     

@@ -47,6 +47,7 @@ internal struct HomeView: View {
                         )
                         if !viewModel.discoverySection.isEmpty {
                             Rectangle()
+                                .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
                                 .frame(minHeight: 1)
                                 .foregroundColor(Color.clear)
                                 .onAppear {
@@ -62,7 +63,7 @@ internal struct HomeView: View {
                         try await viewModel.movieForDiscoveryView()
                         try await viewModel.dataForTodaySelection()
                     } catch {
-       print("Error loading data: \(error)")
+                        print("Error loading data: \(error)")
                     }
                 }
                 .padding(16)

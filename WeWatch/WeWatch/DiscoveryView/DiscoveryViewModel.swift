@@ -20,14 +20,13 @@ internal final class DiscoveryViewModel: ObservableObject {
     internal var isBackEndDateEmpty: Bool = false
     internal let dbManager: DatabaseManager = .shared
     
-    
     internal func dataFromEndpoint() async {
         do {
-        try await idFromDatabase()
-        await MainActor.run { [weak self] in
-            self?.dataForAllMovieTab = .init()
-            self?.currentPage = 0
-        }
+            try await idFromDatabase()
+            await MainActor.run { [weak self] in
+                self?.dataForAllMovieTab = .init()
+                self?.currentPage = 0
+            }
             let discoveryMovieData: Array<Movie> = try await prepareDataForDiscoveryView(
                 genre: filterGenres(),
                 page: String(currentPage)
@@ -35,8 +34,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             let filtredMovie = discoveryMovieData.map { movie -> Movie in
                 var updateMovie = movie
                 updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-               print(bookmarkedMovieIds)
-                    return updateMovie
+                return updateMovie
             }
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = filtredMovie
@@ -66,8 +64,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             let filtredMovie = moviesFromDb.map { movie -> Movie in
                 var updateMovie = movie
                 updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-               print(bookmarkedMovieIds)
-                    return updateMovie
+                return updateMovie
             }
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = filtredMovie
@@ -78,7 +75,10 @@ internal final class DiscoveryViewModel: ObservableObject {
         }
     }
     
-    internal func prepareDataForDiscoveryView(genre: String, page: String) async throws -> Array<Movie> {
+    internal func prepareDataForDiscoveryView(
+        genre: String,
+        page: String
+    ) async throws -> Array<Movie> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let listsResource: Resource<SearchResponse> = .init(
@@ -252,7 +252,11 @@ internal final class DiscoveryViewModel: ObservableObject {
         }
     }
     
-    internal func refreshBookmarked(active: Bool, movieId: String, selectedMovie: Movie) async {
+    internal func refreshBookmarked(
+        active: Bool,
+        movieId: String,
+        selectedMovie: Movie
+    ) async {
         do {
             if active {
                 try await dbManager.insert(selectedMovie)
@@ -266,7 +270,6 @@ internal final class DiscoveryViewModel: ObservableObject {
                     movieId: movieId
                 )
             }
-            print(bookmarkedMovieIds)
             await MainActor.run {
                 dataForAllMovieTab = dataForAllMovieTab.map { movie in
                     var updatedMovie = movie
@@ -277,7 +280,7 @@ internal final class DiscoveryViewModel: ObservableObject {
                 }
             }
         } catch {
-  print("Error adding bookmark: \(error)")
+            print("Error adding bookmark: \(error)")
         }
         await updateBookmarks()
     }

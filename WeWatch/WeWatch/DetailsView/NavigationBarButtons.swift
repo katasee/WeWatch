@@ -11,18 +11,17 @@ internal struct NavigationBarButtons: View {
     
     @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
     private let refreshBookmark: @MainActor(Movie) async -> Void
-    internal var movie: Movie
     private var didTap: @MainActor (Bool) -> Void
+    internal var movie: Movie
     
-    init(
+    internal init(
         refreshBookmark: @escaping @MainActor(Movie) async -> Void,
-        movie: Movie,
-        didTap: @escaping(Bool) -> Void
+        didTap: @escaping(Bool) -> Void,
+        movie: Movie
     ) {
         self.refreshBookmark = refreshBookmark
-        self.movie = movie
         self.didTap = didTap
-        
+        self.movie = movie
         UINavigationBar.appearance().setBackgroundImage(UIImage(), for: UIBarMetrics.default)
         UINavigationBar.appearance().shadowImage = UIImage()
         UINavigationBar.appearance().isTranslucent = true

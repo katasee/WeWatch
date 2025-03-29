@@ -72,7 +72,7 @@ internal struct SearchView: View {
                                         .frame(minHeight: 1)
                                         .foregroundColor(Color.clear)
                                         .onAppear {
-                                            Task { try await viewModel.appendDateFromEndpoint()}
+                                            Task { try await viewModel.appendDateFromEndpoint() }
                                         }
                                 }
                             }

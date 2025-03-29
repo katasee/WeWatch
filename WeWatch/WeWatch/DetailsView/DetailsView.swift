@@ -27,8 +27,8 @@ internal struct DetailsView: View {
                             )
                         }
                     },
-                    movie: movie,
-                    didTap: { isActive in }
+                    didTap: { isActive in },
+                    movie: movie
                 )
                 ScrollView {
                     VStack {
@@ -36,7 +36,7 @@ internal struct DetailsView: View {
                     }
                 }
             }
-               
+            
         }
         .task {
             await viewModel.dataFromEndpoint()

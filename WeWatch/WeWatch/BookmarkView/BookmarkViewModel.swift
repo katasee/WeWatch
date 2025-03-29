@@ -17,8 +17,8 @@ internal final class BookmarkViewModel: ObservableObject {
     func refreshBookmarkedIDs() async throws {
         let movies = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
         let ids = movies.map { $0.id }
-         await MainActor.run { [weak self] in
-             self?.bookmarkedMovieIds = Set(ids)
+        await MainActor.run { [weak self] in
+            self?.bookmarkedMovieIds = Set(ids)
         }
     }
     
@@ -26,22 +26,23 @@ internal final class BookmarkViewModel: ObservableObject {
         do {
             try await refreshBookmarkedIDs()
             let movies = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
-            print(movies.count)
             let filtredMovies = movies.map { movie -> Movie in
-                 var updatedMovie = movie
+                var updatedMovie = movie
                 updatedMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                print(bookmarkedMovieIds)
-                     return updatedMovie
-             }
-                    await MainActor.run { [weak self] in
-                        self?.dataForBookmarkView = filtredMovies
-                    }
+                return updatedMovie
+            }
+            await MainActor.run { [weak self] in
+                self?.dataForBookmarkView = filtredMovies
+            }
         } catch {
-      print("Error loading bookmark data: \(error)")
+            print("Error loading bookmark data: \(error)")
         }
     }
     
-    internal func refreshBookmarked(active: Bool, movieId: String) async {
+    internal func refreshBookmarked(
+        active: Bool,
+        movieId: String
+    ) async {
         do {
             try await dbManager.detachMovieFromList(
                 listId: Constans.bookmarkList,
@@ -49,11 +50,10 @@ internal final class BookmarkViewModel: ObservableObject {
             )
             await MainActor.run { [weak self] in
                 self?.bookmarkedMovieIds.remove(movieId)
-                print(bookmarkedMovieIds)
             }
             await loadBookmarkData()
         } catch {
-    print("Error removing bookmark for movie \(movieId): \(error)")
+            print("Error removing bookmark for movie \(movieId): \(error)")
         }
     }
     
@@ -65,16 +65,16 @@ internal final class BookmarkViewModel: ObservableObject {
                     listId: Constans.bookmarkList,
                     movieId: movie.id
                 )
-             }
+            }
             await loadBookmarkData()
-         } catch {
+        } catch {
             print("Error removing all bookmarks: \(error)")
-         }
-     }
+        }
+    }
     
     internal var filteredBookmarkedMovie: Array<Movie> {
         if searchText.isEmpty {
-      return dataForBookmarkView
+            return dataForBookmarkView
         } else {
             return dataForBookmarkView.filter {
                 $0.title.localizedStandardContains(searchText) ||
@@ -84,4 +84,3 @@ internal final class BookmarkViewModel: ObservableObject {
         }
     }
 }
-

@@ -11,6 +11,7 @@ internal final class HomeViewModel: ObservableObject {
     
     @Published internal var todaySelection: Array<Movie> = .init()
     @Published internal var discoverySection: Array<Movie> = .init()
+    @Published internal var isFetchingNextPage = false
     internal var currentPage: Int = 0
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal let dbManager: DatabaseManager = .shared
@@ -20,17 +21,17 @@ internal final class HomeViewModel: ObservableObject {
     }
     
     internal func updateBookmarks() async {
-            do {
-                let bookmarked = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
-                let ids = Set(bookmarked.map { $0.id })
-                await MainActor.run {
-                    self.bookmarkedMovieIds = ids
-                }
-            } catch {
-                print("Error updating bookmarks: \(error)")
+        do {
+            let bookmarked = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
+            let ids = Set(bookmarked.map { $0.id })
+            await MainActor.run {
+                self.bookmarkedMovieIds = ids
             }
+        } catch {
+            print("Error updating bookmarks: \(error)")
         }
-
+    }
+    
     func idFromDatabase() async throws {
         let movieIds = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList).map { $0.id }
         await MainActor.run {
@@ -38,7 +39,11 @@ internal final class HomeViewModel: ObservableObject {
         }
     }
     
-    internal func refreshBookmarked(active: Bool, movieId: String, selectedMovie: Movie) async {
+    internal func refreshBookmarked(
+        active: Bool,
+        movieId: String,
+        selectedMovie: Movie
+    ) async {
         do {
             if active {
                 try await dbManager.insert(selectedMovie)
@@ -46,15 +51,11 @@ internal final class HomeViewModel: ObservableObject {
                     listId: Constans.bookmarkList,
                     movieId: movieId
                 )
-                print(bookmarkedMovieIds)
-
             } else {
                 try await dbManager.detachMovieFromList(
                     listId: Constans.bookmarkList,
                     movieId: movieId
                 )
-                print(bookmarkedMovieIds)
-
             }
             await updateBookmarks()
             await MainActor.run {
@@ -67,12 +68,11 @@ internal final class HomeViewModel: ObservableObject {
                 }
             }
         } catch {
-  print("Error adding bookmark: \(error)")
+            print("Error adding bookmark: \(error)")
         }
     }
     
     internal func prepareDataDiscoverySection(page: String) async throws -> Array<Movie> {
-//        try await idFromDatabase()
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let listsResource: Resource<SearchResponse> = .init(
@@ -126,8 +126,7 @@ internal final class HomeViewModel: ObservableObject {
             let filtredMovie = discoveryMovieData.map { movie -> Movie in
                 var updateMovie = movie
                 updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-               print(bookmarkedMovieIds)
-                    return updateMovie
+                return updateMovie
             }
             try await MainActor.run {
                 self.discoverySection = filtredMovie
@@ -140,7 +139,7 @@ internal final class HomeViewModel: ObservableObject {
             let filtredMovie = fetchMovie.map { movie -> Movie in
                 var updateMovie = movie
                 updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                    return updateMovie
+                return updateMovie
             }
             await MainActor.run {
                 self.discoverySection = filtredMovie
@@ -150,9 +149,15 @@ internal final class HomeViewModel: ObservableObject {
     }
     
     internal func appendDateFromEndpoint() async throws {
+        Task { @MainActor in
+            isFetchingNextPage = true
+        }
         let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
         await MainActor.run {
             self.discoverySection.append(contentsOf: discoveryMovieData)
+        }
+        await MainActor.run { [weak self] in
+            self?.isFetchingNextPage = false
         }
     }
     
@@ -161,7 +166,7 @@ internal final class HomeViewModel: ObservableObject {
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let searchResource: Resource<SearchResponse> = .init(
             url: URL.SearchResponseURL,
-           method: .get([.init(name: "query", value: "\(query)")]),
+            method: .get([.init(name: "query", value: "\(query)")]),
             token: token
         )
         var response: SearchResponse = try await Webservice().call(searchResource)
@@ -195,12 +200,18 @@ internal final class HomeViewModel: ObservableObject {
             } ?? []
         for movie in moviesForUI {
             try await dbManager.insert(movie)
-            try await dbManager.attachMovieToList(listId: Constans.todaySelectionList, movieId: movie.id)
+            try await dbManager.attachMovieToList(
+                listId: Constans.todaySelectionList,
+                movieId: movie.id
+            )
         }
         return moviesForUI
     }
     
-    internal func refreshBookmarkedinTodaySelection(active: Bool, movieId: String) async {
+    internal func refreshBookmarkedinTodaySelection(
+        active: Bool,
+        movieId: String
+    ) async {
         do {
             if active {
                 try await dbManager.attachMovieToList(
@@ -213,7 +224,6 @@ internal final class HomeViewModel: ObservableObject {
                     movieId: movieId
                 )
             }
-            print(bookmarkedMovieIds)
             await MainActor.run {
                 todaySelection = todaySelection.map { movie in
                     var updatedMovie = movie
@@ -224,7 +234,7 @@ internal final class HomeViewModel: ObservableObject {
                 }
             }
         } catch {
-  print("Error adding bookmark: \(error)")
+            print("Error adding bookmark: \(error)")
         }
         await updateBookmarks()
     }
@@ -236,8 +246,7 @@ internal final class HomeViewModel: ObservableObject {
             let filtredMovie = todaySelection.map { movie -> Movie in
                 var updateMovie = movie
                 updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-               print(bookmarkedMovieIds)
-                    return updateMovie
+                return updateMovie
             }
             try await MainActor.run {
                 self.todaySelection = filtredMovie
@@ -253,7 +262,7 @@ internal final class HomeViewModel: ObservableObject {
             let filtredMovie = fetchMovie.map { movie -> Movie in
                 var updateMovie = movie
                 updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                    return updateMovie
+                return updateMovie
             }
             await MainActor.run {
                 self.todaySelection = filtredMovie

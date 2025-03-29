@@ -48,13 +48,13 @@ internal struct DiscoveryView: View {
                                     }
                                 }
                             )
-                                Rectangle()
+                            Rectangle()
                                 .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-                                    .frame(minHeight: 16)
-                                    .foregroundColor(Color.clear)
-                                    .onAppear {
-                                        viewModel.fetchNextPage()
-                                    }
+                                .frame(minHeight: 16)
+                                .foregroundColor(Color.clear)
+                                .onAppear {
+                                    viewModel.fetchNextPage()
+                                }
                         }
                         .onChange(of: viewModel.selectedGenre) { change in
                             Task {

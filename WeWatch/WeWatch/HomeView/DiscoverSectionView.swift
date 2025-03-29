@@ -13,17 +13,14 @@ internal struct DiscoverSectionView: View {
     private let seeMoreButtonAction: @MainActor () -> Void
     private let refreshBookmark: @MainActor (Movie) async -> Void
     
-    
     internal init(
         data: Array<Movie>,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
         refreshBookmark: @escaping @MainActor (Movie) async -> Void
-        
     ) {
         self.data = data
         self.seeMoreButtonAction = seeMoreButtonAction
         self.refreshBookmark = refreshBookmark
-        
     }
     
     internal var body: some View {

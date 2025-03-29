@@ -18,7 +18,6 @@ internal struct MovieCardDiscover: View {
 
     
     internal init(
-        
         refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         movie: Movie,
         didTap: @escaping @MainActor(Bool) -> Void

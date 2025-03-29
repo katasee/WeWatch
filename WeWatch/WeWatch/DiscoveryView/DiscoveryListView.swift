@@ -26,7 +26,6 @@ internal struct DiscoveryListView: View {
         }
     }
     
-    
     private let columns: Array<GridItem> = [
         GridItem(.flexible()),
         GridItem(.flexible())

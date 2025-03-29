@@ -18,10 +18,10 @@ internal struct BookmarkIds: SQLTable, Identifiable, Sendable, Hashable {
     }
 
     internal static var tableName: String { "bookmark" }
-
     internal static var createTableStatement: String {
         SQLStatements.createBookmarkIdsTableSQL
     }
+    
     internal init(row: Dictionary<String, Any>) throws {
         guard let id = row["id"] as? String
         else {

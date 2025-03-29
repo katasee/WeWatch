@@ -13,22 +13,19 @@ internal struct BookmarkListView: View {
     private let refreshBookmark: @MainActor (Movie) async -> Void
     private let data: Array<Movie>
     private let chooseButtonAction: @MainActor(Movie) -> Void
-
     private let bookmarkRemoveAllMovie: @MainActor() async -> Void
-
+    
     internal init(
         searchText: Binding<String>,
         refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         data: Array<Movie>,
         chooseButtonAction: @escaping @MainActor(Movie) -> Void,
-
         bookmarkRemoveAllMovie: @escaping @MainActor() async -> Void
     ) {
         self._searchText = searchText
         self.refreshBookmark = refreshBookmark
         self.data = data
         self.chooseButtonAction = chooseButtonAction
-
         self.bookmarkRemoveAllMovie = bookmarkRemoveAllMovie
     }
     
@@ -81,8 +78,8 @@ internal struct BookmarkListView: View {
                 NavigationLink(
                     destination: DetailsView(
                         viewModel: DetailsViewModel(movieId: model.id)
-                        )
                     )
+                )
                 {
                     MovieCard(
                         refreshBookmark: refreshBookmark,

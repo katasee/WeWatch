@@ -25,6 +25,7 @@ internal struct Genre: SQLTable, Identifiable, Sendable, Hashable {
     internal static var createTableStatement: String {
         SQLStatements.createGenresTableSQL
     }
+    
     internal init(row: Dictionary<String, Any>) throws {
         guard let id = row["id"] as? String,
               let title = row["title"] as? String
