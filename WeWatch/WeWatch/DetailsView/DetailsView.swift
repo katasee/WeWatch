@@ -20,14 +20,11 @@ internal struct DetailsView: View {
             if let movie = viewModel.movieForDetailsView {
                 NavigationBarButtons(
                     refreshBookmark: { movie in
-                        Task {
-                            await viewModel.refreshBookmarked(
-                                active: !movie.isBookmarked,
-                                movieId: movie.id
-                            )
-                        }
+                        viewModel.refreshBookmarked(
+                            active: !movie.isBookmarked,
+                            movieId: movie.id
+                        )
                     },
-                    didTap: { isActive in },
                     movie: movie
                 )
                 ScrollView {

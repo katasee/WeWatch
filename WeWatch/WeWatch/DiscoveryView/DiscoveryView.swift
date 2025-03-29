@@ -40,12 +40,10 @@ internal struct DiscoveryView: View {
                             DiscoveryListView(
                                 data: viewModel.dataForAllMovieTab,
                                 refreshBookmark: { movie in
-                                    Task {
-                                        await viewModel.refreshBookmarked(
-                                            active: !movie.isBookmarked,
-                                            movieId: movie.id, selectedMovie: movie
-                                        )
-                                    }
+                                    viewModel.refreshBookmarked(
+                                        active: !movie.isBookmarked,
+                                        movieId: movie.id, selectedMovie: movie
+                                    )
                                 }
                             )
                             Rectangle()

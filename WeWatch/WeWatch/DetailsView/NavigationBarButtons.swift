@@ -10,17 +10,14 @@ import SwiftUI
 internal struct NavigationBarButtons: View {
     
     @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
-    private let refreshBookmark: @MainActor(Movie) async -> Void
-    private var didTap: @MainActor (Bool) -> Void
+    private let refreshBookmark: @MainActor(Movie) -> Void
     internal var movie: Movie
     
     internal init(
-        refreshBookmark: @escaping @MainActor(Movie) async -> Void,
-        didTap: @escaping(Bool) -> Void,
+        refreshBookmark: @escaping @MainActor(Movie) -> Void,
         movie: Movie
     ) {
         self.refreshBookmark = refreshBookmark
-        self.didTap = didTap
         self.movie = movie
         UINavigationBar.appearance().setBackgroundImage(UIImage(), for: UIBarMetrics.default)
         UINavigationBar.appearance().shadowImage = UIImage()
@@ -44,7 +41,6 @@ internal struct NavigationBarButtons: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
                             let movieSelected = !movie.isBookmarked
-                            didTap(movieSelected)
                             Task {
                                 await refreshBookmark(movie)
                             }

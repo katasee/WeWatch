@@ -14,7 +14,11 @@ internal final class HomeViewModel: ObservableObject {
     @Published internal var isFetchingNextPage = false
     internal var currentPage: Int = 0
     internal var bookmarkedMovieIds: Set<String> = .init()
-    internal let dbManager: DatabaseManager = .shared
+    internal let dbManager: DatabaseManager
+    
+    internal init(dbManager: DatabaseManager = .shared) {
+        self.dbManager = dbManager
+    }
     
     fileprivate enum HomeViewModelError: Error {
         case insufficientData
@@ -24,18 +28,11 @@ internal final class HomeViewModel: ObservableObject {
         do {
             let bookmarked = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
             let ids = Set(bookmarked.map { $0.id })
-            await MainActor.run {
-                self.bookmarkedMovieIds = ids
+            await MainActor.run { [weak self] in
+                self?.bookmarkedMovieIds = ids
             }
         } catch {
             print("Error updating bookmarks: \(error)")
-        }
-    }
-    
-    func idFromDatabase() async throws {
-        let movieIds = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList).map { $0.id }
-        await MainActor.run {
-            self.bookmarkedMovieIds = Set(movieIds)
         }
     }
     
@@ -43,32 +40,34 @@ internal final class HomeViewModel: ObservableObject {
         active: Bool,
         movieId: String,
         selectedMovie: Movie
-    ) async {
-        do {
-            if active {
-                try await dbManager.insert(selectedMovie)
-                try await dbManager.attachMovieToList(
-                    listId: Constans.bookmarkList,
-                    movieId: movieId
-                )
-            } else {
-                try await dbManager.detachMovieFromList(
-                    listId: Constans.bookmarkList,
-                    movieId: movieId
-                )
-            }
-            await updateBookmarks()
-            await MainActor.run {
-                discoverySection = discoverySection.map { movie in
-                    var updatedMovie = movie
-                    if movie.id == movieId {
-                        updatedMovie.isBookmarked = active
-                    }
-                    return updatedMovie
+    ) {
+        Task {
+            do {
+                if active {
+                    try await dbManager.insert(selectedMovie)
+                    try await dbManager.attachMovieToList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                } else {
+                    try await dbManager.detachMovieFromList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
                 }
+                await updateBookmarks()
+                await MainActor.run { [weak self] in
+                    discoverySection = discoverySection.map { movie in
+                        var updatedMovie = movie
+                        if movie.id == movieId {
+                            updatedMovie.isBookmarked = active
+                        }
+                        return updatedMovie
+                    }
+                }
+            } catch {
+                print("Error adding bookmark: \(error)")
             }
-        } catch {
-            print("Error adding bookmark: \(error)")
         }
     }
     
@@ -121,28 +120,20 @@ internal final class HomeViewModel: ObservableObject {
     
     internal func movieForDiscoveryView() async throws {
         do {
-            try await idFromDatabase()
+            await updateBookmarks()
             let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
-            let filtredMovie = discoveryMovieData.map { movie -> Movie in
-                var updateMovie = movie
-                updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                return updateMovie
-            }
-            try await MainActor.run {
-                self.discoverySection = filtredMovie
+            let filtredMovie = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            try await MainActor.run { [weak self] in
+                self?.discoverySection = filtredMovie
                 if discoveryMovieData.isEmpty {
                     throw EndpointResponce.dataFromEndpoint
                 }
             }
         } catch {
             let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
-            let filtredMovie = fetchMovie.map { movie -> Movie in
-                var updateMovie = movie
-                updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                return updateMovie
-            }
-            await MainActor.run {
-                self.discoverySection = filtredMovie
+            let filtredMovie = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            await MainActor.run { [weak self] in
+                self?.discoverySection = filtredMovie
                 
             }
         }
@@ -153,8 +144,8 @@ internal final class HomeViewModel: ObservableObject {
             isFetchingNextPage = true
         }
         let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
-        await MainActor.run {
-            self.discoverySection.append(contentsOf: discoveryMovieData)
+        await MainActor.run { [weak self] in
+            self?.discoverySection.append(contentsOf: discoveryMovieData)
         }
         await MainActor.run { [weak self] in
             self?.isFetchingNextPage = false
@@ -211,45 +202,43 @@ internal final class HomeViewModel: ObservableObject {
     internal func refreshBookmarkedinTodaySelection(
         active: Bool,
         movieId: String
-    ) async {
-        do {
-            if active {
-                try await dbManager.attachMovieToList(
-                    listId: Constans.bookmarkList,
-                    movieId: movieId
-                )
-            } else {
-                try await dbManager.detachMovieFromList(
-                    listId: Constans.bookmarkList,
-                    movieId: movieId
-                )
-            }
-            await MainActor.run {
-                todaySelection = todaySelection.map { movie in
-                    var updatedMovie = movie
-                    if movie.id == movieId {
-                        updatedMovie.isBookmarked = active
-                    }
-                    return updatedMovie
+    ) {
+        Task {
+            do {
+                if active {
+                    try await dbManager.attachMovieToList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                } else {
+                    try await dbManager.detachMovieFromList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
                 }
+                await MainActor.run { [weak self] in
+                    todaySelection = todaySelection.map { movie in
+                        var updatedMovie = movie
+                        if movie.id == movieId {
+                            updatedMovie.isBookmarked = active
+                        }
+                        return updatedMovie
+                    }
+                }
+            } catch {
+                print("Error adding bookmark: \(error)")
             }
-        } catch {
-            print("Error adding bookmark: \(error)")
+            await updateBookmarks()
         }
-        await updateBookmarks()
     }
     
     internal func dataForTodaySelection() async throws {
         do {
-            try await idFromDatabase()
+            await updateBookmarks()
             let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
-            let filtredMovie = todaySelection.map { movie -> Movie in
-                var updateMovie = movie
-                updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                return updateMovie
-            }
-            try await MainActor.run {
-                self.todaySelection = filtredMovie
+            let filtredMovie = todaySelectionData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            try await MainActor.run { [weak self] in
+                self?.todaySelection = filtredMovie
                 if todaySelection.isEmpty {
                     throw EndpointResponce.dataFromEndpoint
                 }
@@ -259,14 +248,9 @@ internal final class HomeViewModel: ObservableObject {
             }
         } catch {
             let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
-            let filtredMovie = fetchMovie.map { movie -> Movie in
-                var updateMovie = movie
-                updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                return updateMovie
-            }
-            await MainActor.run {
-                self.todaySelection = filtredMovie
-                
+            let filtredMovie = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            await MainActor.run { [weak self] in
+                self?.todaySelection = filtredMovie
             }
         }
     }

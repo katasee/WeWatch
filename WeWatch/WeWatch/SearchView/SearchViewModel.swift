@@ -16,7 +16,11 @@ internal final class SearchViewModel: ObservableObject {
     @Published internal var isFetchingNextPage = false
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal var currentPage: Int = 0
-    internal let dbManager: DatabaseManager = .shared
+    internal let dbManager: DatabaseManager
+    
+    internal init(dbManager: DatabaseManager = .shared) {
+        self.dbManager = dbManager
+    }
     
     internal func prepareGenreForSearchView() async throws -> Array<Genre> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
@@ -111,7 +115,7 @@ internal final class SearchViewModel: ObservableObject {
     
     internal func dataFromEndpoint() async {
         do {
-            try await idFromDatabase()
+            await updateBookmarks()
             currentPage = 0
             if searchText.isEmpty {
                 await MainActor.run { [weak self] in
@@ -123,13 +127,9 @@ internal final class SearchViewModel: ObservableObject {
                     genre: selectedGenre.title,
                     page: String(currentPage)
                 )
-                let filtredMovie = searchMovieData.map { movie -> Movie in
-                    var updateMovie = movie
-                    updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                    return updateMovie
-                }
-                await MainActor.run {
-                    self.dataForSearchView = filtredMovie
+                let filtredMovie = searchMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+                await MainActor.run { [weak self] in
+                    self?.dataForSearchView = filtredMovie
                 }
                 if searchMovieData.isEmpty {
                     throw EndpointResponce.dataFromEndpoint
@@ -142,13 +142,9 @@ internal final class SearchViewModel: ObservableObject {
     
     private func dateFromDatabase() async {
         do {
-            try await idFromDatabase()
+            await updateBookmarks()
             let fetchMovie: Array<Movie> = try await dbManager.searchMovie(by: searchText)
-            let filtredMovie = fetchMovie.map { movie -> Movie in
-                var updateMovie = movie
-                updateMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                return updateMovie
-            }
+            let filtredMovie = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
                 self?.dataForSearchView = filtredMovie
             }
@@ -174,18 +170,11 @@ internal final class SearchViewModel: ObservableObject {
         do {
             let bookmarked = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
             let ids = Set(bookmarked.map { $0.id })
-            await MainActor.run {
-                self.bookmarkedMovieIds = ids
+            await MainActor.run { [weak self] in
+                self?.bookmarkedMovieIds = ids
             }
         } catch {
             print("Error updating bookmarks: \(error)")
-        }
-    }
-    
-    func idFromDatabase() async throws {
-        let movieIds = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList).map { $0.id }
-        await MainActor.run {
-            self.bookmarkedMovieIds = Set(movieIds)
         }
     }
     
@@ -193,33 +182,35 @@ internal final class SearchViewModel: ObservableObject {
         active: Bool,
         movieId: String,
         selectedMovie: Movie
-    ) async {
-        do {
-            if active {
-                try await dbManager.insert(selectedMovie)
-                try await dbManager.attachMovieToList(
-                    listId: Constans.bookmarkList,
-                    movieId: movieId
-                )
-            } else {
-                try await dbManager.detachMovieFromList(
-                    listId: Constans.bookmarkList,
-                    movieId: movieId
-                )
-            }
-            await MainActor.run {
-                dataForSearchView = dataForSearchView.map { movie in
-                    var updatedMovie = movie
-                    if movie.id == movieId {
-                        updatedMovie.isBookmarked = active
-                    }
-                    return updatedMovie
+    ) {
+        Task {
+            do {
+                if active {
+                    try await dbManager.insert(selectedMovie)
+                    try await dbManager.attachMovieToList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                } else {
+                    try await dbManager.detachMovieFromList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
                 }
+                await MainActor.run { [weak self] in
+                    dataForSearchView = dataForSearchView.map { movie in
+                        var updatedMovie = movie
+                        if movie.id == movieId {
+                            updatedMovie.isBookmarked = active
+                        }
+                        return updatedMovie
+                    }
+                }
+            } catch {
+                print("Error adding bookmark: \(error)")
             }
-        } catch {
-            print("Error adding bookmark: \(error)")
+            await updateBookmarks()
         }
-        await updateBookmarks()
     }
     
     internal var filteredMovie: Array<Movie> {

@@ -57,9 +57,3 @@ internal struct SearchBar: View {
             )
     }
 }
-
-#Preview {
-    @Previewable @State var text = ""
-    return SearchBar(
-        searchText: $text)
-}

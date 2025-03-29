@@ -24,12 +24,10 @@ internal struct BookmarkView: View {
                     BookmarkListView(
                         searchText: $viewModel.searchText,
                         refreshBookmark: { movie in
-                            Task {
-                                await viewModel.refreshBookmarked(
-                                    active: !movie.isBookmarked,
-                                    movieId: movie.id
-                                )
-                            }
+                            viewModel.refreshBookmarked(
+                                active: !movie.isBookmarked,
+                                movieId: movie.id
+                            )
                         },
                         data: viewModel.filteredBookmarkedMovie,
                         chooseButtonAction: { isActive in },

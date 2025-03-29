@@ -10,11 +10,11 @@ import SwiftUI
 internal struct DiscoveryListView: View {
     
     @MainActor private let dataForAllMovies: Array<Movie>
-    private let refreshBookmark: @MainActor (Movie) async -> Void
+    private let refreshBookmark: @MainActor (Movie) -> Void
     
     internal init(
         data: Array<Movie>,
-        refreshBookmark: @escaping @MainActor (Movie) async -> Void
+        refreshBookmark: @escaping @MainActor (Movie) -> Void
     ) {
         self.dataForAllMovies = data
         self.refreshBookmark = refreshBookmark
@@ -43,12 +43,7 @@ internal struct DiscoveryListView: View {
                     ) {
                         MovieCardDiscover(
                             refreshBookmark: refreshBookmark,
-                            movie: model,
-                            didTap: { isActive in
-                                Task {
-                                    await refreshBookmark(model)
-                                }
-                            }
+                            movie: model
                         )
                     }
                 }

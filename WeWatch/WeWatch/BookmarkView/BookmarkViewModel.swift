@@ -12,7 +12,11 @@ internal final class BookmarkViewModel: ObservableObject {
     @Published internal var searchText: String = ""
     @Published internal var dataForBookmarkView: Array<Movie> = .init()
     internal var bookmarkedMovieIds: Set<String> = .init()
-    internal let dbManager: DatabaseManager = .shared
+    internal let dbManager: DatabaseManager
+    
+    internal init(dbManager: DatabaseManager = .shared) {
+        self.dbManager = dbManager
+    }
     
     func refreshBookmarkedIDs() async throws {
         let movies = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
@@ -26,13 +30,9 @@ internal final class BookmarkViewModel: ObservableObject {
         do {
             try await refreshBookmarkedIDs()
             let movies = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
-            let filtredMovies = movies.map { movie -> Movie in
-                var updatedMovie = movie
-                updatedMovie.isBookmarked = bookmarkedMovieIds.contains(movie.id)
-                return updatedMovie
-            }
+            let filtredMovie = movies.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
-                self?.dataForBookmarkView = filtredMovies
+                self?.dataForBookmarkView = filtredMovie
             }
         } catch {
             print("Error loading bookmark data: \(error)")
@@ -42,18 +42,20 @@ internal final class BookmarkViewModel: ObservableObject {
     internal func refreshBookmarked(
         active: Bool,
         movieId: String
-    ) async {
-        do {
-            try await dbManager.detachMovieFromList(
-                listId: Constans.bookmarkList,
-                movieId: movieId
-            )
-            await MainActor.run { [weak self] in
-                self?.bookmarkedMovieIds.remove(movieId)
+    ) {
+        Task {
+            do {
+                try await dbManager.detachMovieFromList(
+                    listId: Constans.bookmarkList,
+                    movieId: movieId
+                )
+                await MainActor.run { [weak self] in
+                    self?.bookmarkedMovieIds.remove(movieId)
+                }
+                await loadBookmarkData()
+            } catch {
+                print("Error removing bookmark for movie \(movieId): \(error)")
             }
-            await loadBookmarkData()
-        } catch {
-            print("Error removing bookmark for movie \(movieId): \(error)")
         }
     }
     

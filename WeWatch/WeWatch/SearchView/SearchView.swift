@@ -58,12 +58,10 @@ internal struct SearchView: View {
                                         data: viewModel.filteredMovie,
                                         seeMoreButtonAction: {},
                                         refreshBookmark: { movie in
-                                            Task {
-                                                await viewModel.refreshBookmarked(
-                                                    active: !movie.isBookmarked,
-                                                    movieId: movie.id, selectedMovie: movie
-                                                )
-                                            }
+                                            viewModel.refreshBookmarked(
+                                                active: !movie.isBookmarked,
+                                                movieId: movie.id, selectedMovie: movie
+                                            )
                                         }
                                     )
                                     .padding(16)

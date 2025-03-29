@@ -42,7 +42,6 @@ internal enum SQLStatements {
      id TEXT PRIMARY KEY
      );
      """
-    internal static let insertBookmarkIds: String = "INSERT OR REPLACE INTO bookmark id VALUES ?;"
     internal static let selectedBookmarkIds: String = "SELECT * FROM bookmark;"
     internal static let createMoviesTableSQL: String = """
      CREATE TABLE IF NOT EXISTS movies(
@@ -131,19 +130,15 @@ internal enum SQLiteConstants {
     )
 }
 
-internal actor DatabaseManager {
+internal final actor DatabaseManager {
     
     internal static let shared: DatabaseManager = .init(dataBaseName: DatabaseConfig.name)
     
     private var db: OpaquePointer?
     
     private init(dataBaseName: String = DatabaseConfig.name) {
-        do {
-            try openDatabase(named: dataBaseName)
-            try createAllTables()
-        } catch {
-            print("Database initialization error: \(error)")
-        }
+        try! openDatabase(named: dataBaseName)
+        try! createAllTables()
     }
     
     deinit {
@@ -367,15 +362,6 @@ internal actor DatabaseManager {
         }
     }
     
-    internal func attachBookmarkIds(bookmarkId: String) throws {
-        try transaction { dbManager in
-            try executeSimpleQuery(
-                sql: SQLStatements.insertBookmarkIds,
-                params: [bookmarkId]
-            )
-        }
-    }
-    
     internal func fetch<T: SQLTable>(_:T.Type) throws -> Array<T> {
         var results: Array<T> = .init()
         try transaction { dbManager in
@@ -489,24 +475,6 @@ internal actor DatabaseManager {
             }
         }
         return genres
-    }
-    
-    internal func fetchBookmarkIds() throws -> Array<BookmarkIds> {
-        var ids: Array<BookmarkIds> = .init()
-        try transaction { dbManager in
-            var stmt: OpaquePointer?
-            defer { sqlite3_finalize(stmt) }
-            guard sqlite3_prepare_v2(db, SQLStatements.selectedBookmarkIds, -1, &stmt, nil) == SQLITE_OK else {
-                let errmsg: String = .init(cString: sqlite3_errmsg(db))
-                throw DatabaseError.prepare(message: errmsg)
-            }
-            while sqlite3_step(stmt) == SQLITE_ROW {
-                let row: Dictionary<String, Any> = mapRowToDict(stmt: stmt)
-                let id: BookmarkIds = try .init(row: row)
-                ids.append(id)
-            }
-        }
-        return ids
     }
     
     internal func mapRowToDict(stmt: OpaquePointer?) -> [String: Any] {

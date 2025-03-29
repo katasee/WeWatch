@@ -8,15 +8,15 @@
 import Foundation
 
 internal struct BookmarkIds: SQLTable, Identifiable, Sendable, Hashable {
-
+    
     internal let id: String
-
+    
     internal init(
         id: String
     ) {
         self.id = id
     }
-
+    
     internal static var tableName: String { "bookmark" }
     internal static var createTableStatement: String {
         SQLStatements.createBookmarkIdsTableSQL
@@ -29,7 +29,7 @@ internal struct BookmarkIds: SQLTable, Identifiable, Sendable, Hashable {
         }
         self.id = id
     }
-
+    
     internal func toDictionary() -> Dictionary<String, Any> {
         [
             "id": id,

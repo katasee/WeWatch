@@ -10,11 +10,11 @@ import SwiftUI
 internal struct TodaysSelectionSectionView: View {
     
     private let data: Array<Movie>
-    private let refreshBookmark: @MainActor (Movie) async -> Void
+    private let refreshBookmark: @MainActor (Movie) -> Void
     
     internal init(
         data: Array<Movie>,
-        refreshBookmark: @escaping @MainActor (Movie) async -> Void
+        refreshBookmark: @escaping @MainActor (Movie) -> Void
     ) {
         self.data = data
         self.refreshBookmark = refreshBookmark
@@ -52,14 +52,9 @@ internal struct TodaysSelectionSectionView: View {
                         viewModel: DetailsViewModel(movieId: model.id)
                     )
                 ) {
-                    MovieCardTopFive(
+                    MovieCardTodaySelection(
                         refreshBookmark: refreshBookmark,
-                        movie: model,
-                        didTap: { isActive in
-                            Task {
-                                await refreshBookmark(model)
-                            }
-                        }
+                        movie: model
                     )
                 }
             }

@@ -11,12 +11,12 @@ internal struct DiscoverSectionView: View {
     
     private let data: Array<Movie>
     private let seeMoreButtonAction: @MainActor () -> Void
-    private let refreshBookmark: @MainActor (Movie) async -> Void
+    private let refreshBookmark: @MainActor (Movie) -> Void
     
     internal init(
         data: Array<Movie>,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
-        refreshBookmark: @escaping @MainActor (Movie) async -> Void
+        refreshBookmark: @escaping @MainActor (Movie) -> Void
     ) {
         self.data = data
         self.seeMoreButtonAction = seeMoreButtonAction
@@ -69,12 +69,7 @@ internal struct DiscoverSectionView: View {
                 ) {
                     MovieCard(
                         refreshBookmark: refreshBookmark,
-                        movie: model,
-                        didTap: { isActive in
-                            Task {
-                                await refreshBookmark(model)
-                            }
-                        }
+                        movie: model
                     )
                     .multilineTextAlignment(.leading)
                 }

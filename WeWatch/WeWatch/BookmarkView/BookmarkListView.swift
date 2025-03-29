@@ -10,14 +10,14 @@ import SwiftUI
 internal struct BookmarkListView: View {
     
     @Binding private var searchText: String
-    private let refreshBookmark: @MainActor (Movie) async -> Void
+    private let refreshBookmark: @MainActor (Movie) -> Void
     private let data: Array<Movie>
     private let chooseButtonAction: @MainActor(Movie) -> Void
     private let bookmarkRemoveAllMovie: @MainActor() async -> Void
     
     internal init(
         searchText: Binding<String>,
-        refreshBookmark: @escaping @MainActor(Movie) async -> Void,
+        refreshBookmark: @escaping @MainActor(Movie) -> Void,
         data: Array<Movie>,
         chooseButtonAction: @escaping @MainActor(Movie) -> Void,
         bookmarkRemoveAllMovie: @escaping @MainActor() async -> Void
@@ -83,12 +83,7 @@ internal struct BookmarkListView: View {
                 {
                     MovieCard(
                         refreshBookmark: refreshBookmark,
-                        movie: model,
-                        didTap: { isActive in
-                            Task {
-                                await refreshBookmark(model)
-                            }
-                        }
+                        movie: model
                     )
                     .multilineTextAlignment(.leading)
                 }

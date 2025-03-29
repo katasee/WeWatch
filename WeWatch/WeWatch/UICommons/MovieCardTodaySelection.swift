@@ -1,5 +1,5 @@
 //
-//  MovieCardTopFive.swift
+//  MovieCardTodaySelection.swift
 //  WeWatch
 //
 //  Created by Anton on 26/12/2024.
@@ -8,20 +8,17 @@
 import SwiftUI
 import Kingfisher
 
-internal struct MovieCardTopFive: View {
+internal struct MovieCardTodaySelection: View {
     
-    private let refreshBookmark: @MainActor(Movie) async -> Void
+    private let refreshBookmark: @MainActor(Movie) -> Void
     private let movie: Movie
-    private var didTap: @MainActor (Bool) -> Void
     
     internal init(
-        refreshBookmark: @escaping @MainActor(Movie) async -> Void,
-        movie: Movie,
-        didTap: @escaping @MainActor (Bool) -> Void
+        refreshBookmark: @escaping @MainActor(Movie) -> Void,
+        movie: Movie
     ) {
         self.refreshBookmark = refreshBookmark
         self.movie = movie
-        self.didTap = didTap
     }
     
     internal var body: some View {
@@ -41,11 +38,7 @@ internal struct MovieCardTopFive: View {
                             .frame(maxWidth: 300, maxHeight: 200)
                             .clipped()
                         Button {
-                            let movieSelected = !movie.isBookmarked
-                            didTap(movieSelected)
-                            Task {
-                                await refreshBookmark(movie)
-                            }
+                            refreshBookmark(movie)
                         } label: {
                             Bookmark(isActive: movie.isBookmarked)
                         }

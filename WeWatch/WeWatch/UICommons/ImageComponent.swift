@@ -25,8 +25,3 @@ internal struct ImageComponent: View {
     }
 }
 
-#Preview {
-    ImageComponent(
-        image: nil
-    )
-}

@@ -25,24 +25,20 @@ internal struct HomeView: View {
                         TodaysSelectionSectionView(
                             data: viewModel.todaySelection,
                             refreshBookmark: { movie in
-                                Task {
-                                    await viewModel.refreshBookmarkedinTodaySelection(
-                                        active: !movie.isBookmarked,
-                                        movieId: movie.id
-                                    )
-                                }
+                                viewModel.refreshBookmarkedinTodaySelection(
+                                    active: !movie.isBookmarked,
+                                    movieId: movie.id
+                                )
                             }
                         )
                         DiscoverSectionView(
                             data: viewModel.discoverySection,
                             seeMoreButtonAction: {},
                             refreshBookmark: { movie in
-                                Task {
-                                    await viewModel.refreshBookmarked(
-                                        active: !movie.isBookmarked,
-                                        movieId: movie.id, selectedMovie: movie
-                                    )
-                                }
+                                viewModel.refreshBookmarked(
+                                    active: !movie.isBookmarked,
+                                    movieId: movie.id, selectedMovie: movie
+                                )
                             }
                         )
                         if !viewModel.discoverySection.isEmpty {
@@ -50,9 +46,11 @@ internal struct HomeView: View {
                                 .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
                                 .frame(minHeight: 1)
                                 .foregroundColor(Color.clear)
-                                .onAppear {
-                                    Task {
+                                .task {
+                                    do {
                                         try await viewModel.appendDateFromEndpoint()
+                                    } catch {
+                                        print(error)
                                     }
                                 }
                         }
