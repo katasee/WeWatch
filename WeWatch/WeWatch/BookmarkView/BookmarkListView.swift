@@ -40,8 +40,10 @@ internal struct BookmarkListView: View {
                 Spacer()
                 cleareAllButton
             }
-            movieCardButton
-            Spacer()
+            ScrollView {
+                movieCardButton
+                Spacer()
+            }
         }
     }
     
@@ -78,14 +80,9 @@ internal struct BookmarkListView: View {
             } label: {
                 NavigationLink(
                     destination: DetailsView(
-                        viewModel: DetailsViewModel(
-                            dbManager: DatabaseManager(
-                                dataBaseName: DatabaseConfig.name
-                            ),
-                            movieId: model.id
+                        viewModel: DetailsViewModel(movieId: model.id)
                         )
                     )
-                )
                 {
                     MovieCard(
                         refreshBookmark: refreshBookmark,

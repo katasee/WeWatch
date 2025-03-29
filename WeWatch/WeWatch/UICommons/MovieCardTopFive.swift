@@ -10,22 +10,25 @@ import Kingfisher
 
 internal struct MovieCardTopFive: View {
     
-    @State private var isActive: Bool = false
+//    @State private var isActive: Bool = false
+    private let refreshBookmark: @MainActor(Movie) async -> Void
     private let movie: Movie
     private var didTap: @MainActor (Bool) -> Void
-    private let bookmarkAddAction: @MainActor (Movie) async -> Void
-    private let bookmarkRemoveAction: @MainActor (Movie) async -> Void
+//    private let bookmarkAddAction: @MainActor (Movie) async -> Void
+//    private let bookmarkRemoveAction: @MainActor (Movie) async -> Void
     
     internal init(
+        refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         movie: Movie,
-        didTap: @escaping @MainActor (Bool) -> Void,
-        bookmarkAddAction: @escaping @MainActor (Movie) async -> Void,
-        bookmarkRemoveAction: @escaping @MainActor (Movie) async -> Void
+        didTap: @escaping @MainActor (Bool) -> Void
+//        bookmarkAddAction: @escaping @MainActor (Movie) async -> Void,
+//        bookmarkRemoveAction: @escaping @MainActor (Movie) async -> Void
     ) {
+        self.refreshBookmark = refreshBookmark
         self.movie = movie
         self.didTap = didTap
-        self.bookmarkAddAction = bookmarkAddAction
-        self.bookmarkRemoveAction = bookmarkRemoveAction
+//        self.bookmarkAddAction = bookmarkAddAction
+//        self.bookmarkRemoveAction = bookmarkRemoveAction
     }
     
     internal var body: some View {
@@ -45,24 +48,13 @@ internal struct MovieCardTopFive: View {
                                 .frame(maxWidth: 300, maxHeight: 200)
                                 .clipped()
                         Button {
-                            isActive.toggle()
-                            didTap(isActive)
-                            if isActive == true {
-                                Task {
-                                    await bookmarkAddAction(movie)
-                                }
-                            } else {
-                                Task {
-                                    await bookmarkRemoveAction(movie)
-                                }
+                            let movieSelected = !movie.isBookmarked
+                            didTap(movieSelected)
+                            Task {
+                                await refreshBookmark(movie)
                             }
                         } label: {
-                            if isActive == true {
-                                
-                                Bookmark(isActive: true)
-                            } else {
-                                Bookmark(isActive: false)
-                            }
+                            Bookmark(isActive: movie.isBookmarked)
                         }
                         .padding(16)
                     }

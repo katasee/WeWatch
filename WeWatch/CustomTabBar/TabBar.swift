@@ -23,27 +23,15 @@ internal struct TabBar: View {
         switch viewModel.selectedTab {
         case .bookmark:
             BookmarkView(
-                viewModel: BookmarkViewModel(
-                dbManager: DatabaseManager(
-                    dataBaseName: DatabaseConfig.name
-                )
-            )
+                viewModel: BookmarkViewModel()
         )
         case .homeView:
             HomeView(
-                viewModel: HomeViewModel(
-                    dbManager: DatabaseManager(
-                        dataBaseName: DatabaseConfig.name
-                    )
-                )
+                viewModel: HomeViewModel()
             )
         case .searchView:
             SearchView(
-                viewModel: SearchViewModel(
-                    dbManager: DatabaseManager(
-                        dataBaseName: DatabaseConfig.name
-                    )
-                )
+                viewModel: SearchViewModel()
             )
         }
     }

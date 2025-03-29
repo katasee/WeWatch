@@ -11,25 +11,21 @@ import Kingfisher
 
 internal struct MovieCardDiscover: View {
     
-    @State private var isActive: Bool
+    private let refreshBookmark: @MainActor(Movie) async -> Void
     @State private var isLoading: Bool = true
     private let movie: Movie
     private var didTap: @MainActor(Bool) -> Void
-    private let bookmarkAddAction: @MainActor(Movie) async -> Void
-    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
+
     
     internal init(
-        isActive: Bool,
+        
+        refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         movie: Movie,
-        didTap: @escaping @MainActor(Bool) -> Void,
-        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
-        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void
+        didTap: @escaping @MainActor(Bool) -> Void
     ) {
-        self.isActive = isActive
+        self.refreshBookmark = refreshBookmark
         self.movie = movie
         self.didTap = didTap
-        self.bookmarkAddAction = bookmarkAddAction
-        self.bookmarkRemoveAction = bookmarkRemoveAction
     }
     
     internal var body: some View {
@@ -38,23 +34,13 @@ internal struct MovieCardDiscover: View {
                 filmImage
                 Spacer()
                 Button {
-                    isActive.toggle()
-                    didTap(isActive)
-                    if isActive == true {
-                        Task {
-                            await bookmarkAddAction(movie)
-                        }
-                    } else {
-                        Task {
-                            await bookmarkRemoveAction(movie)
-                        }
+                    let movieSelected = !movie.isBookmarked
+                    didTap(movieSelected)
+                    Task {
+                        await refreshBookmark(movie)
                     }
                 } label: {
-                    if isActive == true {
-                        Bookmark(isActive: true)
-                    } else {
-                        Bookmark(isActive: false)
-                    }
+                    Bookmark(isActive: movie.isBookmarked)
                 }
                 .padding(16)
             }

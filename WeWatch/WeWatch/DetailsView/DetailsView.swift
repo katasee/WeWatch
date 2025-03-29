@@ -19,16 +19,16 @@ internal struct DetailsView: View {
         ZStack {
             if let movie = viewModel.movieForDetailsView {
                 NavigationBarButtons(
-                    isActive: false,
-                    movie: movie,
-                    action: {_ in },
-                    didTap: { isActive in },
-                    bookmarkAddAction: { movie in
-                        await viewModel.addBookmark(movieId: movie.id)
+                    refreshBookmark: { movie in
+                        Task {
+                            await viewModel.refreshBookmarked(
+                                active: !movie.isBookmarked,
+                                movieId: movie.id
+                            )
+                        }
                     },
-                    bookmarkRemoveAction: { movie in
-                        await viewModel.removeBookmark(movieId: movie.id)
-                    }
+                    movie: movie,
+                    didTap: { isActive in }
                 )
                 ScrollView {
                     VStack {

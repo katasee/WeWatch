@@ -10,28 +10,19 @@ import SwiftUI
 internal struct NavigationBarButtons: View {
     
     @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
-    @State private var isActive: Bool
+    private let refreshBookmark: @MainActor(Movie) async -> Void
     internal var movie: Movie
-    private var action: (String) -> Void
     private var didTap: @MainActor (Bool) -> Void
-    private let bookmarkAddAction: @MainActor (Movie) async -> Void
-    private let bookmarkRemoveAction: @MainActor (Movie) async -> Void
     
     init(
-        isActive: Bool,
+        refreshBookmark: @escaping @MainActor(Movie) async -> Void,
         movie: Movie,
-        action: @escaping(String) -> Void,
-        didTap: @escaping(Bool) -> Void,
-        bookmarkAddAction: @escaping @MainActor (Movie) async -> Void,
-        bookmarkRemoveAction: @escaping @MainActor (Movie) async -> Void
-        
+        didTap: @escaping(Bool) -> Void
     ) {
-        self.isActive = isActive
+        self.refreshBookmark = refreshBookmark
         self.movie = movie
-        self.action = action
         self.didTap = didTap
-        self.bookmarkAddAction = bookmarkAddAction
-        self.bookmarkRemoveAction = bookmarkRemoveAction
+        
         UINavigationBar.appearance().setBackgroundImage(UIImage(), for: UIBarMetrics.default)
         UINavigationBar.appearance().shadowImage = UIImage()
         UINavigationBar.appearance().isTranslucent = true
@@ -53,24 +44,13 @@ internal struct NavigationBarButtons: View {
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            action(movie.id)
-                            isActive.toggle()
-                            didTap(isActive)
-                            if isActive == true {
-                                Task {
-                                    await bookmarkAddAction(movie)
-                                }
-                            } else {
-                                Task {
-                                    await bookmarkRemoveAction(movie)
-                                }
+                            let movieSelected = !movie.isBookmarked
+                            didTap(movieSelected)
+                            Task {
+                                await refreshBookmark(movie)
                             }
                         } label: {
-                            if isActive == true {
-                                Bookmark(isActive: true)
-                            } else {
-                                Bookmark(isActive: false)
-                            }
+                            Bookmark(isActive: movie.isBookmarked)
                         }
                     }
                 }

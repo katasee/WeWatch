@@ -24,19 +24,25 @@ internal struct HomeView: View {
                     LazyVStack {
                         TodaysSelectionSectionView(
                             data: viewModel.todaySelection,
-                            chooseButtonAction: { isActive in },
-                            bookmarkAddAction: {_ in },
-                            bookmarkRemoveAction: {_ in }
+                            refreshBookmark: { movie in
+                                Task {
+                                    await viewModel.refreshBookmarkedinTodaySelection(
+                                        active: !movie.isBookmarked,
+                                        movieId: movie.id
+                                    )
+                                }
+                            }
                         )
                         DiscoverSectionView(
                             data: viewModel.discoverySection,
                             seeMoreButtonAction: {},
-//                            chooseButtonAction: { isActive in },
                             refreshBookmark: { movie in
+                                Task {
                                     await viewModel.refreshBookmarked(
                                         active: !movie.isBookmarked,
-                                        movieId: movie.id
+                                        movieId: movie.id, selectedMovie: movie
                                     )
+                                }
                             }
                         )
                         if !viewModel.discoverySection.isEmpty {
@@ -44,7 +50,9 @@ internal struct HomeView: View {
                                 .frame(minHeight: 1)
                                 .foregroundColor(Color.clear)
                                 .onAppear {
-                                    Task { try await viewModel.appendDateFromEndpoint()}
+                                    Task {
+                                        try await viewModel.appendDateFromEndpoint()
+                                    }
                                 }
                         }
                     }
@@ -54,7 +62,7 @@ internal struct HomeView: View {
                         try await viewModel.movieForDiscoveryView()
                         try await viewModel.dataForTodaySelection()
                     } catch {
-                        print(error)
+       print("Error loading data: \(error)")
                     }
                 }
                 .padding(16)

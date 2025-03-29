@@ -10,20 +10,14 @@ import SwiftUI
 internal struct DiscoveryListView: View {
     
     @MainActor private let dataForAllMovies: Array<Movie>
-    private let chooseButtonAction: @MainActor(Movie) -> Void
-    private let bookmarkAddAction: @MainActor(Movie) async -> Void
-    private let bookmarkRemoveAction: @MainActor(Movie) async -> Void
-
+    private let refreshBookmark: @MainActor (Movie) async -> Void
+    
     internal init(
         data: Array<Movie>,
-        chooseButtonAction: @escaping @MainActor(Movie) -> Void,
-        bookmarkAddAction: @escaping @MainActor(Movie) async -> Void,
-        bookmarkRemoveAction: @escaping @MainActor(Movie) async -> Void
+        refreshBookmark: @escaping @MainActor (Movie) async -> Void
     ) {
         self.dataForAllMovies = data
-        self.chooseButtonAction = chooseButtonAction
-        self.bookmarkAddAction = bookmarkAddAction
-        self.bookmarkRemoveAction = bookmarkRemoveAction
+        self.refreshBookmark = refreshBookmark
     }
     
     internal var body: some View {
@@ -42,24 +36,22 @@ internal struct DiscoveryListView: View {
         LazyVGrid(columns: columns) {
             ForEach(dataForAllMovies) { model in
                 Button {
-                    chooseButtonAction(model)
                 } label: {
                     NavigationLink(
                         destination: DetailsView(
-                            viewModel: DetailsViewModel(
-                                dbManager: DatabaseManager(
-                                    dataBaseName: DatabaseConfig.name
-                                ), movieId: model.id
-                            )
+                            viewModel: DetailsViewModel(movieId: model.id)
                         )
                     ) {
                         MovieCardDiscover(
-                            isActive: false,
+                            refreshBookmark: refreshBookmark,
                             movie: model,
-                            didTap: { isActive in },
-                            bookmarkAddAction: bookmarkAddAction,
-                            bookmarkRemoveAction: bookmarkRemoveAction
-                        )}
+                            didTap: { isActive in
+                                Task {
+                                    await refreshBookmark(model)
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }

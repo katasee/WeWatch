@@ -20,15 +20,10 @@ internal struct BookmarkView: View {
             ZStack {
                 Color.black
                     .ignoresSafeArea()
-                ScrollView {
                     VStack {
                         BookmarkListView(
                             searchText: $viewModel.searchText,
                             refreshBookmark: { movie in
-                                    await viewModel.refreshBookmarked(
-                                        active: !movie.isBookmarked,
-                                        movieId: movie.id
-                                    )
                                 Task {
                                     await viewModel.refreshBookmarked(
                                     active: !movie.isBookmarked,
@@ -51,7 +46,6 @@ internal struct BookmarkView: View {
                             await viewModel.loadBookmarkData()
                         }
                     }
-                }
             }
         }
     }

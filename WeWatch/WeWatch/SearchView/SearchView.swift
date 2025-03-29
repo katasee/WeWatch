@@ -55,14 +55,16 @@ internal struct SearchView: View {
                                     Spacer()
                                 } else {
                                     SearchListView(
-                                        didTap: true,
                                         data: viewModel.filteredMovie,
                                         seeMoreButtonAction: {},
-                                        chooseButtonAction: { isActive in },
-                                        bookmarkAddAction: { movie in
-                                            await viewModel.addBookmark(movieId: movie.id)},
-                                        bookmarkRemoveAction: { movie in
-                                           await viewModel.removeBookmark(movieId: movie.id)}
+                                        refreshBookmark: { movie in
+                                            Task {
+                                                await viewModel.refreshBookmarked(
+                                                    active: !movie.isBookmarked,
+                                                    movieId: movie.id, selectedMovie: movie
+                                                )
+                                            }
+                                        }
                                     )
                                     .padding(16)
                                     Rectangle()
