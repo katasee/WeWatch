@@ -14,6 +14,7 @@ internal final class DiscoveryViewModel: ObservableObject {
     @Published internal var genresForDiscoveryView: Array<Genre> = .init()
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
     @Published internal var isFetchingNextPage = false
+    @Published internal var isLoading: Bool = false
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal var isFirstTimeLoad: Bool = true
     internal var currentPage: Int = 0
@@ -22,6 +23,16 @@ internal final class DiscoveryViewModel: ObservableObject {
     
     internal init(dbManager: DatabaseManager = .shared) {
         self.dbManager = dbManager
+    }
+    
+    internal func fetchData() async {
+        await MainActor.run { [weak self] in
+            self?.isLoading = true
+        }
+            await dataFromEndpoint()
+        await MainActor.run { [weak self] in
+            self?.isLoading = false
+        }
     }
     
     internal func dataFromEndpoint() async {

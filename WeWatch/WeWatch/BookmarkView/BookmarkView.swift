@@ -21,27 +21,34 @@ internal struct BookmarkView: View {
                 Color.black
                     .ignoresSafeArea()
                 VStack {
-                    BookmarkListView(
-                        searchText: $viewModel.searchText,
-                        refreshBookmark: { movie in
-                            viewModel.refreshBookmarked(
-                                active: !movie.isBookmarked,
-                                movieId: movie.id
-                            )
-                        },
-                        data: viewModel.filteredBookmarkedMovie,
-                        chooseButtonAction: { isActive in },
-                        bookmarkRemoveAllMovie: {
-                            Task {
-                                await viewModel.removeAllMovie()
+                    if viewModel.isLoading {
+                        Spacer()
+                        ProgressView()
+                            .loader(isLoading: viewModel.isLoading)
+                        Spacer()
+                    } else {
+                        BookmarkListView(
+                            searchText: $viewModel.searchText,
+                            refreshBookmark: { movie in
+                                viewModel.refreshBookmarked(
+                                    active: !movie.isBookmarked,
+                                    movieId: movie.id
+                                )
+                            },
+                            data: viewModel.filteredBookmarkedMovie,
+                            chooseButtonAction: { isActive in },
+                            bookmarkRemoveAllMovie: {
+                                Task {
+                                    await viewModel.removeAllMovie()
+                                }
                             }
-                        }
-                    )
-                    .padding(16)
+                        )
+                        .padding(16)
+                    }
                 }
                 .onAppear {
                     Task {
-                        await viewModel.loadBookmarkData()
+                        await viewModel.fetchData()
                     }
                 }
             }

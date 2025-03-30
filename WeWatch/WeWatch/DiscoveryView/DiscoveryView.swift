@@ -10,7 +10,6 @@ import SwiftUI
 internal struct DiscoveryView: View {
     
     @StateObject private var viewModel: DiscoveryViewModel
-    @State private var isLoading = false
     
     internal init(viewModel: DiscoveryViewModel) {
         self._viewModel = .init(wrappedValue: viewModel)
@@ -29,10 +28,11 @@ internal struct DiscoveryView: View {
                         viewModel.selectedGenre = genre
                     }
                 )
-                if isLoading {
+                if viewModel.isLoading {
+                    Spacer()
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .loader(isLoading: viewModel.isLoading)
+                    Spacer()
                 } else {
                     ScrollView {
                         Color.clear.frame(height: 16) 
@@ -56,7 +56,7 @@ internal struct DiscoveryView: View {
                         }
                         .onChange(of: viewModel.selectedGenre) { change in
                             Task {
-                                await fetchData()
+                                await viewModel.fetchData()
                             }
                         }
                     }
@@ -64,14 +64,9 @@ internal struct DiscoveryView: View {
             }
             .task {
                 await viewModel.dataFromEndpointForGenreTabs()
-                await fetchData()
+                await viewModel.fetchData()
             }
         }
     }
     
-    private func fetchData() async {
-        isLoading = true
-        await viewModel.dataFromEndpoint()
-        isLoading = false
-    }
 }
