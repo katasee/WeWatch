@@ -41,9 +41,7 @@ internal struct NavigationBarButtons: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
                             let movieSelected = !movie.isBookmarked
-                            Task {
-                                await refreshBookmark(movie)
-                            }
+                            refreshBookmark(movie)
                         } label: {
                             Bookmark(isActive: movie.isBookmarked)
                         }

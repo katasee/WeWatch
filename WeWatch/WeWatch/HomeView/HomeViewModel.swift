@@ -41,7 +41,7 @@ internal final class HomeViewModel: ObservableObject {
         movieId: String,
         selectedMovie: Movie
     ) {
-        Task {
+        Task { [weak self] in
             do {
                 if active {
                     try await dbManager.insert(selectedMovie)
@@ -118,11 +118,11 @@ internal final class HomeViewModel: ObservableObject {
         return moviesForUI
     }
     
-    internal func movieForDiscoveryView() async throws {
+    internal func movieForDiscoveryView() async {
         do {
             await updateBookmarks()
             let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
-            let filtredMovie = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            let filtredMovie: [Movie] = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             try await MainActor.run { [weak self] in
                 self?.discoverySection = filtredMovie
                 if discoveryMovieData.isEmpty {
@@ -130,25 +130,22 @@ internal final class HomeViewModel: ObservableObject {
                 }
             }
         } catch {
-            let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
-            let filtredMovie = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
-            await MainActor.run { [weak self] in
-                self?.discoverySection = filtredMovie
-                
-            }
+            await fetchAndUpdateDiscoverySection()
         }
     }
     
-    internal func appendDateFromEndpoint() async throws {
-        Task { @MainActor in
+    internal func appendDataFromEndpoint() async {
+        await MainActor.run {
             isFetchingNextPage = true
         }
-        let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
-        await MainActor.run { [weak self] in
-            self?.discoverySection.append(contentsOf: discoveryMovieData)
-        }
-        await MainActor.run { [weak self] in
-            self?.isFetchingNextPage = false
+        do {
+            let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
+            await MainActor.run { [weak self] in
+                self?.discoverySection.append(contentsOf: discoveryMovieData)
+                self?.isFetchingNextPage = false
+            }
+        } catch {
+            print(error)
         }
     }
     
@@ -203,7 +200,7 @@ internal final class HomeViewModel: ObservableObject {
         active: Bool,
         movieId: String
     ) {
-        Task {
+        Task { [weak self] in
             do {
                 if active {
                     try await dbManager.attachMovieToList(
@@ -232,11 +229,11 @@ internal final class HomeViewModel: ObservableObject {
         }
     }
     
-    internal func dataForTodaySelection() async throws {
+    internal func dataForTodaySelection() async {
         do {
             await updateBookmarks()
             let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
-            let filtredMovie = todaySelectionData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            let filtredMovie: [Movie] = todaySelectionData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             try await MainActor.run { [weak self] in
                 self?.todaySelection = filtredMovie
                 if todaySelection.isEmpty {
@@ -247,11 +244,7 @@ internal final class HomeViewModel: ObservableObject {
                 throw EndpointResponce.dataFromEndpoint
             }
         } catch {
-            let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
-            let filtredMovie = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
-            await MainActor.run { [weak self] in
-                self?.todaySelection = filtredMovie
-            }
+            await fetchAndUpdateTodaySelection()
         }
     }
     
@@ -270,5 +263,29 @@ internal final class HomeViewModel: ObservableObject {
     internal func randomData() -> String {
         let alphabet: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         return alphabet.randomElement().map(String.init) ?? "A"
+    }
+    
+    private func fetchAndUpdateTodaySelection() async {
+        do {
+            let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
+            let filtredMovie: [Movie] = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            await MainActor.run { [weak self] in
+                self?.todaySelection = filtredMovie
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    private func fetchAndUpdateDiscoverySection() async {
+        do {
+            let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
+            let filtredMovie: [Movie] = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            await MainActor.run { [weak self] in
+                self?.discoverySection = filtredMovie
+            }
+        } catch {
+            print(error)
+        }
     }
 }

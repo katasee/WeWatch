@@ -35,7 +35,7 @@ internal final class DiscoveryViewModel: ObservableObject {
                 genre: filterGenres(),
                 page: String(currentPage)
             )
-            let filtredMovie = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            let filtredMovie: [Movie] = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = filtredMovie
             }
@@ -61,7 +61,7 @@ internal final class DiscoveryViewModel: ObservableObject {
                     genres: movie.genres
                 )
             }
-            let filtredMovie = moviesFromDb.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            let filtredMovie: [Movie] = moviesFromDb.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = filtredMovie
             }
@@ -124,12 +124,10 @@ internal final class DiscoveryViewModel: ObservableObject {
             isFirstTimeLoad = false
             return
         }
-        Task {
-            await MainActor.run { [weak self] in
+        Task { [weak self] in
+            await MainActor.run {
                 self?.isFetchingNextPage = true
             }
-        }
-        Task {
             do {
                 let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
                     genre: selectedGenre.title,
@@ -248,7 +246,7 @@ internal final class DiscoveryViewModel: ObservableObject {
         movieId: String,
         selectedMovie: Movie
     ) {
-        Task {
+        Task { [weak self] in
             do {
                 if active {
                     try await dbManager.insert(selectedMovie)

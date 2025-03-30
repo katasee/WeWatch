@@ -30,7 +30,7 @@ internal final class BookmarkViewModel: ObservableObject {
         do {
             try await refreshBookmarkedIDs()
             let movies = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
-            let filtredMovie = movies.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            let filtredMovie: [Movie] = movies.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
                 self?.dataForBookmarkView = filtredMovie
             }
@@ -43,7 +43,7 @@ internal final class BookmarkViewModel: ObservableObject {
         active: Bool,
         movieId: String
     ) {
-        Task {
+        Task { [weak self] in
             do {
                 try await dbManager.detachMovieFromList(
                     listId: Constans.bookmarkList,

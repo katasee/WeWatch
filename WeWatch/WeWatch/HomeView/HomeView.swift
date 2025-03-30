@@ -47,22 +47,14 @@ internal struct HomeView: View {
                                 .frame(minHeight: 1)
                                 .foregroundColor(Color.clear)
                                 .task {
-                                    do {
-                                        try await viewModel.appendDateFromEndpoint()
-                                    } catch {
-                                        print(error)
-                                    }
+                                    await viewModel.appendDataFromEndpoint()
                                 }
                         }
                     }
                 }
                 .task {
-                    do {
-                        try await viewModel.movieForDiscoveryView()
-                        try await viewModel.dataForTodaySelection()
-                    } catch {
-                        print("Error loading data: \(error)")
-                    }
+                    await viewModel.movieForDiscoveryView()
+                    await viewModel.dataForTodaySelection()
                 }
                 .padding(16)
             }

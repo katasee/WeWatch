@@ -63,7 +63,7 @@ internal final class DetailsViewModel: ObservableObject {
                 return
             }
             detailsData.isBookmarked = bookmarkedMovieIds.contains(detailsData.id)
-            let filtredMovie = detailsData
+            let filtredMovie: Movie = detailsData
             try await MainActor.run { [weak self] in
                 self?.movieForDetailsView = detailsData
                 if movieId.isEmpty {
@@ -79,7 +79,7 @@ internal final class DetailsViewModel: ObservableObject {
         do {
             var detailsData: Movie = try await dbManager.fetchMovie(by: movieId)
             detailsData.isBookmarked = bookmarkedMovieIds.contains(detailsData.id)
-            let filtredMovie = detailsData
+            let filtredMovie: Movie = detailsData
             await MainActor.run { [weak self] in
                 self?.movieForDetailsView = detailsData
             }
@@ -104,7 +104,7 @@ internal final class DetailsViewModel: ObservableObject {
         active: Bool,
         movieId: String
     ) {
-        Task {
+        Task { [weak self] in
             do {
                 if active {
                     try await dbManager.attachMovieToList(

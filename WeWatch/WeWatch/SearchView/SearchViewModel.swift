@@ -127,7 +127,7 @@ internal final class SearchViewModel: ObservableObject {
                     genre: selectedGenre.title,
                     page: String(currentPage)
                 )
-                let filtredMovie = searchMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+                let filtredMovie: [Movie] = searchMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
                 await MainActor.run { [weak self] in
                     self?.dataForSearchView = filtredMovie
                 }
@@ -144,7 +144,7 @@ internal final class SearchViewModel: ObservableObject {
         do {
             await updateBookmarks()
             let fetchMovie: Array<Movie> = try await dbManager.searchMovie(by: searchText)
-            let filtredMovie = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+            let filtredMovie: [Movie] = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
                 self?.dataForSearchView = filtredMovie
             }
@@ -183,7 +183,7 @@ internal final class SearchViewModel: ObservableObject {
         movieId: String,
         selectedMovie: Movie
     ) {
-        Task {
+        Task { [weak self] in
             do {
                 if active {
                     try await dbManager.insert(selectedMovie)
