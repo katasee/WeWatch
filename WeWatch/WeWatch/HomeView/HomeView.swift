@@ -24,30 +24,37 @@ internal struct HomeView: View {
                     LazyVStack {
                         TodaysSelectionSectionView(
                             data: viewModel.todaySelection,
-                            chooseButtonAction: { isActive in }
+                            refreshBookmark: { movie in
+                                viewModel.refreshBookmarkedinTodaySelection(
+                                    active: !movie.isBookmarked,
+                                    movieId: movie.id
+                                )
+                            }
                         )
                         DiscoverSectionView(
                             data: viewModel.discoverySection,
                             seeMoreButtonAction: {},
-                            chooseButtonAction: { isActive in }
+                            refreshBookmark: { movie in
+                                viewModel.refreshBookmarked(
+                                    active: !movie.isBookmarked,
+                                    movieId: movie.id, selectedMovie: movie
+                                )
+                            }
                         )
                         if !viewModel.discoverySection.isEmpty {
                             Rectangle()
+                                .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
                                 .frame(minHeight: 1)
                                 .foregroundColor(Color.clear)
-                                .onAppear {
-                                    Task { try await viewModel.appendDateFromEndpoint()}
+                                .task {
+                                    await viewModel.appendDataFromEndpoint()
                                 }
                         }
                     }
                 }
                 .task {
-                    do {
-                        try await viewModel.movieForDiscoveryView()
-                        try await viewModel.dataForTodaySelection()
-                    } catch {
-                        print(error)
-                    }
+                    await viewModel.movieForDiscoveryView()
+                    await viewModel.dataForTodaySelection()
                 }
                 .padding(16)
             }

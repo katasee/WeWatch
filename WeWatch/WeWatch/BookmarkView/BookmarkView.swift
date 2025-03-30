@@ -20,17 +20,28 @@ internal struct BookmarkView: View {
             ZStack {
                 Color.black
                     .ignoresSafeArea()
-                ScrollView {
-                    VStack {
-                        BookmarkListView(
-                            searchText: $viewModel.searchText,
-                            data: viewModel.filteredBookmarkedMovie,
-                            chooseButtonAction: { isActive in }
-                        )
-                        .padding(16)
-                    }
-                    .onAppear {
-                        viewModel.prepareDataBookmarkView()
+                VStack {
+                    BookmarkListView(
+                        searchText: $viewModel.searchText,
+                        refreshBookmark: { movie in
+                            viewModel.refreshBookmarked(
+                                active: !movie.isBookmarked,
+                                movieId: movie.id
+                            )
+                        },
+                        data: viewModel.filteredBookmarkedMovie,
+                        chooseButtonAction: { isActive in },
+                        bookmarkRemoveAllMovie: {
+                            Task {
+                                await viewModel.removeAllMovie()
+                            }
+                        }
+                    )
+                    .padding(16)
+                }
+                .onAppear {
+                    Task {
+                        await viewModel.loadBookmarkData()
                     }
                 }
             }

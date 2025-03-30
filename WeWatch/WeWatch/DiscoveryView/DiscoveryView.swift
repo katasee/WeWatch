@@ -39,15 +39,20 @@ internal struct DiscoveryView: View {
                         LazyVStack {
                             DiscoveryListView(
                                 data: viewModel.dataForAllMovieTab,
-                                chooseButtonAction: { isActive in }
+                                refreshBookmark: { movie in
+                                    viewModel.refreshBookmarked(
+                                        active: !movie.isBookmarked,
+                                        movieId: movie.id, selectedMovie: movie
+                                    )
+                                }
                             )
-                                Rectangle()
+                            Rectangle()
                                 .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-                                    .frame(minHeight: 16)
-                                    .foregroundColor(Color.clear)
-                                    .onAppear {
-                                        viewModel.fetchNextPage()
-                                    }
+                                .frame(minHeight: 16)
+                                .foregroundColor(Color.clear)
+                                .onAppear {
+                                    viewModel.fetchNextPage()
+                                }
                         }
                         .onChange(of: viewModel.selectedGenre) { change in
                             Task {

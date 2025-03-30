@@ -9,6 +9,8 @@ import Foundation
 
 internal struct Movie: SQLTable, Identifiable, Sendable {
     
+    var isBookmarked: Bool = false
+    
     internal let id: String
     internal let title: String
     internal let overview: String

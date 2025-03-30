@@ -10,14 +10,15 @@ import SwiftUI
 internal struct NavigationBarButtons: View {
     
     @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
+    private let refreshBookmark: @MainActor(Movie) -> Void
     internal var movie: Movie
-    private var action: (String) -> Void
-    init(
-        movie: Movie,
-        action: @escaping (String) -> Void
+    
+    internal init(
+        refreshBookmark: @escaping @MainActor(Movie) -> Void,
+        movie: Movie
     ) {
+        self.refreshBookmark = refreshBookmark
         self.movie = movie
-        self.action = action
         UINavigationBar.appearance().setBackgroundImage(UIImage(), for: UIBarMetrics.default)
         UINavigationBar.appearance().shadowImage = UIImage()
         UINavigationBar.appearance().isTranslucent = true
@@ -39,9 +40,10 @@ internal struct NavigationBarButtons: View {
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            action(movie.id)
+                            let movieSelected = !movie.isBookmarked
+                            refreshBookmark(movie)
                         } label: {
-                            Bookmark()
+                            Bookmark(isActive: movie.isBookmarked)
                         }
                     }
                 }

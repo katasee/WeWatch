@@ -10,26 +10,50 @@ import SwiftUI
 internal struct BookmarkListView: View {
     
     @Binding private var searchText: String
-    private let data: Array<MovieCardPreviewModel>
-    private let chooseButtonAction: @MainActor (MovieCardPreviewModel) -> Void
+    private let refreshBookmark: @MainActor (Movie) -> Void
+    private let data: Array<Movie>
+    private let chooseButtonAction: @MainActor(Movie) -> Void
+    private let bookmarkRemoveAllMovie: @MainActor() async -> Void
     
     internal init(
         searchText: Binding<String>,
-        data: Array<MovieCardPreviewModel>,
-        chooseButtonAction: @escaping @MainActor (MovieCardPreviewModel) -> Void
+        refreshBookmark: @escaping @MainActor(Movie) -> Void,
+        data: Array<Movie>,
+        chooseButtonAction: @escaping @MainActor(Movie) -> Void,
+        bookmarkRemoveAllMovie: @escaping @MainActor() async -> Void
     ) {
         self._searchText = searchText
+        self.refreshBookmark = refreshBookmark
         self.data = data
         self.chooseButtonAction = chooseButtonAction
+        self.bookmarkRemoveAllMovie = bookmarkRemoveAllMovie
     }
     
     internal var body: some View {
         VStack(spacing: 20) {
             bookmarkTitle
             SearchBar(searchText: $searchText)
-            movieCardButton
-            Spacer()
+            HStack {
+                Spacer()
+                cleareAllButton
+            }
+            ScrollView {
+                movieCardButton
+                Spacer()
+            }
         }
+    }
+    
+    private var cleareAllButton: some View {
+        Button {
+            Task {
+                await bookmarkRemoveAllMovie()
+            }
+        } label: {
+            Text("Clear.all.button")
+            Image(systemName: "trash")
+        }
+        .foregroundColor(.fieryRed)
     }
     
     private var bookmarkTitle: some View {
@@ -51,21 +75,19 @@ internal struct BookmarkListView: View {
             Button {
                 chooseButtonAction(model)
             } label: {
-//                NavigationLink(destination: DetailsView(
-//                    viewModel: DetailsViewModel()
-//                )) {
+                NavigationLink(
+                    destination: DetailsView(
+                        viewModel: DetailsViewModel(movieId: model.id)
+                    )
+                )
+                {
                     MovieCard(
-                        isActive: true,
-                        title: model.title,
-                        ranking: model.rating,
-                        genres: model.genres,
-                        storyline: model.storyline,
-                        imageUrl: model.image,
-                        didTap: { isActive in }
+                        refreshBookmark: refreshBookmark,
+                        movie: model
                     )
                     .multilineTextAlignment(.leading)
                 }
             }
         }
     }
-//}
+}

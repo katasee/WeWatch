@@ -10,30 +10,15 @@ import Kingfisher
 
 internal struct MovieCard: View {
     
-    @State private var isActive: Bool
-    private let title: String
-    private let ranking: Double
-    private let genres: String
-    private let storyline: String
-    private let image: URL?
-    private var didTap: @MainActor (Bool) -> Void
+    private let refreshBookmark: @MainActor(Movie) -> Void
+    private let movie: Movie
     
     internal init(
-        isActive: Bool,
-        title: String,
-        ranking: Double,
-        genres: String,
-        storyline: String,
-        imageUrl: URL?,
-        didTap: @escaping @MainActor (Bool) -> Void
+        refreshBookmark: @escaping @MainActor(Movie) -> Void,
+        movie: Movie
     ) {
-        self.isActive = isActive
-        self.title = title
-        self.ranking = ranking
-        self.genres = genres
-        self.storyline = storyline
-        self.image = imageUrl
-        self.didTap = didTap
+        self.refreshBookmark = refreshBookmark
+        self.movie = movie
     }
     
     internal var body: some View {
@@ -43,23 +28,18 @@ internal struct MovieCard: View {
                     filmImage
                     Spacer()
                     Button {
-                        isActive.toggle()
-                        didTap(isActive)
+                        refreshBookmark(movie)
                     } label: {
-                        if isActive == true {
-                            Bookmark(isActive: true)
-                        } else {
-                            Bookmark(isActive: false)
-                        }
+                        Bookmark(isActive: movie.isBookmarked)
                     }
-                        .padding(16)
+                    .padding(16)
                 }
             }
             VStack(alignment: .leading, spacing: 10) {
                 filmTitle
                 HStack {
                     filmRanking
-                    RatingView(ranking: ranking)
+                    RatingView(ranking: movie.rating)
                 }
                 filmGenres
                 storyLine
@@ -68,7 +48,7 @@ internal struct MovieCard: View {
     }
     
     private var filmImage: some View {
-        KFImage(image)
+        KFImage(URL(string: movie.posterUrl))
             .resizable()
             .placeholder({
                 ZStack {
@@ -85,25 +65,25 @@ internal struct MovieCard: View {
     }
     
     private var filmTitle: some View {
-        Text(title)
+        Text(movie.title)
             .font(.poppinsBold20px)
             .foregroundColor(.whiteColor)
     }
     
     private var filmRanking: some View {
-        Text("\(ranking, specifier: "%.1f")")
+        Text("\(movie.rating, specifier: "%.1f")")
             .font(.poppinsBold16px)
             .foregroundColor(.whiteColor)
     }
     
     private var filmGenres: some View {
-        Text(genres)
+        Text(movie.genres)
             .font(.poppinsBold14px)
             .foregroundColor(.whiteColor)
     }
     
     private var storyLine: some View {
-        Text(storyline)
+        Text(movie.overview)
             .font(.poppinsRegular13px)
             .foregroundColor(.lightGreyColor)
             .lineLimit(4)

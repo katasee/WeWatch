@@ -10,16 +10,14 @@ import SwiftUI
 internal struct DiscoveryListView: View {
     
     @MainActor private let dataForAllMovies: Array<Movie>
-    private let chooseButtonAction: @MainActor (Movie) -> Void
+    private let refreshBookmark: @MainActor (Movie) -> Void
     
     internal init(
         data: Array<Movie>,
-        chooseButtonAction: @escaping @MainActor (Movie) -> Void
-        
+        refreshBookmark: @escaping @MainActor (Movie) -> Void
     ) {
         self.dataForAllMovies = data
-        self.chooseButtonAction = chooseButtonAction
-        
+        self.refreshBookmark = refreshBookmark
     }
     
     internal var body: some View {
@@ -27,7 +25,6 @@ internal struct DiscoveryListView: View {
             allMovie
         }
     }
-    
     
     private let columns: Array<GridItem> = [
         GridItem(.flexible()),
@@ -38,24 +35,17 @@ internal struct DiscoveryListView: View {
         LazyVGrid(columns: columns) {
             ForEach(dataForAllMovies) { model in
                 Button {
-                    chooseButtonAction(model)
                 } label: {
                     NavigationLink(
                         destination: DetailsView(
-                            viewModel: DetailsViewModel(
-                                dbManager: DatabaseManager(
-                                    dataBaseName: DatabaseConfig.name
-                                ), movieId: model.id
-                            )
+                            viewModel: DetailsViewModel(movieId: model.id)
                         )
                     ) {
                         MovieCardDiscover(
-                            isActive: false,
-                            title: model.title,
-                            ranking: Double(model.rating),
-                            imageUrl: URL(string: model.posterUrl),
-                            didTap: { isActive in }
-                        )}
+                            refreshBookmark: refreshBookmark,
+                            movie: model
+                        )
+                    }
                 }
             }
         }

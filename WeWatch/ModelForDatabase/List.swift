@@ -11,6 +11,7 @@ internal struct List: SQLTable, Identifiable, Sendable {
     
     internal let id: String
     internal let title: String
+    
     internal init (
         id: String,
         title: String

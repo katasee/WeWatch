@@ -11,26 +11,16 @@ import Kingfisher
 
 internal struct MovieCardDiscover: View {
     
-    @State private var isActive: Bool
+    private let refreshBookmark: @MainActor(Movie) -> Void
     @State private var isLoading: Bool = true
-    private let title: String
-    private let ranking: Double
-    private let imageUrl: URL?
-    private var didTap: @MainActor (Bool) -> Void
-    
+    private let movie: Movie
     
     internal init(
-        isActive: Bool,
-        title: String,
-        ranking: Double,
-        imageUrl: URL?,
-        didTap: @escaping @MainActor (Bool) -> Void
+        refreshBookmark: @escaping @MainActor(Movie) -> Void,
+        movie: Movie
     ) {
-        self.isActive = isActive
-        self.title = title
-        self.ranking = ranking
-        self.imageUrl = imageUrl
-        self.didTap = didTap
+        self.refreshBookmark = refreshBookmark
+        self.movie = movie
     }
     
     internal var body: some View {
@@ -39,18 +29,13 @@ internal struct MovieCardDiscover: View {
                 filmImage
                 Spacer()
                 Button {
-                    isActive.toggle()
-                    didTap(isActive)
+                    refreshBookmark(movie)
                 } label: {
-                    if isActive == true {
-                        Bookmark(isActive: true)
-                    } else {
-                        Bookmark(isActive: false)
-                    }
+                    Bookmark(isActive: movie.isBookmarked)
                 }
                 .padding(16)
             }
-            Text(title)
+            Text(movie.title)
                 .font(.poppinsBold18px)
                 .lineLimit(1)
             HStack {
@@ -63,12 +48,12 @@ internal struct MovieCardDiscover: View {
     }
     
     private var filmRanking: some View {
-        Text("\(ranking, specifier: "%.1f")")
+        Text("\(movie.rating, specifier: "%.1f")")
             .font(.poppinsRegular18px)
     }
     
     private var filmImage: some View {
-        KFImage(imageUrl)
+        KFImage(URL(string: movie.posterUrl))
             .resizable()
             .placeholder({
                 ZStack {

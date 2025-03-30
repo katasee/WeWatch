@@ -80,7 +80,6 @@ internal final class Webservice {
                 throw AuthenticationError.invalidCredentials
             }
             request = URLRequest(url: url)
-            print(request)
         }
         
         let configuration: URLSessionConfiguration = URLSessionConfiguration.default
@@ -93,7 +92,6 @@ internal final class Webservice {
         guard let response: HTTPURLResponse = response as? HTTPURLResponse else {
             throw AuthenticationError.invalidResponse
         }
-        print(response.statusCode)
         guard response.statusCode == 200 else {
             throw AuthenticationError.invalidStatusCode
         }

@@ -33,6 +33,17 @@
         }
       }
     },
+    "Clear.all.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear all"
+          }
+        }
+      }
+    },
     "Discover" : {
 
     },

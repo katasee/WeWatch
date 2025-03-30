@@ -10,15 +10,16 @@ import Foundation
 internal final class DetailsViewModel: ObservableObject {
     
     @Published internal var movieForDetailsView: Movie?
-    private let dbManager: DatabaseManager
     private var movieId: String
+    internal var bookmarkedMovieIds: Set<String> = .init()
+    internal let dbManager: DatabaseManager
     
     internal init(
-        dbManager: DatabaseManager,
-        movieId: String
+        movieId: String,
+        dbManager: DatabaseManager = .shared
     ) {
-        self.dbManager = dbManager
         self.movieId = movieId
+        self.dbManager = dbManager
     }
     
     internal func prepareDetailsFromEndpoint(id: String) async throws -> Array<Movie> {
@@ -57,11 +58,14 @@ internal final class DetailsViewModel: ObservableObject {
     
     internal func dataFromEndpoint() async {
         do {
-            guard let movie: Movie = try await prepareDetailsFromEndpoint(id: movieId).first else {
+            await updateBookmarks()
+            guard var detailsData: Movie = try await prepareDetailsFromEndpoint(id: movieId).first else {
                 return
             }
+            detailsData.isBookmarked = bookmarkedMovieIds.contains(detailsData.id)
+            let filtredMovie: Movie = detailsData
             try await MainActor.run { [weak self] in
-                self?.movieForDetailsView = movie
+                self?.movieForDetailsView = detailsData
                 if movieId.isEmpty {
                     throw EndpointResponce.dataFromEndpoint
                 }
@@ -73,12 +77,59 @@ internal final class DetailsViewModel: ObservableObject {
     
     private func dateFromDatabase() async {
         do {
-            let movie: Movie = try await dbManager.fetchMovie(by: movieId)
+            var detailsData: Movie = try await dbManager.fetchMovie(by: movieId)
+            detailsData.isBookmarked = bookmarkedMovieIds.contains(detailsData.id)
+            let filtredMovie: Movie = detailsData
             await MainActor.run { [weak self] in
-                self?.movieForDetailsView = movie
+                self?.movieForDetailsView = detailsData
             }
         } catch {
             DatabaseError.fetchError(message: "Error fetch movie by id")
+        }
+    }
+    
+    internal func updateBookmarks() async {
+        do {
+            let bookmarked = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
+            let ids = Set(bookmarked.map { $0.id })
+            await MainActor.run { [weak self] in
+                self?.bookmarkedMovieIds = ids
+            }
+        } catch {
+            print("Error updating bookmarks: \(error)")
+        }
+    }
+    
+    internal func refreshBookmarked(
+        active: Bool,
+        movieId: String
+    ) {
+        Task { [weak self] in
+            do {
+                if active {
+                    try await dbManager.attachMovieToList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                } else {
+                    try await dbManager.detachMovieFromList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                }
+                await MainActor.run { [weak self] in
+                    movieForDetailsView = movieForDetailsView.map { movie in
+                        var updatedMovie = movie
+                        if movie.id == movieId {
+                            updatedMovie.isBookmarked = active
+                        }
+                        return updatedMovie
+                    }
+                }
+            } catch {
+                print("Error adding bookmark: \(error)")
+            }
+            await updateBookmarks()
         }
     }
 }

@@ -11,16 +11,16 @@ internal struct DiscoverSectionView: View {
     
     private let data: Array<Movie>
     private let seeMoreButtonAction: @MainActor () -> Void
-    private let chooseButtonAction: @MainActor (Movie) -> Void
+    private let refreshBookmark: @MainActor (Movie) -> Void
     
     internal init(
         data: Array<Movie>,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
-        chooseButtonAction: @escaping @MainActor (Movie) -> Void
+        refreshBookmark: @escaping @MainActor (Movie) -> Void
     ) {
         self.data = data
         self.seeMoreButtonAction = seeMoreButtonAction
-        self.chooseButtonAction = chooseButtonAction
+        self.refreshBookmark = refreshBookmark
     }
     
     internal var body: some View {
@@ -48,11 +48,7 @@ internal struct DiscoverSectionView: View {
         } label: {
             NavigationLink(
                 destination: DiscoveryView(
-                    viewModel: DiscoveryViewModel(
-                        dbManager: DatabaseManager(
-                            dataBaseName: DatabaseConfig.name
-                        )
-                    )
+                    viewModel: DiscoveryViewModel()
                 )
             ) {
                 Text("home.see.more.button.title")
@@ -65,28 +61,19 @@ internal struct DiscoverSectionView: View {
     private var movieCardButton: some View {
         ForEach(data) { model in
             Button {
-                chooseButtonAction(model)
             } label: {
                 NavigationLink(
                     destination: DetailsView(
-                        viewModel: DetailsViewModel(
-                            dbManager: DatabaseManager(
-                                dataBaseName: DatabaseConfig.name
-                            ),
-                            movieId: model.id
-                        ))) {
-                            MovieCard(
-                                isActive: false,
-                                title: model.title,
-                                ranking: Double(model.rating),
-                                genres: model.genres,
-                                storyline: model.overview,
-                                imageUrl: URL(string: model.posterUrl),
-                                didTap: { isActive in })
-                            .multilineTextAlignment(.leading)
-                        }
+                        viewModel: DetailsViewModel(movieId: model.id)
+                    )
+                ) {
+                    MovieCard(
+                        refreshBookmark: refreshBookmark,
+                        movie: model
+                    )
+                    .multilineTextAlignment(.leading)
+                }
             }
         }
     }
 }
-

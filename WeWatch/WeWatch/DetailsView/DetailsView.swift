@@ -19,8 +19,13 @@ internal struct DetailsView: View {
         ZStack {
             if let movie = viewModel.movieForDetailsView {
                 NavigationBarButtons(
-                    movie: movie,
-                    action: {_ in }
+                    refreshBookmark: { movie in
+                        viewModel.refreshBookmarked(
+                            active: !movie.isBookmarked,
+                            movieId: movie.id
+                        )
+                    },
+                    movie: movie
                 )
                 ScrollView {
                     VStack {
@@ -28,7 +33,7 @@ internal struct DetailsView: View {
                     }
                 }
             }
-               
+            
         }
         .task {
             await viewModel.dataFromEndpoint()

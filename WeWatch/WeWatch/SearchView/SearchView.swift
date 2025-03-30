@@ -55,11 +55,14 @@ internal struct SearchView: View {
                                     Spacer()
                                 } else {
                                     SearchListView(
-                                        didTap: true,
                                         data: viewModel.filteredMovie,
-                                        isActive: true,
                                         seeMoreButtonAction: {},
-                                        chooseButtonAction: { isActive in }
+                                        refreshBookmark: { movie in
+                                            viewModel.refreshBookmarked(
+                                                active: !movie.isBookmarked,
+                                                movieId: movie.id, selectedMovie: movie
+                                            )
+                                        }
                                     )
                                     .padding(16)
                                     Rectangle()
@@ -67,7 +70,7 @@ internal struct SearchView: View {
                                         .frame(minHeight: 1)
                                         .foregroundColor(Color.clear)
                                         .onAppear {
-                                            Task { try await viewModel.appendDateFromEndpoint()}
+                                            Task { try await viewModel.appendDateFromEndpoint() }
                                         }
                                 }
                             }

@@ -9,18 +9,16 @@ import Foundation
 
 internal final class SearchViewModel: ObservableObject {
     
-    @Published internal var genresForSearchView: Array<Genre> = []
-    @Published internal var dataForSearchView: Array<Movie> = []
+    @Published internal var genresForSearchView: Array<Genre> = .init()
+    @Published internal var dataForSearchView: Array<Movie> = .init()
     @Published internal var searchText: String = ""
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
     @Published internal var isFetchingNextPage = false
+    internal var bookmarkedMovieIds: Set<String> = .init()
     internal var currentPage: Int = 0
+    internal let dbManager: DatabaseManager
     
-    
-    
-    private let dbManager: DatabaseManager
-    
-    internal init(dbManager: DatabaseManager) {
+    internal init(dbManager: DatabaseManager = .shared) {
         self.dbManager = dbManager
     }
     
@@ -45,6 +43,7 @@ internal final class SearchViewModel: ObservableObject {
                     title: title
                 )
             } ?? .init()
+        genreForUI.insert(Genre(id: "0", title: "All"), at: 0)
         return genreForUI
     }
     
@@ -66,20 +65,11 @@ internal final class SearchViewModel: ObservableObject {
         }
     }
     
-    internal var filteredMovie: Array<Movie> {
-        if searchText.isEmpty {
-            []
-        } else {
-            dataForSearchView.filter {
-                $0.title.localizedStandardContains(searchText) ||
-                $0.genres.localizedStandardContains(searchText) ||
-                $0.overview.localizedStandardContains(searchText) ||
-                $0.genres.localizedStandardContains(selectedGenre.title)
-            }
-        }
-    }
-    
-    internal func prepareDataForSearchView(searchQuery: String, genre: String, page: String) async throws -> Array<Movie> {
+    internal func prepareDataForSearchView(
+        searchQuery: String,
+        genre: String,
+        page: String
+    ) async throws -> Array<Movie> {
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         var queryArray: Array<URLQueryItem> = [
@@ -124,35 +114,39 @@ internal final class SearchViewModel: ObservableObject {
     }
     
     internal func dataFromEndpoint() async {
-        currentPage = 0
-        if searchText.isEmpty {
-            await MainActor.run { [weak self] in
-                self?.dataForSearchView = []
-            }
-        } else {
-            do {
+        do {
+            await updateBookmarks()
+            currentPage = 0
+            if searchText.isEmpty {
+                await MainActor.run { [weak self] in
+                    self?.dataForSearchView = .init()
+                }
+            } else {
                 let searchMovieData: Array<Movie> = try await prepareDataForSearchView(
                     searchQuery: searchText,
                     genre: selectedGenre.title,
                     page: String(currentPage)
                 )
+                let filtredMovie: [Movie] = searchMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
                 await MainActor.run { [weak self] in
-                    self?.dataForSearchView = searchMovieData
+                    self?.dataForSearchView = filtredMovie
                 }
                 if searchMovieData.isEmpty {
                     throw EndpointResponce.dataFromEndpoint
                 }
-            } catch {
-                await dateFromDatabase()
             }
+        } catch {
+            await dateFromDatabase()
         }
     }
     
     private func dateFromDatabase() async {
         do {
-            let movie: Array<Movie> = try await dbManager.searchMovie(by: searchText)
+            await updateBookmarks()
+            let fetchMovie: Array<Movie> = try await dbManager.searchMovie(by: searchText)
+            let filtredMovie: [Movie] = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
-                self?.dataForSearchView = movie
+                self?.dataForSearchView = filtredMovie
             }
         } catch {
             DatabaseError.fetchError(message: "Error fetch movie by id")
@@ -167,9 +161,68 @@ internal final class SearchViewModel: ObservableObject {
             page: String(currentPage)
         )
         await MainActor.run { [weak self] in
-        isFetchingNextPage = true
+            isFetchingNextPage = true
             self?.dataForSearchView.append(contentsOf: searchMovieData)
         }
     }
+    
+    internal func updateBookmarks() async {
+        do {
+            let bookmarked = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
+            let ids = Set(bookmarked.map { $0.id })
+            await MainActor.run { [weak self] in
+                self?.bookmarkedMovieIds = ids
+            }
+        } catch {
+            print("Error updating bookmarks: \(error)")
+        }
+    }
+    
+    internal func refreshBookmarked(
+        active: Bool,
+        movieId: String,
+        selectedMovie: Movie
+    ) {
+        Task { [weak self] in
+            do {
+                if active {
+                    try await dbManager.insert(selectedMovie)
+                    try await dbManager.attachMovieToList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                } else {
+                    try await dbManager.detachMovieFromList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                }
+                await MainActor.run { [weak self] in
+                    dataForSearchView = dataForSearchView.map { movie in
+                        var updatedMovie = movie
+                        if movie.id == movieId {
+                            updatedMovie.isBookmarked = active
+                        }
+                        return updatedMovie
+                    }
+                }
+            } catch {
+                print("Error adding bookmark: \(error)")
+            }
+            await updateBookmarks()
+        }
+    }
+    
+    internal var filteredMovie: Array<Movie> {
+        if searchText.isEmpty {
+            []
+        } else {
+            dataForSearchView.filter {
+                $0.title.localizedStandardContains(searchText) ||
+                $0.genres.localizedStandardContains(searchText) ||
+                $0.overview.localizedStandardContains(searchText) ||
+                $0.genres.localizedStandardContains(selectedGenre.title)
+            }
+        }
+    }
 }
-

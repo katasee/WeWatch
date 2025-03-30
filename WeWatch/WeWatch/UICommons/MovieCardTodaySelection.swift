@@ -1,5 +1,5 @@
 //
-//  MovieCardTopFive.swift
+//  MovieCardTodaySelection.swift
 //  WeWatch
 //
 //  Created by Anton on 26/12/2024.
@@ -8,24 +8,17 @@
 import SwiftUI
 import Kingfisher
 
-internal struct MovieCardTopFive: View {
+internal struct MovieCardTodaySelection: View {
     
-    @State private var isActive: Bool = false
-    private let title: String
-    private let ranking: Double
-    private let imageUrl: URL?
-    private var didTap: @MainActor (Bool) -> Void
+    private let refreshBookmark: @MainActor(Movie) -> Void
+    private let movie: Movie
     
     internal init(
-        title: String,
-        ranking: Double,
-        image: URL?,
-        didTap: @escaping @MainActor (Bool) -> Void
+        refreshBookmark: @escaping @MainActor(Movie) -> Void,
+        movie: Movie
     ) {
-        self.title = title
-        self.ranking = ranking
-        self.imageUrl = image
-        self.didTap = didTap
+        self.refreshBookmark = refreshBookmark
+        self.movie = movie
     }
     
     internal var body: some View {
@@ -33,7 +26,7 @@ internal struct MovieCardTopFive: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     ZStack(alignment: .topTrailing) {
-                        KFImage(imageUrl)
+                        KFImage(URL(string: movie.posterUrl))
                             .resizable()
                             .placeholder({
                                 ZStack {
@@ -41,18 +34,13 @@ internal struct MovieCardTopFive: View {
                                         .loadingIndicator()
                                 }
                             })
-                                .aspectRatio(contentMode: .fill)
-                                .frame(maxWidth: 300, maxHeight: 200)
-                                .clipped()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(maxWidth: 300, maxHeight: 200)
+                            .clipped()
                         Button {
-                            isActive.toggle()
-                            didTap(isActive)
+                            refreshBookmark(movie)
                         } label: {
-                            if isActive == true {
-                                Bookmark(isActive: true)
-                            } else {
-                                Bookmark(isActive: false)
-                            }
+                            Bookmark(isActive: movie.isBookmarked)
                         }
                         .padding(16)
                     }
@@ -64,7 +52,7 @@ internal struct MovieCardTopFive: View {
             }
             HStack {
                 filmRanking
-                RatingView(ranking: ranking)
+                RatingView(ranking: movie.rating)
             }
         }
         .frame(width: 300)
@@ -73,13 +61,13 @@ internal struct MovieCardTopFive: View {
     }
     
     private var filmRanking: some View {
-        Text("\(ranking, specifier: "%.1f")")
+        Text("\(movie.rating, specifier: "%.1f")")
             .font(.poppinsRegular22px)
             .foregroundColor(.whiteColor)
     }
     
     private var filmTitle: some View {
-        Text(title)
+        Text(movie.title)
             .font(.poppinsBold20px)
             .foregroundColor(.whiteColor)
     }

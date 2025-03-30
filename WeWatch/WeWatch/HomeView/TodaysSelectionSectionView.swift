@@ -9,19 +9,18 @@ import SwiftUI
 
 internal struct TodaysSelectionSectionView: View {
     
-    private let data: [Movie]
-    private let chooseButtonAction: @MainActor (Movie) -> Void
+    private let data: Array<Movie>
+    private let refreshBookmark: @MainActor (Movie) -> Void
     
     internal init(
-        data: [Movie],
-        chooseButtonAction: @escaping @MainActor (Movie) -> Void
+        data: Array<Movie>,
+        refreshBookmark: @escaping @MainActor (Movie) -> Void
     ) {
         self.data = data
-        self.chooseButtonAction = chooseButtonAction
+        self.refreshBookmark = refreshBookmark
     }
     
     internal var body: some View {
-        
         VStack {
             HStack {
                 title
@@ -47,23 +46,15 @@ internal struct TodaysSelectionSectionView: View {
     private var movieCardButton: some View {
         ForEach(data) { model in
             Button {
-                chooseButtonAction(model)
             } label: {
                 NavigationLink(
                     destination: DetailsView(
-                        viewModel: DetailsViewModel(
-                            dbManager: DatabaseManager(
-                                dataBaseName: DatabaseConfig.name
-                            ),
-                            movieId: model.id
-                        )
+                        viewModel: DetailsViewModel(movieId: model.id)
                     )
                 ) {
-                    MovieCardTopFive(
-                        title: model.title,
-                        ranking: Double(model.rating),
-                        image: URL(string: model.posterUrl),
-                        didTap: { isActive in }
+                    MovieCardTodaySelection(
+                        refreshBookmark: refreshBookmark,
+                        movie: model
                     )
                 }
             }
