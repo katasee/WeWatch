@@ -14,12 +14,23 @@ internal final class SearchViewModel: ObservableObject {
     @Published internal var searchText: String = ""
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
     @Published internal var isFetchingNextPage = false
+    @Published internal var isLoading: Bool = false
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal var currentPage: Int = 0
     internal let dbManager: DatabaseManager
     
     internal init(dbManager: DatabaseManager = .shared) {
         self.dbManager = dbManager
+    }
+    
+    internal func fetchData() async {
+        await MainActor.run { [weak self] in
+            self?.isLoading = true
+        }
+            await dataFromEndpoint()
+        await MainActor.run { [weak self] in
+            self?.isLoading = false
+        }
     }
     
     internal func prepareGenreForSearchView() async throws -> Array<Genre> {

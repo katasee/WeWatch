@@ -12,6 +12,8 @@ internal final class HomeViewModel: ObservableObject {
     @Published internal var todaySelection: Array<Movie> = .init()
     @Published internal var discoverySection: Array<Movie> = .init()
     @Published internal var isFetchingNextPage = false
+    @Published internal var isOpenNewPage = false
+    @Published internal var isLoading: Bool = false
     internal var currentPage: Int = 0
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal let dbManager: DatabaseManager
@@ -22,6 +24,17 @@ internal final class HomeViewModel: ObservableObject {
     
     fileprivate enum HomeViewModelError: Error {
         case insufficientData
+    }
+    
+    internal func fetchData() async {
+        await MainActor.run { [weak self] in
+            self?.isLoading = true
+        }
+        await dataForTodaySelection()
+        await movieForDiscoveryView()
+        await MainActor.run { [weak self] in
+            self?.isLoading = false
+        }
     }
     
     internal func updateBookmarks() async {
@@ -120,6 +133,7 @@ internal final class HomeViewModel: ObservableObject {
     
     internal func movieForDiscoveryView() async {
         do {
+
             await updateBookmarks()
             let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
             let filtredMovie: [Movie] = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)

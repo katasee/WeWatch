@@ -10,6 +10,7 @@ import Foundation
 internal final class DetailsViewModel: ObservableObject {
     
     @Published internal var movieForDetailsView: Movie?
+    @Published internal var isLoading: Bool = false
     private var movieId: String
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal let dbManager: DatabaseManager
@@ -20,6 +21,16 @@ internal final class DetailsViewModel: ObservableObject {
     ) {
         self.movieId = movieId
         self.dbManager = dbManager
+    }
+    
+    internal func fetchData() async {
+        await MainActor.run { [weak self] in
+            self?.isLoading = true
+        }
+            await dataFromEndpoint()
+        await MainActor.run { [weak self] in
+            self?.isLoading = false
+        }
     }
     
     internal func prepareDetailsFromEndpoint(id: String) async throws -> Array<Movie> {

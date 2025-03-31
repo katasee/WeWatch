@@ -75,16 +75,18 @@ internal struct SearchView: View {
                                 }
                             }
                         }
+                        .fullScreenLoader(isLoading: viewModel.isLoading)
                         .frame(minHeight: proxy.size.height)
                     }
                     .onChange(of: viewModel.searchText) { change in
                         Task {
-                            await viewModel.dataFromEndpoint()
+                            await viewModel.fetchData()
                         }
+                        
                     }
                     .onChange(of: viewModel.selectedGenre) { change in
                         Task {
-                            await viewModel.dataFromEndpoint()
+                            await viewModel.fetchData()
                         }
                     }
                 }

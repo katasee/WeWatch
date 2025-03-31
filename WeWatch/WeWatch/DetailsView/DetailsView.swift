@@ -17,6 +17,8 @@ internal struct DetailsView: View {
     
     internal var body: some View {
         ZStack {
+            Color.black
+                .ignoresSafeArea()
             if let movie = viewModel.movieForDetailsView {
                 NavigationBarButtons(
                     refreshBookmark: { movie in
@@ -27,16 +29,17 @@ internal struct DetailsView: View {
                     },
                     movie: movie
                 )
+                
                 ScrollView {
                     VStack {
                         DetailSectionView(movie: movie)
                     }
+                    .fullScreenLoader(isLoading: viewModel.isLoading)
                 }
             }
-            
         }
         .task {
-            await viewModel.dataFromEndpoint()
+            await viewModel.fetchData()
         }
         .ignoresSafeArea()
     }

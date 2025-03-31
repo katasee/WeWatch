@@ -11,11 +11,22 @@ internal final class BookmarkViewModel: ObservableObject {
     
     @Published internal var searchText: String = ""
     @Published internal var dataForBookmarkView: Array<Movie> = .init()
+    @Published internal var isLoading: Bool = false
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal let dbManager: DatabaseManager
     
     internal init(dbManager: DatabaseManager = .shared) {
         self.dbManager = dbManager
+    }
+    
+    internal func fetchData() async {
+        await MainActor.run { [weak self] in
+            self?.isLoading = true
+        }
+        await loadBookmarkData()
+        await MainActor.run { [weak self] in
+            self?.isLoading = false
+        }
     }
     
     func refreshBookmarkedIDs() async throws {

@@ -37,11 +37,12 @@ internal struct BookmarkView: View {
                             }
                         }
                     )
+                    .fullScreenLoader(isLoading: viewModel.isLoading)
                     .padding(16)
                 }
                 .onAppear {
                     Task {
-                        await viewModel.loadBookmarkData()
+                        await viewModel.fetchData()
                     }
                 }
             }
