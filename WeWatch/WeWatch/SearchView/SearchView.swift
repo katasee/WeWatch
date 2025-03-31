@@ -45,54 +45,48 @@ internal struct SearchView: View {
                             .font(.poppinsBold18px)
                             .foregroundColor(.whiteColor)
                     }
-                    if viewModel.isLoading {
-                        Spacer()
-                        ProgressView()
-                            .loader(isLoading: viewModel.isLoading)
-                        Spacer()
-                    } else {
-                        GeometryReader { proxy in
-                            ScrollView {
-                                LazyVStack {
-                                    if viewModel.dataForSearchView.isEmpty {
-                                        Spacer()
-                                        ContentUnavailableView.search(text: viewModel.searchText)
-                                            .foregroundColor(.whiteColor)
-                                        Spacer()
-                                    } else {
-                                        SearchListView(
-                                            data: viewModel.filteredMovie,
-                                            seeMoreButtonAction: {},
-                                            refreshBookmark: { movie in
-                                                viewModel.refreshBookmarked(
-                                                    active: !movie.isBookmarked,
-                                                    movieId: movie.id, selectedMovie: movie
-                                                )
-                                            }
-                                        )
-                                        .padding(16)
-                                        Rectangle()
-                                            .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-                                            .frame(minHeight: 1)
-                                            .foregroundColor(Color.clear)
-                                            .onAppear {
-                                                Task { try await viewModel.appendDateFromEndpoint() }
-                                            }
-                                    }
+                    GeometryReader { proxy in
+                        ScrollView {
+                            LazyVStack {
+                                if viewModel.dataForSearchView.isEmpty {
+                                    Spacer()
+                                    ContentUnavailableView.search(text: viewModel.searchText)
+                                        .foregroundColor(.whiteColor)
+                                    Spacer()
+                                } else {
+                                    SearchListView(
+                                        data: viewModel.filteredMovie,
+                                        seeMoreButtonAction: {},
+                                        refreshBookmark: { movie in
+                                            viewModel.refreshBookmarked(
+                                                active: !movie.isBookmarked,
+                                                movieId: movie.id, selectedMovie: movie
+                                            )
+                                        }
+                                    )
+                                    .padding(16)
+                                    Rectangle()
+                                        .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
+                                        .frame(minHeight: 1)
+                                        .foregroundColor(Color.clear)
+                                        .onAppear {
+                                            Task { try await viewModel.appendDateFromEndpoint() }
+                                        }
                                 }
                             }
-                            .frame(minHeight: proxy.size.height)
                         }
-                        .onChange(of: viewModel.searchText) { change in
-                            Task {
-                                await viewModel.fetchData()
-                            }
-                            
+                        .fullScreenLoader(isLoading: viewModel.isLoading)
+                        .frame(minHeight: proxy.size.height)
+                    }
+                    .onChange(of: viewModel.searchText) { change in
+                        Task {
+                            await viewModel.fetchData()
                         }
-                        .onChange(of: viewModel.selectedGenre) { change in
-                            Task {
-                                await viewModel.fetchData()
-                            }
+                        
+                    }
+                    .onChange(of: viewModel.selectedGenre) { change in
+                        Task {
+                            await viewModel.fetchData()
                         }
                     }
                 }

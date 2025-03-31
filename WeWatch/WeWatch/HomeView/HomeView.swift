@@ -21,45 +21,39 @@ internal struct HomeView: View {
                 Color.blackColor
                     .ignoresSafeArea()
                 VStack {
-                    if viewModel.isLoading {
-                        Spacer()
-                        ProgressView()
-                            .loader(isLoading: viewModel.isLoading)
-                        Spacer()
-                    } else {
-                        ScrollView {
-                            LazyVStack {
-                                TodaysSelectionSectionView(
-                                    data: viewModel.todaySelection,
-                                    refreshBookmark: { movie in
-                                        viewModel.refreshBookmarkedinTodaySelection(
-                                            active: !movie.isBookmarked,
-                                            movieId: movie.id
-                                        )
-                                    }
-                                )
-                                DiscoverSectionView(
-                                    data: viewModel.discoverySection,
-                                    seeMoreButtonAction: {},
-                                    refreshBookmark: { movie in
-                                        viewModel.refreshBookmarked(
-                                            active: !movie.isBookmarked,
-                                            movieId: movie.id, selectedMovie: movie
-                                        )
-                                    }
-                                )
-                                if !viewModel.discoverySection.isEmpty {
-                                    Rectangle()
-                                        .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-                                        .frame(minHeight: 1)
-                                        .foregroundColor(Color.clear)
-                                        .task {
-                                            await viewModel.appendDataFromEndpoint()
-                                        }
+                    ScrollView {
+                        LazyVStack {
+                            TodaysSelectionSectionView(
+                                data: viewModel.todaySelection,
+                                refreshBookmark: { movie in
+                                    viewModel.refreshBookmarkedinTodaySelection(
+                                        active: !movie.isBookmarked,
+                                        movieId: movie.id
+                                    )
                                 }
+                            )
+                            DiscoverSectionView(
+                                data: viewModel.discoverySection,
+                                seeMoreButtonAction: {},
+                                refreshBookmark: { movie in
+                                    viewModel.refreshBookmarked(
+                                        active: !movie.isBookmarked,
+                                        movieId: movie.id, selectedMovie: movie
+                                    )
+                                }
+                            )
+                            if !viewModel.discoverySection.isEmpty {
+                                Rectangle()
+                                    .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
+                                    .frame(minHeight: 1)
+                                    .foregroundColor(Color.clear)
+                                    .task {
+                                        await viewModel.appendDataFromEndpoint()
+                                    }
                             }
                         }
                     }
+                    .fullScreenLoader(isLoading: viewModel.isLoading)
                 }
                 .task {
                     await viewModel.fetchData()

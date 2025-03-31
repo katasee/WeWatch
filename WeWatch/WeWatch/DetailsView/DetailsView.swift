@@ -29,17 +29,12 @@ internal struct DetailsView: View {
                     },
                     movie: movie
                 )
-                if viewModel.isLoading {
-                    Spacer()
-                    ProgressView()
-                        .loader(isLoading: viewModel.isLoading)
-                    Spacer()
-                } else {
-                    ScrollView {
-                        VStack {
-                            DetailSectionView(movie: movie)
-                        }
+                
+                ScrollView {
+                    VStack {
+                        DetailSectionView(movie: movie)
                     }
+                    .fullScreenLoader(isLoading: viewModel.isLoading)
                 }
             }
         }

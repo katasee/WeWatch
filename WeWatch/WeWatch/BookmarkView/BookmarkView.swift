@@ -21,30 +21,24 @@ internal struct BookmarkView: View {
                 Color.black
                     .ignoresSafeArea()
                 VStack {
-                    if viewModel.isLoading {
-                        Spacer()
-                        ProgressView()
-                            .loader(isLoading: viewModel.isLoading)
-                        Spacer()
-                    } else {
-                        BookmarkListView(
-                            searchText: $viewModel.searchText,
-                            refreshBookmark: { movie in
-                                viewModel.refreshBookmarked(
-                                    active: !movie.isBookmarked,
-                                    movieId: movie.id
-                                )
-                            },
-                            data: viewModel.filteredBookmarkedMovie,
-                            chooseButtonAction: { isActive in },
-                            bookmarkRemoveAllMovie: {
-                                Task {
-                                    await viewModel.removeAllMovie()
-                                }
+                    BookmarkListView(
+                        searchText: $viewModel.searchText,
+                        refreshBookmark: { movie in
+                            viewModel.refreshBookmarked(
+                                active: !movie.isBookmarked,
+                                movieId: movie.id
+                            )
+                        },
+                        data: viewModel.filteredBookmarkedMovie,
+                        chooseButtonAction: { isActive in },
+                        bookmarkRemoveAllMovie: {
+                            Task {
+                                await viewModel.removeAllMovie()
                             }
-                        )
-                        .padding(16)
-                    }
+                        }
+                    )
+                    .fullScreenLoader(isLoading: viewModel.isLoading)
+                    .padding(16)
                 }
                 .onAppear {
                     Task {

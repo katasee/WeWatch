@@ -28,39 +28,33 @@ internal struct DiscoveryView: View {
                         viewModel.selectedGenre = genre
                     }
                 )
-                if viewModel.isLoading {
-                    Spacer()
-                    ProgressView()
-                        .loader(isLoading: viewModel.isLoading)
-                    Spacer()
-                } else {
-                    ScrollView {
-                        Color.clear.frame(height: 16) 
-                        LazyVStack {
-                            DiscoveryListView(
-                                data: viewModel.dataForAllMovieTab,
-                                refreshBookmark: { movie in
-                                    viewModel.refreshBookmarked(
-                                        active: !movie.isBookmarked,
-                                        movieId: movie.id, selectedMovie: movie
-                                    )
-                                }
-                            )
-                            Rectangle()
-                                .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-                                .frame(minHeight: 16)
-                                .foregroundColor(Color.clear)
-                                .onAppear {
-                                    viewModel.fetchNextPage()
-                                }
-                        }
-                        .onChange(of: viewModel.selectedGenre) { change in
-                            Task {
-                                await viewModel.fetchData()
+                ScrollView {
+                    Color.clear.frame(height: 16) 
+                    LazyVStack {
+                        DiscoveryListView(
+                            data: viewModel.dataForAllMovieTab,
+                            refreshBookmark: { movie in
+                                viewModel.refreshBookmarked(
+                                    active: !movie.isBookmarked,
+                                    movieId: movie.id, selectedMovie: movie
+                                )
                             }
+                        )
+                        Rectangle()
+                            .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
+                            .frame(minHeight: 16)
+                            .foregroundColor(Color.clear)
+                            .onAppear {
+                                viewModel.fetchNextPage()
+                            }
+                    }
+                    .onChange(of: viewModel.selectedGenre) { change in
+                        Task {
+                            await viewModel.fetchData()
                         }
                     }
                 }
+                .fullScreenLoader(isLoading: viewModel.isLoading)
             }
             .task {
                 await viewModel.dataFromEndpointForGenreTabs()
