@@ -47,13 +47,24 @@ internal struct HomeView: View {
                                     .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
                                     .frame(minHeight: 1)
                                     .foregroundColor(Color.clear)
-                                    .task {
-                                        await viewModel.appendDataFromEndpoint()
+                                    .onAppear {
+                                        Task { try await viewModel.appendDataFromEndpoint() }
                                     }
                             }
                         }
                     }
-                    .fullScreenLoader(isLoading: viewModel.isLoading)
+//                    .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+//                        Task {
+//                            if viewModel.fetchDataError == true {
+//                                await viewModel.fetchData()
+//                                viewModel.fetchDataError = false
+//                            } else if viewModel.appendDataError == true {
+//                                await viewModel.appendDataFromEndpoint()
+//                                viewModel.appendDataError = false
+//                            }
+//                        }
+//                    })
+//                    .fullScreenLoader(isLoading: viewModel.isLoading)
                 }
                 .task {
                     await viewModel.fetchData()

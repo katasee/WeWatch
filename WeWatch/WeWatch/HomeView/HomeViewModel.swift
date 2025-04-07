@@ -14,6 +14,9 @@ internal final class HomeViewModel: ObservableObject {
     @Published internal var isFetchingNextPage = false
     @Published internal var isOpenNewPage = false
     @Published internal var isLoading: Bool = false
+    @Published var error: (any Error)?
+    internal var fetchDataError: Bool = false
+    internal var appendDataError: Bool = false
     internal var currentPage: Int = 0
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal let dbManager: DatabaseManager
@@ -45,7 +48,9 @@ internal final class HomeViewModel: ObservableObject {
                 self?.bookmarkedMovieIds = ids
             }
         } catch {
-            print("Error updating bookmarks: \(error)")
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
@@ -79,7 +84,9 @@ internal final class HomeViewModel: ObservableObject {
                     }
                 }
             } catch {
-                print("Error adding bookmark: \(error)")
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }
             }
         }
     }
@@ -97,19 +104,17 @@ internal final class HomeViewModel: ObservableObject {
             token: token
         )
         let response: SearchResponse = try await Webservice().call(listsResource)
-        currentPage += 1
+//        currentPage += 1
         let moviesForUI: Array<Movie> = response.data?
-            .compactMap { MovieDetails in
-                guard let id: String = MovieDetails.id,
-                      let title: String = MovieDetails.name,
-                      let overview: String = MovieDetails.overview,
-                      let posterUrl: String = MovieDetails.imageUrl,
-                      let genreses: Array<String> = MovieDetails.genres
+            .compactMap { movieDetails in
+                guard let id: String = movieDetails.id,
+                      let title: String = movieDetails.name,
+                      let overview: String = movieDetails.overview,
+                      let posterUrl: String = movieDetails.imageUrl,
+                      let genres: String = movieDetails.genres?.joined(separator: ", ")
                 else {
                     return nil
                 }
-                let genres: String = genreses
-                    .joined(separator: ", ")
                 return .init(
                     id: id,
                     title: title,
@@ -133,37 +138,44 @@ internal final class HomeViewModel: ObservableObject {
     
     internal func movieForDiscoveryView() async {
         do {
-
             await updateBookmarks()
+            currentPage = 0
             let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
             let filtredMovie: [Movie] = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             try await MainActor.run { [weak self] in
                 self?.discoverySection = filtredMovie
+            }
                 if discoveryMovieData.isEmpty {
                     throw EndpointResponce.dataFromEndpoint
                 }
-            }
+            
         } catch {
             await fetchAndUpdateDiscoverySection()
         }
     }
     
     internal func appendDataFromEndpoint() async {
-        await MainActor.run {
-            isFetchingNextPage = true
-        }
+//        await MainActor.run {
+//            isFetchingNextPage = true
+//        }
         do {
+            currentPage += 1
             let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
             await MainActor.run { [weak self] in
                 self?.discoverySection.append(contentsOf: discoveryMovieData)
-                self?.isFetchingNextPage = false
+                self?.isFetchingNextPage = true
             }
         } catch {
-            print(error)
+            appendDataError = true
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
     internal func prepareDataTodaySelection(query: String) async throws -> Array<Movie> {
+        var attempts: Int = 0
+        let maxAttempts: Int = 5
         let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let searchResource: Resource<SearchResponse> = .init(
@@ -172,8 +184,7 @@ internal final class HomeViewModel: ObservableObject {
             token: token
         )
         var response: SearchResponse = try await Webservice().call(searchResource)
-        var attempts: Int = 0
-        let maxAttempts: Int = 5
+        print(response.data?.count)
         while (response.data?.count ?? 0) < 10 && attempts < maxAttempts {
             response = try await Webservice().call(searchResource)
             attempts += 1
@@ -187,9 +198,9 @@ internal final class HomeViewModel: ObservableObject {
                 guard let movieId: String = details.id,
                       let title: String = details.name,
                       let image: String = details.imageUrl,
-                      let overview: String = details.overview,
-                      let genresArray: Array<String> = details.genres
+                      let overview: String = details.overview
                 else { return nil }
+                let genresArray: Array<String> = details.genres ?? []
                 let genres: String = genresArray.joined(separator: ", ")
                 return .init(
                     id: movieId,
@@ -200,6 +211,7 @@ internal final class HomeViewModel: ObservableObject {
                     genres: genres
                 )
             } ?? []
+        print(moviesForUI.count)
         for movie in moviesForUI {
             try await dbManager.insert(movie)
             try await dbManager.attachMovieToList(
@@ -207,6 +219,7 @@ internal final class HomeViewModel: ObservableObject {
                 movieId: movie.id
             )
         }
+        print(moviesForUI.count)
         return moviesForUI
     }
     
@@ -237,27 +250,32 @@ internal final class HomeViewModel: ObservableObject {
                     }
                 }
             } catch {
-                print("Error adding bookmark: \(error)")
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }
             }
             await updateBookmarks()
         }
     }
     
     internal func dataForTodaySelection() async {
-        do {
-            await updateBookmarks()
-            let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
-            let filtredMovie: [Movie] = todaySelectionData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
-            try await MainActor.run { [weak self] in
-                self?.todaySelection = filtredMovie
-                if todaySelection.isEmpty {
+        if hasDateChanged() {
+            do {
+                await updateBookmarks()
+                let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
+                let filtredMovie: [Movie] = todaySelectionData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
+                try await MainActor.run { [weak self] in
+                    self?.todaySelection = filtredMovie
+                }
+                if todaySelectionData.isEmpty {
                     throw EndpointResponce.dataFromEndpoint
                 }
+            } catch {
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }
             }
-            if todaySelectionData.isEmpty {
-                throw EndpointResponce.dataFromEndpoint
-            }
-        } catch {
+        } else {
             await fetchAndUpdateTodaySelection()
         }
     }
@@ -281,25 +299,32 @@ internal final class HomeViewModel: ObservableObject {
     
     private func fetchAndUpdateTodaySelection() async {
         do {
-            let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
+            let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.todaySelectionList)
             let filtredMovie: [Movie] = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
                 self?.todaySelection = filtredMovie
             }
         } catch {
-            print(error)
+            fetchDataError = true
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
     private func fetchAndUpdateDiscoverySection() async {
         do {
+            await updateBookmarks()
             let fetchMovie = try await dbManager.fetchMovieByList(forList: Constans.discoveryList)
             let filtredMovie: [Movie] = fetchMovie.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
                 self?.discoverySection = filtredMovie
             }
         } catch {
-            print(error)
+            fetchDataError = true
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
 }

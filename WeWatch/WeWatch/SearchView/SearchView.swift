@@ -10,7 +10,6 @@ import SwiftUI
 internal struct SearchView: View {
     
     @StateObject private var viewModel: SearchViewModel
-    @State private var isLoading = false
     
     internal init(viewModel: SearchViewModel) {
         self._viewModel = .init(wrappedValue: viewModel)
@@ -22,29 +21,8 @@ internal struct SearchView: View {
                 Color.blackColor
                     .ignoresSafeArea()
                 VStack(spacing: 20) {
-                    HStack {
-                        Text("search.title")
-                            .foregroundColor(.whiteColor)
-                            .font(.poppinsBold30px)
-                        + Text(".")
-                            .foregroundColor(.fieryRed)
-                            .font(.poppinsBold30px)
-                        Spacer()
-                    }
-                    VStack(alignment: .leading) {
-                        SearchBar(searchText: $viewModel.searchText)
-                        MovieCategoryView(
-                            genreTabs: viewModel.genresForSearchView,
-                            selectedGenre: viewModel.selectedGenre,
-                            action: { genre in viewModel.selectedGenre = genre }
-                        )
-                        Text("search.result")
-                            .font(.poppinsBold18px)
-                            .foregroundColor(.whiteColor)
-                        + Text(" \(viewModel.searchText.count)")
-                            .font(.poppinsBold18px)
-                            .foregroundColor(.whiteColor)
-                    }
+                    title
+                    searchBar
                     GeometryReader { proxy in
                         ScrollView {
                             LazyVStack {
@@ -65,17 +43,22 @@ internal struct SearchView: View {
                                         }
                                     )
                                     .padding(16)
-                                    Rectangle()
-                                        .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-                                        .frame(minHeight: 1)
-                                        .foregroundColor(Color.clear)
-                                        .onAppear {
-                                            Task { try await viewModel.appendDateFromEndpoint() }
-                                        }
+                                    rectangele
                                 }
                             }
                         }
-                        .fullScreenLoader(isLoading: viewModel.isLoading)
+//                        .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+//                            Task {
+//                                if viewModel.fetchDataError == true {
+//                                    await viewModel.fetchData()
+//                                    viewModel.fetchDataError = false
+//                                } else if viewModel.appendDataError == true {
+//                                    try await viewModel.appendDataFromEndpoint()
+//                                    viewModel.appendDataError = false
+//                                }
+//                            }
+//                        })
+//                        .fullScreenLoader(isLoading: viewModel.isLoading)
                         .frame(minHeight: proxy.size.height)
                     }
                     .onChange(of: viewModel.searchText) { change in
@@ -95,5 +78,44 @@ internal struct SearchView: View {
         .task {
             await viewModel.dataFromEndpointForGenreTabs()
         }
+    }
+    
+    internal var title: some View {
+        HStack {
+            Text("search.title")
+                .foregroundColor(.whiteColor)
+                .font(.poppinsBold30px)
+            + Text(".")
+                .foregroundColor(.fieryRed)
+                .font(.poppinsBold30px)
+            Spacer()
+        }
+    }
+    
+    internal var searchBar: some View {
+        VStack(alignment: .leading) {
+            SearchBar(searchText: $viewModel.searchText)
+            MovieCategoryView(
+                genreTabs: viewModel.genresForSearchView,
+                selectedGenre: viewModel.selectedGenre,
+                action: { genre in viewModel.selectedGenre = genre }
+            )
+            Text("search.result")
+                .font(.poppinsBold18px)
+                .foregroundColor(.whiteColor)
+            + Text(" \(viewModel.dataForSearchView.count)")
+                .font(.poppinsBold18px)
+                .foregroundColor(.whiteColor)
+        }
+    }
+    
+    internal var rectangele: some View {
+        Rectangle()
+            .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
+            .frame(minHeight: 1)
+            .foregroundColor(Color.clear)
+            .onAppear {
+                Task { try await viewModel.appendDataFromEndpoint() }
+            }
     }
 }

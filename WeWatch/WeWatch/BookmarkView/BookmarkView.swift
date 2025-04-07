@@ -37,7 +37,12 @@ internal struct BookmarkView: View {
                             }
                         }
                     )
-                    .fullScreenLoader(isLoading: viewModel.isLoading)
+                    .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                        Task {
+                            await viewModel.fetchData()
+                        }
+                    })
+//                    .fullScreenLoader(isLoading: viewModel.isLoading)
                     .padding(16)
                 }
                 .onAppear {

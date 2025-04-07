@@ -12,6 +12,7 @@ internal final class BookmarkViewModel: ObservableObject {
     @Published internal var searchText: String = ""
     @Published internal var dataForBookmarkView: Array<Movie> = .init()
     @Published internal var isLoading: Bool = false
+    @Published var error: (any Error)?
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal let dbManager: DatabaseManager
     
@@ -46,7 +47,9 @@ internal final class BookmarkViewModel: ObservableObject {
                 self?.dataForBookmarkView = filtredMovie
             }
         } catch {
-            print("Error loading bookmark data: \(error)")
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
@@ -65,7 +68,9 @@ internal final class BookmarkViewModel: ObservableObject {
                 }
                 await loadBookmarkData()
             } catch {
-                print("Error removing bookmark for movie \(movieId): \(error)")
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }
             }
         }
     }
