@@ -62,7 +62,7 @@ internal struct MovieCardDiscover: View {
                 }
             })
             .cornerRadius(15)
-            .frame(maxWidth: 182, maxHeight: 273)
+            .frame(maxHeight: 275)
             .background(
                 RoundedRectangle(cornerRadius: 15)
                     .fill(Color.darkGreyColor)

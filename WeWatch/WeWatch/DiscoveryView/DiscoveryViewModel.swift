@@ -19,7 +19,6 @@ internal final class DiscoveryViewModel: ObservableObject {
     internal var fetchDataError: Bool = false
     internal var appendDataError: Bool = false
     internal var bookmarkedMovieIds: Set<String> = .init()
-    internal var isFirstTimeLoad: Bool = true
     internal var currentPage: Int = 0
     internal var isBackEndDateEmpty: Bool = false
     internal let dbManager: DatabaseManager
@@ -60,7 +59,7 @@ internal final class DiscoveryViewModel: ObservableObject {
         await MainActor.run { [weak self] in
             self?.isLoading = false
             print( isLoading)
-
+            
         }
     }
     
@@ -129,40 +128,36 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func fetchNextPage() {
-        if isFirstTimeLoad || isFetchingNextPage {
-            isFirstTimeLoad = false
-            return
-        }
+        if isFetchingNextPage {
+                    return
+                }
         Task { [weak self] in
             await MainActor.run { [weak self] in
                 self?.isFetchingNextPage = true
             }
-                do {
-                    currentPage += 1
-                    let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
-                        genre: selectedGenre.title,
-                        page: String(currentPage)
-                    )
-                    if discoveryMovieData.isEmpty {
-                        throw EndpointResponce.dataFromEndpoint
-                    } else {
-                        await MainActor.run { [weak self] in
-                            self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
-//                            self?.isFetchingNextPage = false
-                        }
-                    }
-                } catch {
-                    appendDataError = true
+            do {
+                currentPage += 1
+                let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
+                    genre: selectedGenre.title,
+                    page: String(currentPage)
+                )
+                if discoveryMovieData.isEmpty {
+                    throw EndpointResponce.dataFromEndpoint
+                } else {
                     await MainActor.run { [weak self] in
-                        self?.error = error
+                        self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
+                                                    self?.isFetchingNextPage = false
                     }
                 }
+            } catch {
+                appendDataError = true
                 await MainActor.run { [weak self] in
-                                                self?.isFetchingNextPage = false
-
+                    self?.error = error
+                    self?.isFetchingNextPage = false
                 }
             }
         }
+    }
     
     internal func updateBookmarksIds() async {
         do {
@@ -177,7 +172,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             }
         }
     }
-
+    
     internal func refreshBookmarked(
         active: Bool,
         movieId: String,
@@ -278,11 +273,11 @@ internal final class DiscoveryViewModel: ObservableObject {
         return chooseGenre
     }
 }
-    
-    
 
-    
 
-    
-    
+
+
+
+
+
 

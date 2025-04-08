@@ -45,8 +45,6 @@ internal struct TodaysSelectionSectionView: View {
     
     private var movieCardButton: some View {
         ForEach(data) { model in
-            Button {
-            } label: {
                 NavigationLink(
                     destination: DetailsView(
                         viewModel: DetailsViewModel(movieId: model.id)
@@ -57,7 +55,6 @@ internal struct TodaysSelectionSectionView: View {
                         movie: model
                     )
                 }
-            }
         }
     }
 }

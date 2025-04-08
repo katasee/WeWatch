@@ -98,7 +98,7 @@ internal final class HomeViewModel: ObservableObject {
             url: URL.SearchResponseURL,
             method: .get([
                 .init(name: "query", value: "All"),
-                .init(name: "limit", value: "100"),
+                .init(name: "limit", value: "20"),
                 .init(name: "page", value: page)
             ]),
             token: token
@@ -154,21 +154,31 @@ internal final class HomeViewModel: ObservableObject {
         }
     }
     
-    internal func appendDataFromEndpoint() async {
-//        await MainActor.run {
-//            isFetchingNextPage = true
-//        }
-        do {
-            currentPage += 1
-            let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
+    internal func appendDataFromEndpoint() {
+        if isFetchingNextPage {
+            return
+        }
+        Task { [weak self] in
             await MainActor.run { [weak self] in
-                self?.discoverySection.append(contentsOf: discoveryMovieData)
                 self?.isFetchingNextPage = true
             }
-        } catch {
-            appendDataError = true
-            await MainActor.run { [weak self] in
-                self?.error = error
+            do {
+                currentPage += 1
+                let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
+                if discoveryMovieData.isEmpty {
+                    throw EndpointResponce.dataFromEndpoint
+                } else {
+                    await MainActor.run { [weak self] in
+                        self?.discoverySection.append(contentsOf: discoveryMovieData)
+                        self?.isFetchingNextPage = false
+                    }
+                }
+            } catch {
+                appendDataError = true
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                    self?.isFetchingNextPage = false
+                }
             }
         }
     }

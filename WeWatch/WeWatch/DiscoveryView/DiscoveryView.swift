@@ -27,31 +27,32 @@ internal struct DiscoveryView: View {
                     Color.clear.frame(height: 16)
                     LazyVStack {
                         discoveryList
-                        rectangle
+                    }
+                    .onChange(of: viewModel.selectedGenre) { change in
+                        Task {
+                            await viewModel.fetchData()
+                        }
                     }
                 }
-                .onChange(of: viewModel.selectedGenre) { change in
+                .onLoad {
                     Task {
+                        await viewModel.dataFromEndpointForGenreTabs()
                         await viewModel.fetchData()
                     }
                 }
-                .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
-                    Task {
-                        if viewModel.fetchDataError {
-                            await viewModel.fetchData()
-                            viewModel.fetchDataError = false
-                        } else if viewModel.appendDataError {
-                            await viewModel.fetchNextPage()
-                            viewModel.appendDataError = false
-                        }
+            }
+            .fullScreenLoader(isLoading: viewModel.isLoading)
+            .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                Task {
+                    if viewModel.fetchDataError {
+                        await viewModel.fetchData()
+                        viewModel.fetchDataError = false
+                    } else if viewModel.appendDataError {
+                        await viewModel.fetchNextPage()
+                        viewModel.appendDataError = false
                     }
-                })
-                .fullScreenLoader(isLoading: viewModel.isLoading)
-            }
-            .task {
-                await viewModel.dataFromEndpointForGenreTabs()
-                await viewModel.fetchData()
-            }
+                }
+            })
         }
     }
     
@@ -74,17 +75,9 @@ internal struct DiscoveryView: View {
                     movieId: movie.id,
                     selectedMovie: movie
                 )
-            }
+            },
+            loadMore: { viewModel.fetchNextPage() },
+            isLoading: viewModel.isFetchingNextPage
         )
-    }
-    
-    private var rectangle: some View {
-        Rectangle()
-            .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-            .frame(minHeight: 100)
-            .foregroundColor(Color.green)
-            .onAppear() {
-                viewModel.fetchNextPage()
-            }
     }
 }

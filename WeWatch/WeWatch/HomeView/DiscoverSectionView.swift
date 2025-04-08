@@ -9,18 +9,24 @@ import SwiftUI
 
 internal struct DiscoverSectionView: View {
     
-    private let data: Array<Movie>
+    private let dataForAllMovies: Array<Movie>
     private let seeMoreButtonAction: @MainActor () -> Void
     private let refreshBookmark: @MainActor (Movie) -> Void
+    private let loadMore: @MainActor () -> Void
+    private let isLoading: Bool
     
     internal init(
-        data: Array<Movie>,
+        dataForAllMovies: Array<Movie>,
         seeMoreButtonAction: @escaping @MainActor () -> Void,
-        refreshBookmark: @escaping @MainActor (Movie) -> Void
+        refreshBookmark: @escaping @MainActor (Movie) -> Void,
+        loadMore: @escaping @MainActor () -> Void,
+        isLoading: Bool
     ) {
-        self.data = data
+        self.dataForAllMovies = dataForAllMovies
         self.seeMoreButtonAction = seeMoreButtonAction
         self.refreshBookmark = refreshBookmark
+        self.loadMore = loadMore
+        self.isLoading = isLoading
     }
     
     internal var body: some View {
@@ -31,6 +37,10 @@ internal struct DiscoverSectionView: View {
                 seeMoreButton
             }
             movieCardButton
+        }
+        if isLoading {
+            self
+                .loadingIndicator(isLoading: isLoading)
         }
     }
     
@@ -44,8 +54,6 @@ internal struct DiscoverSectionView: View {
     }
     
     private var seeMoreButton: some View {
-        Button() {
-        } label: {
             NavigationLink(
                 destination: DiscoveryView(
                     viewModel: DiscoveryViewModel()
@@ -55,23 +63,30 @@ internal struct DiscoverSectionView: View {
                     .font(.poppinsRegular16px)
                     .foregroundColor(.fieryRed)
             }
-        }
     }
+    private let columns: Array<GridItem> = [
+        GridItem(.flexible())
+    ]
     
     private var movieCardButton: some View {
-        ForEach(data) { model in
-            Button {
-            } label: {
+        LazyVGrid(columns: columns) {
+            ForEach(dataForAllMovies.indices, id: \.self) { index in
+                let movie = dataForAllMovies[index]
                 NavigationLink(
                     destination: DetailsView(
-                        viewModel: DetailsViewModel(movieId: model.id)
+                        viewModel: DetailsViewModel(movieId: movie.id)
                     )
                 ) {
                     MovieCard(
                         refreshBookmark: refreshBookmark,
-                        movie: model
+                        movie: movie
                     )
                     .multilineTextAlignment(.leading)
+                }
+                .onAppear {
+                    if index == dataForAllMovies.count - 1 {
+                        loadMore()
+                    }
                 }
             }
         }
