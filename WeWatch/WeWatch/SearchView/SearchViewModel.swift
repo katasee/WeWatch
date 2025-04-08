@@ -147,9 +147,6 @@ internal final class SearchViewModel: ObservableObject {
                 await MainActor.run { [weak self] in
                     self?.dataForSearchView = filtredMovie
                 }
-                if searchMovieData.isEmpty {
-                    throw EndpointResponce.dataFromEndpoint
-                }
             }
         } catch {
             await dateFromDatabase()
@@ -172,22 +169,31 @@ internal final class SearchViewModel: ObservableObject {
         }
     }
     
-    internal func appendDataFromEndpoint() async throws {
-        do {
-            currentPage += 1
-            let searchMovieData: Array<Movie> = try await prepareDataForSearchView(
-                searchQuery: searchText,
-                genre: selectedGenre.title,
-                page: String(currentPage)
-            )
+    internal func appendDataFromEndpoint() {
+        if isFetchingNextPage {
+            return
+        }
+        Task { [weak self] in
             await MainActor.run { [weak self] in
-                self?.dataForSearchView.append(contentsOf: searchMovieData)
-                isFetchingNextPage = true
+                self?.isFetchingNextPage = true
             }
-        } catch {
-            appendDataError = true
-            await MainActor.run { [weak self] in
-                self?.error = error
+            do {
+                currentPage += 1
+                let searchMovieData: Array<Movie> = try await prepareDataForSearchView(
+                    searchQuery: searchText,
+                    genre: selectedGenre.title,
+                    page: String(currentPage)
+                )
+                await MainActor.run { [weak self] in
+                    self?.dataForSearchView.append(contentsOf: searchMovieData)
+                    self?.isFetchingNextPage = false
+                }
+            } catch {
+                appendDataError = true
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                    self?.isFetchingNextPage = false
+                }
             }
         }
     }

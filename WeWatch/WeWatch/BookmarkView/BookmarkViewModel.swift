@@ -86,7 +86,9 @@ internal final class BookmarkViewModel: ObservableObject {
             }
             await loadBookmarkData()
         } catch {
-            print("Error removing all bookmarks: \(error)")
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     

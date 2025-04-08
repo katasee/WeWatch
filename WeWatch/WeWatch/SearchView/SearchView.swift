@@ -23,56 +23,46 @@ internal struct SearchView: View {
                 VStack(spacing: 20) {
                     title
                     searchBar
-                    GeometryReader { proxy in
                         ScrollView {
-                            LazyVStack {
-                                if viewModel.dataForSearchView.isEmpty {
-                                    Spacer()
-                                    ContentUnavailableView.search(text: viewModel.searchText)
-                                        .foregroundColor(.whiteColor)
-                                    Spacer()
-                                } else {
-                                    SearchListView(
-                                        data: viewModel.filteredMovie,
-                                        seeMoreButtonAction: {},
-                                        refreshBookmark: { movie in
-                                            viewModel.refreshBookmarked(
-                                                active: !movie.isBookmarked,
-                                                movieId: movie.id, selectedMovie: movie
-                                            )
-                                        }
-                                    )
+                            if viewModel.dataForSearchView.isEmpty {
+                                Spacer()
+                                ContentUnavailableView.search(text: viewModel.searchText)
+                                    .foregroundColor(.whiteColor)
+                                Spacer()
+                            } else {
+                                searchList
                                     .padding(16)
-                                    rectangele
-                                }
                             }
                         }
-//                        .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
-//                            Task {
-//                                if viewModel.fetchDataError == true {
-//                                    await viewModel.fetchData()
-//                                    viewModel.fetchDataError = false
-//                                } else if viewModel.appendDataError == true {
-//                                    try await viewModel.appendDataFromEndpoint()
-//                                    viewModel.appendDataError = false
-//                                }
-//                            }
-//                        })
-//                        .fullScreenLoader(isLoading: viewModel.isLoading)
-                        .frame(minHeight: proxy.size.height)
-                    }
-                    .onChange(of: viewModel.searchText) { change in
-                        Task {
-                            await viewModel.fetchData()
+                        .onChange(of: viewModel.searchText) { change in
+                            Task {
+                                await viewModel.fetchData()
+                            }
                         }
-                        
-                    }
+                        .onLoad() {
+                            Task {
+                                await viewModel.fetchData()
+                            }
+                        }
+                   
                     .onChange(of: viewModel.selectedGenre) { change in
                         Task {
                             await viewModel.fetchData()
                         }
                     }
                 }
+                .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                    Task {
+                        if viewModel.fetchDataError == true {
+                            await viewModel.fetchData()
+                            viewModel.fetchDataError = false
+                        } else if viewModel.appendDataError == true {
+                            try await viewModel.appendDataFromEndpoint()
+                            viewModel.appendDataError = false
+                        }
+                    }
+                })
+                .fullScreenLoader(isLoading: viewModel.isLoading)
             }
         }
         .task {
@@ -80,7 +70,7 @@ internal struct SearchView: View {
         }
     }
     
-    internal var title: some View {
+    private var title: some View {
         HStack {
             Text("search.title")
                 .foregroundColor(.whiteColor)
@@ -92,7 +82,7 @@ internal struct SearchView: View {
         }
     }
     
-    internal var searchBar: some View {
+    private var searchBar: some View {
         VStack(alignment: .leading) {
             SearchBar(searchText: $viewModel.searchText)
             MovieCategoryView(
@@ -109,13 +99,18 @@ internal struct SearchView: View {
         }
     }
     
-    internal var rectangele: some View {
-        Rectangle()
-            .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-            .frame(minHeight: 1)
-            .foregroundColor(Color.clear)
-            .onAppear {
-                Task { try await viewModel.appendDataFromEndpoint() }
-            }
+    private var searchList: some View {
+        SearchListView(
+            dataForAllMovies: viewModel.filteredMovie,
+            seeMoreButtonAction: {},
+            refreshBookmark: { movie in
+                viewModel.refreshBookmarked(
+                    active: !movie.isBookmarked,
+                    movieId: movie.id, selectedMovie: movie
+                )
+            },
+            loadMore: { viewModel.appendDataFromEndpoint() },
+            isLoading: viewModel.isFetchingNextPage
+        )
     }
 }

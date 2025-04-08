@@ -10,8 +10,6 @@ import SwiftUI
 extension AuthenticationError: LocalizedError {
     var errorDescription: String? {
         switch self {
-        case .invalidCredentials:
-            return "Bad username or password."
         case .invalidResponse:
             return "Something went wrong while communicating with the server. Please try again later."
         case .decodingError:

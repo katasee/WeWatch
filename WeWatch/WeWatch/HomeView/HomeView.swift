@@ -22,10 +22,8 @@ internal struct HomeView: View {
                     .ignoresSafeArea()
                 VStack {
                     ScrollView {
-                        LazyVStack {
-                            todaySelection
-                            discoverySection
-                        }
+                        todaySelection
+                        discoverySection
                     }
                     .onLoad() {
                         Task {

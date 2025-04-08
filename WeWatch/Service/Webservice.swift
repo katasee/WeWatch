@@ -17,11 +17,6 @@ enum AuthenticationError: Error {
     case invalidStatusCode
 }
 
-enum EndpointResponce: Error {
-    
-    case dataFromEndpoint
-}
-
 internal struct LoginRequestBody: Encodable {
     
     internal let apikey: String
@@ -65,7 +60,6 @@ internal final class Webservice {
     
     internal func call <T: Codable>(_ resource: Resource<T>) async throws -> T {
         var request: URLRequest = URLRequest(url: resource.url)
-        print(request)
         switch resource.method {
         case .post(let data):
             request.httpMethod = resource.method.name
@@ -81,7 +75,6 @@ internal final class Webservice {
                 throw AuthenticationError.invalidCredentials
             }
             request = URLRequest(url: url)
-            print(request)
         }
         
         let configuration: URLSessionConfiguration = URLSessionConfiguration.default
@@ -94,7 +87,6 @@ internal final class Webservice {
         guard let response: HTTPURLResponse = response as? HTTPURLResponse else {
             throw AuthenticationError.invalidResponse
         }
-        print(response.statusCode)
         guard response.statusCode == 200 else {
             throw AuthenticationError.invalidStatusCode
         }

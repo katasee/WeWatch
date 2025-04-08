@@ -25,14 +25,12 @@ internal struct DiscoveryView: View {
                 movieCategoryList
                 ScrollView {
                     Color.clear.frame(height: 16)
-                    LazyVStack {
-                        discoveryList
-                    }
-                    .onChange(of: viewModel.selectedGenre) { change in
-                        Task {
-                            await viewModel.fetchData()
+                    discoveryList
+                        .onChange(of: viewModel.selectedGenre) { change in
+                            Task {
+                                await viewModel.fetchData()
+                            }
                         }
-                    }
                 }
                 .onLoad {
                     Task {

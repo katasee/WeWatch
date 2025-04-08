@@ -45,16 +45,16 @@ internal struct TodaysSelectionSectionView: View {
     
     private var movieCardButton: some View {
         ForEach(data) { model in
-                NavigationLink(
-                    destination: DetailsView(
-                        viewModel: DetailsViewModel(movieId: model.id)
-                    )
-                ) {
-                    MovieCardTodaySelection(
-                        refreshBookmark: refreshBookmark,
-                        movie: model
-                    )
-                }
+            NavigationLink(
+                destination: DetailsView(
+                    viewModel: DetailsViewModel(movieId: model.id)
+                )
+            ) {
+                MovieCardTodaySelection(
+                    refreshBookmark: refreshBookmark,
+                    movie: model
+                )
+            }
         }
     }
 }

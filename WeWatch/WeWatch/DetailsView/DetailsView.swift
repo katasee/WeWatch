@@ -34,12 +34,12 @@ internal struct DetailsView: View {
                     VStack {
                         DetailSectionView(movie: movie)
                     }
-//                    .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
-//                        Task {
-//                            await viewModel.fetchData()
-//                        }
-//                    })
-//                    .fullScreenLoader(isLoading: viewModel.isLoading)
+                    .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                        Task {
+                            await viewModel.fetchData()
+                        }
+                    })
+                    .fullScreenLoader(isLoading: viewModel.isLoading)
                 }
             }
         }

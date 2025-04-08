@@ -78,9 +78,6 @@ internal final class DetailsViewModel: ObservableObject {
             let filtredMovie: Movie = detailsData
             try await MainActor.run { [weak self] in
                 self?.movieForDetailsView = detailsData
-                if movieId.isEmpty {
-                    throw EndpointResponce.dataFromEndpoint
-                }
             }
         } catch {
             await dateFromDatabase()

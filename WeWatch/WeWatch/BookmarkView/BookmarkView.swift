@@ -35,14 +35,15 @@ internal struct BookmarkView: View {
                             Task {
                                 await viewModel.removeAllMovie()
                             }
-                        }
+                        },
+                        results: viewModel.dataForBookmarkView.count
                     )
                     .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
                         Task {
                             await viewModel.fetchData()
                         }
                     })
-//                    .fullScreenLoader(isLoading: viewModel.isLoading)
+                    .fullScreenLoader(isLoading: viewModel.isLoading)
                     .padding(16)
                 }
                 .onAppear {

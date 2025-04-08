@@ -4,7 +4,7 @@
 //
 //  Created by Anton on 31/03/2025.
 //
-//
+
 import SwiftUI
 
 struct ErrorPopup: ViewModifier {

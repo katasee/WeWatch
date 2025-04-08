@@ -4,7 +4,6 @@
 //
 //  Created by Anton on 17/02/2025.
 //
-//
 
 import Foundation
 
@@ -30,7 +29,6 @@ internal final class DiscoveryViewModel: ObservableObject {
     internal func fetchData() async {
         await MainActor.run { [weak self] in
             self?.isLoading = true
-            print( isLoading)
         }
         await dataForDiscoveryView()
     }
@@ -50,16 +48,11 @@ internal final class DiscoveryViewModel: ObservableObject {
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = filtredMovie
             }
-            if discoveryMovieData.isEmpty {
-                throw EndpointResponce.dataFromEndpoint
-            }
         } catch {
             await movieDataFromDatabase()
         }
         await MainActor.run { [weak self] in
-            self?.isLoading = false
-            print( isLoading)
-            
+            self?.isLoading = false            
         }
     }
     
@@ -129,8 +122,8 @@ internal final class DiscoveryViewModel: ObservableObject {
     
     internal func fetchNextPage() {
         if isFetchingNextPage {
-                    return
-                }
+            return
+        }
         Task { [weak self] in
             await MainActor.run { [weak self] in
                 self?.isFetchingNextPage = true
@@ -141,13 +134,11 @@ internal final class DiscoveryViewModel: ObservableObject {
                     genre: selectedGenre.title,
                     page: String(currentPage)
                 )
-                if discoveryMovieData.isEmpty {
-                    throw EndpointResponce.dataFromEndpoint
-                } else {
-                    await MainActor.run { [weak self] in
-                        self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
-                                                    self?.isFetchingNextPage = false
-                    }
+                
+                await MainActor.run { [weak self] in
+                    self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
+                    self?.isFetchingNextPage = false
+                    
                 }
             } catch {
                 appendDataError = true
@@ -202,7 +193,9 @@ internal final class DiscoveryViewModel: ObservableObject {
                     }
                 }
             } catch {
-                print("Error adding bookmark: \(error)")
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }
             }
             await updateBookmarksIds()
         }

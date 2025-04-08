@@ -54,15 +54,15 @@ internal struct DiscoverSectionView: View {
     }
     
     private var seeMoreButton: some View {
-            NavigationLink(
-                destination: DiscoveryView(
-                    viewModel: DiscoveryViewModel()
-                )
-            ) {
-                Text("home.see.more.button.title")
-                    .font(.poppinsRegular16px)
-                    .foregroundColor(.fieryRed)
-            }
+        NavigationLink(
+            destination: DiscoveryView(
+                viewModel: DiscoveryViewModel()
+            )
+        ) {
+            Text("home.see.more.button.title")
+                .font(.poppinsRegular16px)
+                .foregroundColor(.fieryRed)
+        }
     }
     private let columns: Array<GridItem> = [
         GridItem(.flexible())

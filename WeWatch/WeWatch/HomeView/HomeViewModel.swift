@@ -104,7 +104,6 @@ internal final class HomeViewModel: ObservableObject {
             token: token
         )
         let response: SearchResponse = try await Webservice().call(listsResource)
-//        currentPage += 1
         let moviesForUI: Array<Movie> = response.data?
             .compactMap { movieDetails in
                 guard let id: String = movieDetails.id,
@@ -145,10 +144,6 @@ internal final class HomeViewModel: ObservableObject {
             try await MainActor.run { [weak self] in
                 self?.discoverySection = filtredMovie
             }
-                if discoveryMovieData.isEmpty {
-                    throw EndpointResponce.dataFromEndpoint
-                }
-            
         } catch {
             await fetchAndUpdateDiscoverySection()
         }
@@ -165,13 +160,9 @@ internal final class HomeViewModel: ObservableObject {
             do {
                 currentPage += 1
                 let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
-                if discoveryMovieData.isEmpty {
-                    throw EndpointResponce.dataFromEndpoint
-                } else {
-                    await MainActor.run { [weak self] in
-                        self?.discoverySection.append(contentsOf: discoveryMovieData)
-                        self?.isFetchingNextPage = false
-                    }
+                await MainActor.run { [weak self] in
+                    self?.discoverySection.append(contentsOf: discoveryMovieData)
+                    self?.isFetchingNextPage = false
                 }
             } catch {
                 appendDataError = true
@@ -194,7 +185,6 @@ internal final class HomeViewModel: ObservableObject {
             token: token
         )
         var response: SearchResponse = try await Webservice().call(searchResource)
-        print(response.data?.count)
         while (response.data?.count ?? 0) < 10 && attempts < maxAttempts {
             response = try await Webservice().call(searchResource)
             attempts += 1
@@ -221,7 +211,6 @@ internal final class HomeViewModel: ObservableObject {
                     genres: genres
                 )
             } ?? []
-        print(moviesForUI.count)
         for movie in moviesForUI {
             try await dbManager.insert(movie)
             try await dbManager.attachMovieToList(
@@ -229,7 +218,6 @@ internal final class HomeViewModel: ObservableObject {
                 movieId: movie.id
             )
         }
-        print(moviesForUI.count)
         return moviesForUI
     }
     
@@ -276,9 +264,6 @@ internal final class HomeViewModel: ObservableObject {
                 let filtredMovie: [Movie] = todaySelectionData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
                 try await MainActor.run { [weak self] in
                     self?.todaySelection = filtredMovie
-                }
-                if todaySelectionData.isEmpty {
-                    throw EndpointResponce.dataFromEndpoint
                 }
             } catch {
                 await MainActor.run { [weak self] in
