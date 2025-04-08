@@ -4,19 +4,20 @@
 //
 //  Created by Anton on 17/02/2025.
 //
-//
 
 import Foundation
 
 internal final class DiscoveryViewModel: ObservableObject {
     
-    @Published internal var dataForAllMovieTab: Array<Movie> = .init()
+    @Published internal var dataForAllMovieTab: Array<Movie> = []
     @Published internal var genresForDiscoveryView: Array<Genre> = .init()
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
     @Published internal var isFetchingNextPage = false
     @Published internal var isLoading: Bool = false
+    @Published var error: (any Error)?
+    internal var fetchDataError: Bool = false
+    internal var appendDataError: Bool = false
     internal var bookmarkedMovieIds: Set<String> = .init()
-    internal var isFirstTimeLoad: Bool = true
     internal var currentPage: Int = 0
     internal var isBackEndDateEmpty: Bool = false
     internal let dbManager: DatabaseManager
@@ -29,15 +30,12 @@ internal final class DiscoveryViewModel: ObservableObject {
         await MainActor.run { [weak self] in
             self?.isLoading = true
         }
-            await dataFromEndpoint()
-        await MainActor.run { [weak self] in
-            self?.isLoading = false
-        }
+        await dataForDiscoveryView()
     }
     
-    internal func dataFromEndpoint() async {
+    internal func dataForDiscoveryView() async {
         do {
-            await updateBookmarks()
+            await updateBookmarksIds()
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = .init()
                 self?.currentPage = 0
@@ -50,11 +48,11 @@ internal final class DiscoveryViewModel: ObservableObject {
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = filtredMovie
             }
-            if discoveryMovieData.isEmpty {
-                throw EndpointResponce.dataFromEndpoint
-            }
         } catch {
             await movieDataFromDatabase()
+        }
+        await MainActor.run { [weak self] in
+            self?.isLoading = false            
         }
     }
     
@@ -62,23 +60,16 @@ internal final class DiscoveryViewModel: ObservableObject {
         do {
             let moviesFromDb: Array<Movie> = try await dbManager.fetchMovieByGenres(
                 forGenre: filterGenres()
-            ).compactMap { movie in
-                return .init(
-                    id: movie.id,
-                    title: movie.title,
-                    overview: movie.overview,
-                    rating: 3,
-                    posterUrl: movie.posterUrl,
-                    genres: movie.genres
-                )
-            }
+            )
             let filtredMovie: [Movie] = moviesFromDb.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
             await MainActor.run { [weak self] in
                 self?.dataForAllMovieTab = filtredMovie
             }
-            
         } catch {
-            print("Error in movieDataFromDatabase: \(error)")
+            fetchDataError = true
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
@@ -98,7 +89,6 @@ internal final class DiscoveryViewModel: ObservableObject {
             token: token
         )
         let response: SearchResponse = try await Webservice().call(listsResource)
-        currentPage += 1
         let moviesForUI: Array<Movie> = response.data?
             .compactMap { details in
                 guard let movieId: String = details.id,
@@ -131,51 +121,83 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func fetchNextPage() {
-        if isFirstTimeLoad || isFetchingNextPage {
-            isFirstTimeLoad = false
+        if isFetchingNextPage {
             return
         }
         Task { [weak self] in
-            await MainActor.run {
+            await MainActor.run { [weak self] in
                 self?.isFetchingNextPage = true
             }
             do {
+                currentPage += 1
                 let discoveryMovieData: [Movie] = try await prepareDataForDiscoveryView(
                     genre: selectedGenre.title,
                     page: String(currentPage)
                 )
-                if discoveryMovieData.isEmpty {
-                    await MainActor.run { [weak self] in
-                        self?.isBackEndDateEmpty = true
-                    }
-                } else {
-                    await MainActor.run { [weak self] in
-                        self?.isBackEndDateEmpty = false
-                        self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
-                    }
+                
+                await MainActor.run { [weak self] in
+                    self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
+                    self?.isFetchingNextPage = false
+                    
                 }
             } catch {
-                print("Error in fetchNextPage: \(error)")
-            }
-            await MainActor.run { [weak self] in
-                self?.isFetchingNextPage = false
+                appendDataError = true
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                    self?.isFetchingNextPage = false
+                }
             }
         }
     }
     
-    internal func dataFromDatabase() async throws {
-        let moviesFromDb: Array<Movie> = try await dbManager.fetchMovieByGenres(forGenre: filterGenres()).compactMap { movie in
-            return .init(
-                id: movie.id,
-                title: movie.title,
-                overview: movie.overview,
-                rating: 3,
-                posterUrl: movie.posterUrl,
-                genres: movie.genres
-            )
+    internal func updateBookmarksIds() async {
+        do {
+            let bookmarked = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
+            let ids = Set(bookmarked.map { $0.id })
+            await MainActor.run { [weak self] in
+                self?.bookmarkedMovieIds = ids
+            }
+        } catch {
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
-        await MainActor.run { [weak self] in
-            self?.dataForAllMovieTab = moviesFromDb
+    }
+    
+    internal func refreshBookmarked(
+        active: Bool,
+        movieId: String,
+        selectedMovie: Movie
+    ) {
+        Task { [weak self] in
+            do {
+                if active {
+                    try await dbManager.insert(selectedMovie)
+                    try await dbManager.attachMovieToList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                } else {
+                    try await dbManager.detachMovieFromList(
+                        listId: Constans.bookmarkList,
+                        movieId: movieId
+                    )
+                }
+                await MainActor.run { [weak self] in
+                    dataForAllMovieTab = dataForAllMovieTab.map { movie in
+                        var updatedMovie = movie
+                        if movie.id == movieId {
+                            updatedMovie.isBookmarked = active
+                        }
+                        return updatedMovie
+                    }
+                }
+            } catch {
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }
+            }
+            await updateBookmarksIds()
         }
     }
     
@@ -209,7 +231,9 @@ internal final class DiscoveryViewModel: ObservableObject {
                     name: genre.title
                 )
             } catch {
-                print("Error inserting genre: \(error)")
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }
             }
         }
         return genreForUI
@@ -231,7 +255,9 @@ internal final class DiscoveryViewModel: ObservableObject {
                 }
             }
         } catch {
-            print("Error in dataFromEndpointForGenreTabs: \(error)")
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
@@ -239,51 +265,12 @@ internal final class DiscoveryViewModel: ObservableObject {
         let chooseGenre: String = selectedGenre.title
         return chooseGenre
     }
-    
-    internal func updateBookmarks() async {
-        do {
-            let bookmarked = try await dbManager.fetchMovieByList(forList: Constans.bookmarkList)
-            let ids = Set(bookmarked.map { $0.id })
-            await MainActor.run { [weak self] in
-                self?.bookmarkedMovieIds = ids
-            }
-        } catch {
-            print("Error updating bookmarks: \(error)")
-        }
-    }
-    
-    internal func refreshBookmarked(
-        active: Bool,
-        movieId: String,
-        selectedMovie: Movie
-    ) {
-        Task { [weak self] in
-            do {
-                if active {
-                    try await dbManager.insert(selectedMovie)
-                    try await dbManager.attachMovieToList(
-                        listId: Constans.bookmarkList,
-                        movieId: movieId
-                    )
-                } else {
-                    try await dbManager.detachMovieFromList(
-                        listId: Constans.bookmarkList,
-                        movieId: movieId
-                    )
-                }
-                await MainActor.run { [weak self] in
-                    dataForAllMovieTab = dataForAllMovieTab.map { movie in
-                        var updatedMovie = movie
-                        if movie.id == movieId {
-                            updatedMovie.isBookmarked = active
-                        }
-                        return updatedMovie
-                    }
-                }
-            } catch {
-                print("Error adding bookmark: \(error)")
-            }
-            await updateBookmarks()
-        }
-    }
 }
+
+
+
+
+
+
+
+

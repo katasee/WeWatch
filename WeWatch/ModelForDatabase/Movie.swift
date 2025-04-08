@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct Movie: SQLTable, Identifiable, Sendable {
+internal struct Movie: SQLTable, Identifiable, Sendable, Equatable {
     
     var isBookmarked: Bool = false
     

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FullScreenLoader: ViewModifier {
     
-    let isLoading: Bool
+   internal let isLoading: Bool
     
     internal func body(content: Content) -> some View {
         content

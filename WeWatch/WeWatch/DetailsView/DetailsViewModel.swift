@@ -11,6 +11,7 @@ internal final class DetailsViewModel: ObservableObject {
     
     @Published internal var movieForDetailsView: Movie?
     @Published internal var isLoading: Bool = false
+    @Published var error: (any Error)?
     private var movieId: String
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal let dbManager: DatabaseManager
@@ -27,7 +28,7 @@ internal final class DetailsViewModel: ObservableObject {
         await MainActor.run { [weak self] in
             self?.isLoading = true
         }
-            await dataFromEndpoint()
+        await dataFromEndpoint()
         await MainActor.run { [weak self] in
             self?.isLoading = false
         }
@@ -77,9 +78,6 @@ internal final class DetailsViewModel: ObservableObject {
             let filtredMovie: Movie = detailsData
             try await MainActor.run { [weak self] in
                 self?.movieForDetailsView = detailsData
-                if movieId.isEmpty {
-                    throw EndpointResponce.dataFromEndpoint
-                }
             }
         } catch {
             await dateFromDatabase()
@@ -95,7 +93,9 @@ internal final class DetailsViewModel: ObservableObject {
                 self?.movieForDetailsView = detailsData
             }
         } catch {
-            DatabaseError.fetchError(message: "Error fetch movie by id")
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
@@ -107,17 +107,21 @@ internal final class DetailsViewModel: ObservableObject {
                 self?.bookmarkedMovieIds = ids
             }
         } catch {
-            print("Error updating bookmarks: \(error)")
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
     internal func refreshBookmarked(
         active: Bool,
-        movieId: String
+        movieId: String,
+        selectedMovie: Movie
     ) {
         Task { [weak self] in
             do {
                 if active {
+                    try await dbManager.insert(selectedMovie)
                     try await dbManager.attachMovieToList(
                         listId: Constans.bookmarkList,
                         movieId: movieId
@@ -138,7 +142,9 @@ internal final class DetailsViewModel: ObservableObject {
                     }
                 }
             } catch {
-                print("Error adding bookmark: \(error)")
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }
             }
             await updateBookmarks()
         }

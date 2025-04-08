@@ -14,19 +14,22 @@ internal struct BookmarkListView: View {
     private let data: Array<Movie>
     private let chooseButtonAction: @MainActor(Movie) -> Void
     private let bookmarkRemoveAllMovie: @MainActor() async -> Void
+    private let results: Int
     
     internal init(
         searchText: Binding<String>,
         refreshBookmark: @escaping @MainActor(Movie) -> Void,
         data: Array<Movie>,
         chooseButtonAction: @escaping @MainActor(Movie) -> Void,
-        bookmarkRemoveAllMovie: @escaping @MainActor() async -> Void
+        bookmarkRemoveAllMovie: @escaping @MainActor() async -> Void,
+        results: Int
     ) {
         self._searchText = searchText
         self.refreshBookmark = refreshBookmark
         self.data = data
         self.chooseButtonAction = chooseButtonAction
         self.bookmarkRemoveAllMovie = bookmarkRemoveAllMovie
+        self.results = results
     }
     
     internal var body: some View {
@@ -34,6 +37,7 @@ internal struct BookmarkListView: View {
             bookmarkTitle
             SearchBar(searchText: $searchText)
             HStack {
+                searchResults
                 Spacer()
                 cleareAllButton
             }
@@ -42,6 +46,15 @@ internal struct BookmarkListView: View {
                 Spacer()
             }
         }
+    }
+    
+    private var searchResults: some View {
+        Text("search.result")
+            .font(.poppinsBold18px)
+            .foregroundColor(.whiteColor)
+        + Text(" \(results)")
+            .font(.poppinsBold18px)
+            .foregroundColor(.whiteColor)
     }
     
     private var cleareAllButton: some View {

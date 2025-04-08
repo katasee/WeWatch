@@ -29,7 +29,6 @@ internal struct NavigationBarButtons: View {
     internal var body: some View {
         HStack {
             Spacer()
-                .navigationBarBackButtonHidden(true)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {

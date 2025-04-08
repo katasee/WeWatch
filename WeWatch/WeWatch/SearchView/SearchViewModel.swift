@@ -15,6 +15,9 @@ internal final class SearchViewModel: ObservableObject {
     @Published internal var selectedGenre: Genre = .init(id: "0", title: "All")
     @Published internal var isFetchingNextPage = false
     @Published internal var isLoading: Bool = false
+    @Published var error: (any Error)?
+    internal var fetchDataError: Bool = false
+    internal var appendDataError: Bool = false
     internal var bookmarkedMovieIds: Set<String> = .init()
     internal var currentPage: Int = 0
     internal let dbManager: DatabaseManager
@@ -27,7 +30,7 @@ internal final class SearchViewModel: ObservableObject {
         await MainActor.run { [weak self] in
             self?.isLoading = true
         }
-            await dataFromEndpoint()
+        await dataFromEndpoint()
         await MainActor.run { [weak self] in
             self?.isLoading = false
         }
@@ -72,7 +75,9 @@ internal final class SearchViewModel: ObservableObject {
                 }
             }
         } catch {
-            print("Error in dataFromEndpointForGenreTabs: \(error)")
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
@@ -108,7 +113,7 @@ internal final class SearchViewModel: ObservableObject {
                       let title: String = details.name,
                       let overview: String = details.overview,
                       let posterUrl: String = details.imageUrl,
-                      let genres = details.genres?.joined(separator: ", ")
+                      let genres: String = details.genres?.joined(separator: ", ")
                 else {
                     return nil
                 }
@@ -142,9 +147,6 @@ internal final class SearchViewModel: ObservableObject {
                 await MainActor.run { [weak self] in
                     self?.dataForSearchView = filtredMovie
                 }
-                if searchMovieData.isEmpty {
-                    throw EndpointResponce.dataFromEndpoint
-                }
             }
         } catch {
             await dateFromDatabase()
@@ -160,20 +162,39 @@ internal final class SearchViewModel: ObservableObject {
                 self?.dataForSearchView = filtredMovie
             }
         } catch {
-            DatabaseError.fetchError(message: "Error fetch movie by id")
+            fetchDataError = true
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
-    internal func appendDateFromEndpoint() async throws {
-        currentPage += 1
-        let searchMovieData: Array<Movie> = try await prepareDataForSearchView(
-            searchQuery: searchText,
-            genre: selectedGenre.title,
-            page: String(currentPage)
-        )
-        await MainActor.run { [weak self] in
-            isFetchingNextPage = true
-            self?.dataForSearchView.append(contentsOf: searchMovieData)
+    internal func appendDataFromEndpoint() {
+        if isFetchingNextPage {
+            return
+        }
+        Task { [weak self] in
+            await MainActor.run { [weak self] in
+                self?.isFetchingNextPage = true
+            }
+            do {
+                currentPage += 1
+                let searchMovieData: Array<Movie> = try await prepareDataForSearchView(
+                    searchQuery: searchText,
+                    genre: selectedGenre.title,
+                    page: String(currentPage)
+                )
+                await MainActor.run { [weak self] in
+                    self?.dataForSearchView.append(contentsOf: searchMovieData)
+                    self?.isFetchingNextPage = false
+                }
+            } catch {
+                appendDataError = true
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                    self?.isFetchingNextPage = false
+                }
+            }
         }
     }
     
@@ -185,7 +206,9 @@ internal final class SearchViewModel: ObservableObject {
                 self?.bookmarkedMovieIds = ids
             }
         } catch {
-            print("Error updating bookmarks: \(error)")
+            await MainActor.run { [weak self] in
+                self?.error = error
+            }
         }
     }
     
@@ -218,8 +241,9 @@ internal final class SearchViewModel: ObservableObject {
                     }
                 }
             } catch {
-                print("Error adding bookmark: \(error)")
-            }
+                await MainActor.run { [weak self] in
+                    self?.error = error
+                }            }
             await updateBookmarks()
         }
     }

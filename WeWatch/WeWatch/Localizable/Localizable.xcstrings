@@ -33,6 +33,17 @@
         }
       }
     },
+    "cancel.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
     "Clear.all.button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -40,6 +51,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clear all"
+          }
+        }
+      }
+    },
+    "custom.error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error occurred"
           }
         }
       }
@@ -192,6 +214,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Today’s selection"
+          }
+        }
+      }
+    },
+    "Try.again.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
           }
         }
       }

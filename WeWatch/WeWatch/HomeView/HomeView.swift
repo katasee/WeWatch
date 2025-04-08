@@ -22,44 +22,55 @@ internal struct HomeView: View {
                     .ignoresSafeArea()
                 VStack {
                     ScrollView {
-                        LazyVStack {
-                            TodaysSelectionSectionView(
-                                data: viewModel.todaySelection,
-                                refreshBookmark: { movie in
-                                    viewModel.refreshBookmarkedinTodaySelection(
-                                        active: !movie.isBookmarked,
-                                        movieId: movie.id
-                                    )
-                                }
-                            )
-                            DiscoverSectionView(
-                                data: viewModel.discoverySection,
-                                seeMoreButtonAction: {},
-                                refreshBookmark: { movie in
-                                    viewModel.refreshBookmarked(
-                                        active: !movie.isBookmarked,
-                                        movieId: movie.id, selectedMovie: movie
-                                    )
-                                }
-                            )
-                            if !viewModel.discoverySection.isEmpty {
-                                Rectangle()
-                                    .loadingIndicator(isLoading: viewModel.isFetchingNextPage)
-                                    .frame(minHeight: 1)
-                                    .foregroundColor(Color.clear)
-                                    .task {
-                                        await viewModel.appendDataFromEndpoint()
-                                    }
-                            }
+                        todaySelection
+                        discoverySection
+                    }
+                    .onLoad() {
+                        Task {
+                            await viewModel.fetchData()
                         }
                     }
-                    .fullScreenLoader(isLoading: viewModel.isLoading)
+                    .padding(16)
                 }
-                .task {
-                    await viewModel.fetchData()
-                }
-                .padding(16)
+                .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                    Task {
+                        if viewModel.fetchDataError == true {
+                            await viewModel.fetchData()
+                            viewModel.fetchDataError = false
+                        } else if viewModel.appendDataError == true {
+                            viewModel.appendDataFromEndpoint()
+                            viewModel.appendDataError = false
+                        }
+                    }
+                })
+                .fullScreenLoader(isLoading: viewModel.isLoading)
             }
         }
+    }
+    private var todaySelection: some View {
+        TodaysSelectionSectionView(
+            data: viewModel.todaySelection,
+            refreshBookmark: { movie in
+                viewModel.refreshBookmarkedinTodaySelection(
+                    active: !movie.isBookmarked,
+                    movieId: movie.id
+                )
+            }
+        )
+    }
+    
+    private var discoverySection: some View {
+        DiscoverSectionView(
+            dataForAllMovies: viewModel.discoverySection,
+            seeMoreButtonAction: {},
+            refreshBookmark: { movie in
+                viewModel.refreshBookmarked(
+                    active: !movie.isBookmarked,
+                    movieId: movie.id, selectedMovie: movie
+                )
+            },
+            loadMore: { viewModel.appendDataFromEndpoint() },
+            isLoading: viewModel.isFetchingNextPage
+        )
     }
 }

@@ -24,16 +24,21 @@ internal struct DetailsView: View {
                     refreshBookmark: { movie in
                         viewModel.refreshBookmarked(
                             active: !movie.isBookmarked,
-                            movieId: movie.id
+                            movieId: movie.id,
+                            selectedMovie: movie
                         )
                     },
                     movie: movie
                 )
-                
                 ScrollView {
                     VStack {
                         DetailSectionView(movie: movie)
                     }
+                    .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                        Task {
+                            await viewModel.fetchData()
+                        }
+                    })
                     .fullScreenLoader(isLoading: viewModel.isLoading)
                 }
             }
@@ -41,6 +46,7 @@ internal struct DetailsView: View {
         .task {
             await viewModel.fetchData()
         }
+        .navigationBarBackButtonHidden(true)
         .ignoresSafeArea()
     }
 }
