@@ -18,7 +18,7 @@ internal struct DetailSectionView: View {
     internal var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                poster(for: UIScreen.main.bounds.size)
+                poster
                 VStack(alignment: .leading, spacing: 8) {
                     title
                     genres
@@ -35,7 +35,7 @@ internal struct DetailSectionView: View {
         }
     }
     
-    private func poster(for size: CGSize) -> some View {
+    private var poster: some View {
         KFImage(URL(string: movie.posterUrl))
             .resizable()
             .placeholder({

@@ -26,8 +26,6 @@ internal struct SearchBar: View {
             }
             .frame(maxWidth: .infinity, maxHeight: 38)
         }
-       
-
         .foregroundColor(searchText.count > 0 ? .whiteColor : .lightGreyColor)
         .background(RoundedRectangle(cornerRadius: 10.0).fill(Color.darkGreyColor))
         .font(.poppinsRegular16px)

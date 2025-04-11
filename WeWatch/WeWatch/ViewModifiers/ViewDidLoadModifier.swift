@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ViewDidLoadModifier: ViewModifier {
+internal struct ViewDidLoadModifier: ViewModifier {
     
     @State private var didLoad = false
     private let action: (() -> Void)?
@@ -16,7 +16,7 @@ struct ViewDidLoadModifier: ViewModifier {
         self.action = action
     }
     
-    func body(content: Content) -> some View {
+    internal func body(content: Content) -> some View {
         content.onAppear {
             if didLoad == false {
                 didLoad = true
@@ -28,7 +28,7 @@ struct ViewDidLoadModifier: ViewModifier {
 
 extension View {
     
-    func onLoad(perform action: (() -> Void)? = nil) -> some View {
+    internal func onLoad(perform action: (() -> Void)? = nil) -> some View {
         modifier(ViewDidLoadModifier(perform: action))
     }
 }

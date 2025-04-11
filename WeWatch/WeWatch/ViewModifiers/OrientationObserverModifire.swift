@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct OrientationObserver: ViewModifier {
+internal struct OrientationObserver: ViewModifier {
     
-    let perform: (UIDeviceOrientation) -> Void
+    internal let perform: (UIDeviceOrientation) -> Void
     
-    func body(content: Content) -> some View {
+    internal func body(content: Content) -> some View {
         content
             .onAppear {
                 self.perform(UIDevice.current.orientation)
@@ -23,7 +23,8 @@ struct OrientationObserver: ViewModifier {
 }
 
 extension View {
-    func onRotate(perform action: @escaping (UIDeviceOrientation) -> Void) -> some View {
+    
+    internal func onRotate(perform action: @escaping (UIDeviceOrientation) -> Void) -> some View {
         return modifier(OrientationObserver(perform: action))
     }
 }
