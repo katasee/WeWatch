@@ -9,7 +9,6 @@ import Foundation
 
 enum AuthenticationError: Error {
     
-    case invalidCredentials
     case invalidResponse
     case decodingError
     case custom(errorMessage: String)
@@ -72,7 +71,7 @@ internal final class Webservice {
             )
             components?.queryItems = queryItems
             guard let url = components?.url else {
-                throw AuthenticationError.invalidCredentials
+                throw AuthenticationError.invalidURL
             }
             request = URLRequest(url: url)
         }

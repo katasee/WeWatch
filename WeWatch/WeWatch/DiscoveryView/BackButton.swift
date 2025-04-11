@@ -35,10 +35,9 @@ internal struct BackButton: View {
     private var title: some View {
         Text("Discover")
             .foregroundColor(.whiteColor)
-            .font(.poppinsBold30px)
+            .font(.poppinsBold24px)
         + Text(". ")
             .foregroundColor(.fieryRed)
-            .font(.poppinsBold30px)
+            .font(.poppinsBold24px)
     }
 }
-

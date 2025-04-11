@@ -47,8 +47,9 @@ internal enum SQLStatements {
      id TEXT PRIMARY KEY,
      title TEXT NOT NULL,
      overview TEXT,
-     rating REAL,
+     year TEXT,
      posterUrl TEXT,
+     country TEXT,
      genres TEXT
      );
      """

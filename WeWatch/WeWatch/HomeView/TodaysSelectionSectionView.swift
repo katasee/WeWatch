@@ -21,7 +21,7 @@ internal struct TodaysSelectionSectionView: View {
     }
     
     internal var body: some View {
-        VStack {
+        VStack(spacing: 5) {
             HStack {
                 title
                 Spacer()
@@ -37,10 +37,10 @@ internal struct TodaysSelectionSectionView: View {
     private var title: some View {
         Text("todaySelection.title")
             .foregroundColor(.whiteColor)
-            .font(.poppinsBold30px)
+            .font(.poppinsBold24px)
         + Text(". ")
             .foregroundColor(.fieryRed)
-            .font(.poppinsBold30px)
+            .font(.poppinsBold24px)
     }
     
     private var movieCardButton: some View {

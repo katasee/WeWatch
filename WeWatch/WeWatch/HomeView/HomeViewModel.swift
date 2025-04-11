@@ -109,6 +109,7 @@ internal final class HomeViewModel: ObservableObject {
                 guard let id: String = movieDetails.id,
                       let title: String = movieDetails.name,
                       let overview: String = movieDetails.overview,
+                      let year: String = movieDetails.year,
                       let posterUrl: String = movieDetails.imageUrl,
                       let genres: String = movieDetails.genres?.joined(separator: ", ")
                 else {
@@ -118,8 +119,9 @@ internal final class HomeViewModel: ObservableObject {
                     id: id,
                     title: title,
                     overview: overview,
-                    rating: 3,
+                    year: year,
                     posterUrl: posterUrl,
+                    country: "",
                     genres: genres
                 )
             } ?? .init()
@@ -198,6 +200,7 @@ internal final class HomeViewModel: ObservableObject {
                 guard let movieId: String = details.id,
                       let title: String = details.name,
                       let image: String = details.imageUrl,
+                      let year: String = details.year,
                       let overview: String = details.overview
                 else { return nil }
                 let genresArray: Array<String> = details.genres ?? []
@@ -206,8 +209,9 @@ internal final class HomeViewModel: ObservableObject {
                     id: movieId,
                     title: title,
                     overview: overview,
-                    rating: 3,
+                    year: year,
                     posterUrl: image,
+                    country: "",
                     genres: genres
                 )
             } ?? []

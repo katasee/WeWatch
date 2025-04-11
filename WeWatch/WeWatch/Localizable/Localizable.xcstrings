@@ -55,6 +55,17 @@
         }
       }
     },
+    "Country %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Country: %@"
+          }
+        }
+      }
+    },
     "custom.error.message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -102,6 +113,17 @@
         }
       }
     },
+    "movieCard.release.year %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Release in: %@"
+          }
+        }
+      }
+    },
     "read.less.button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -123,6 +145,9 @@
           }
         }
       }
+    },
+    "Release in: %@" : {
+
     },
     "search.bar.promt.title" : {
       "extractionState" : "manual",

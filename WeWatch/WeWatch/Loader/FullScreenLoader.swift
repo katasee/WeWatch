@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FullScreenLoader: ViewModifier {
     
-   internal let isLoading: Bool
+    internal let isLoading: Bool
     
     internal func body(content: Content) -> some View {
         content
@@ -34,7 +34,7 @@ struct FullScreenLoader: ViewModifier {
             }
             Text("loader.label.title") 
         }
-        .frame(maxWidth: .infinity, maxHeight: 142)
+        .frame(maxWidth: 300 , maxHeight: 142)
         .foregroundColor(.whiteColor)
         .font(.poppinsRegular16px)
         .background(RoundedRectangle(cornerRadius: 12.0).fill(Color.darkGreyColor))

@@ -38,18 +38,14 @@ internal struct MovieCardDiscover: View {
             Text(movie.title)
                 .font(.poppinsBold18px)
                 .lineLimit(1)
-            HStack {
-                filmRanking
-                Image("star-full-icon")
-            }
         }
         .foregroundColor(.whiteColor)
-        .frame(maxWidth: 182)
+        .frame(maxWidth: .infinity)
     }
     
     private var filmRanking: some View {
-        Text("\(movie.rating, specifier: "%.1f")")
-            .font(.poppinsRegular18px)
+        Text("movieCard.release.year \(movie.year)")
+            .font(.poppinsRegular14px)
     }
     
     private var filmImage: some View {

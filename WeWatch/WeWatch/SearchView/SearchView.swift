@@ -20,31 +20,31 @@ internal struct SearchView: View {
             ZStack {
                 Color.blackColor
                     .ignoresSafeArea()
-                VStack(spacing: 20) {
+                VStack(spacing: 5) {
                     title
                     searchBar
-                        ScrollView {
-                            if viewModel.dataForSearchView.isEmpty {
-                                Spacer()
-                                ContentUnavailableView.search(text: viewModel.searchText)
-                                    .foregroundColor(.whiteColor)
-                                Spacer()
-                            } else {
-                                searchList
-                                    .padding(16)
-                            }
+                    ScrollView {
+                        if viewModel.dataForSearchView.isEmpty {
+                            Spacer()
+                            ContentUnavailableView.search(text: viewModel.searchText)
+                                .foregroundColor(.whiteColor)
+                            Spacer()
+                        } else {
+                            searchList
+                                .padding(16)
                         }
-                        .onChange(of: viewModel.searchText) { change in
-                            Task {
-                                await viewModel.fetchData()
-                            }
+                    }
+                    .onChange(of: viewModel.searchText) { change in
+                        Task {
+                            await viewModel.fetchData()
                         }
-                        .onLoad() {
-                            Task {
-                                await viewModel.fetchData()
-                            }
+                    }
+                    .onLoad() {
+                        Task {
+                            await viewModel.fetchData()
                         }
-                   
+                    }
+                    
                     .onChange(of: viewModel.selectedGenre) { change in
                         Task {
                             await viewModel.fetchData()
@@ -74,10 +74,10 @@ internal struct SearchView: View {
         HStack {
             Text("search.title")
                 .foregroundColor(.whiteColor)
-                .font(.poppinsBold30px)
+                .font(.poppinsBold24px)
             + Text(".")
                 .foregroundColor(.fieryRed)
-                .font(.poppinsBold30px)
+                .font(.poppinsBold24px)
             Spacer()
         }
     }

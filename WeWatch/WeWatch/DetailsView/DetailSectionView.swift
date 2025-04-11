@@ -12,16 +12,26 @@ internal struct DetailSectionView: View {
     
     internal var movie: Movie
     
+    @State private var isLandscape: Bool = false
+    
+    
     internal var body: some View {
-        ZStack(alignment: .leading) {
-            poster
-            VStack(alignment: .leading) {
-                title
-                rating
-                genres
-                readMoreButton
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                poster
+                VStack(alignment: .leading, spacing: 8) {
+                    title
+                    genres
+                    movieYear
+                    produceCounty
+                    readMoreButton
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 24)
             }
-            .padding(16)
+            .onRotate { newOrientation in
+                self.isLandscape = newOrientation.isLandscape
+            }
         }
     }
     
@@ -35,17 +45,12 @@ internal struct DetailSectionView: View {
                 }
             })
             .aspectRatio(contentMode: .fill)
-            .frame(minHeight: 932)
+            .frame(maxHeight: isLandscape ? 200 : 900)
+            .clipped()
             .overlay(
                 LinearGradient(
-                    gradient: Gradient(
-                        colors: [
-                            Color.clear,
-                            Color.darkColor,
-                            Color.darkColor
-                        ]
-                    ),
-                    startPoint: .top,
+                    gradient: Gradient(colors: [Color.clear, Color.black]),
+                    startPoint: .center,
                     endPoint: .bottom
                 )
             )
@@ -57,18 +62,15 @@ internal struct DetailSectionView: View {
             .font(.poppinsBold30px)
     }
     
-    private var rating: some View {
-        HStack {
-            Text("\(movie.rating, specifier: "%.1f")")
-                .foregroundColor(Color.whiteColor)
-                .font(.poppinsBold16px)
-                .foregroundColor(.whiteColor)
-            RatingView(ranking: movie.rating)
-        }
+    private var movieYear: some View {
+        Text("movieCard.release.year \(movie.year)")
+            .foregroundColor(Color.whiteColor)
+            .font(.poppinsRegular14px)
+            .foregroundColor(.whiteColor)
     }
     
     private var genres: some View {
-        Text("\(movie.genres)")
+        Text(movie.genres)
             .foregroundColor(Color.whiteColor)
             .font(.poppinsRegular14px)
     }
@@ -76,5 +78,11 @@ internal struct DetailSectionView: View {
     private var readMoreButton: some View {
         ExpandableTextView(lineLimit: 2, movie: movie)
             .foregroundColor(Color.lightGreyColor)
+    }
+    
+    private var produceCounty: some View {
+        Text("Country \(movie.country)")
+            .foregroundColor(Color.whiteColor)
+            .font(.poppinsRegular14px)
     }
 }

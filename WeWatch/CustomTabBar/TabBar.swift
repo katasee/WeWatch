@@ -24,7 +24,7 @@ internal struct TabBar: View {
         case .bookmark:
             BookmarkView(
                 viewModel: BookmarkViewModel()
-        )
+            )
         case .homeView:
             HomeView(
                 viewModel: HomeViewModel()
@@ -35,8 +35,4 @@ internal struct TabBar: View {
             )
         }
     }
-}
-
-#Preview {
-    TabBar()
 }

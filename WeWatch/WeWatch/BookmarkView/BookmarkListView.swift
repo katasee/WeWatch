@@ -33,7 +33,7 @@ internal struct BookmarkListView: View {
     }
     
     internal var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 5) {
             bookmarkTitle
             SearchBar(searchText: $searchText)
             HStack {
@@ -43,17 +43,16 @@ internal struct BookmarkListView: View {
             }
             ScrollView {
                 movieCardButton
-                Spacer()
             }
         }
     }
     
     private var searchResults: some View {
         Text("search.result")
-            .font(.poppinsBold18px)
+            .font(.poppinsBold16px)
             .foregroundColor(.whiteColor)
         + Text(" \(results)")
-            .font(.poppinsBold18px)
+            .font(.poppinsBold16px)
             .foregroundColor(.whiteColor)
     }
     
@@ -64,24 +63,24 @@ internal struct BookmarkListView: View {
             }
         } label: {
             Text("Clear.all.button")
+                .font(.poppinsRegular16px)
             Image(systemName: "trash")
+                .font(.poppinsRegular16px)
         }
         .foregroundColor(.fieryRed)
     }
     
     private var bookmarkTitle: some View {
-        VStack{
             HStack {
                 Text("bookmarks.title")
                     .foregroundColor(.whiteColor)
-                    .font(.poppinsBold30px)
+                    .font(.poppinsBold24px)
                 + Text(".")
                     .foregroundColor(.fieryRed)
-                    .font(.poppinsBold30px)
+                    .font(.poppinsBold24px)
                 Spacer()
             }
         }
-    }
     
     private var movieCardButton: some View {
         ForEach(data) { model in
