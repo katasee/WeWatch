@@ -26,18 +26,14 @@ internal struct CustomTabBar: View {
                         tabType.icon(isActive: activeTab == tabType)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                            .frame(maxWidth: 20, maxHeight: 20)
+                            .frame(maxWidth: 15, maxHeight: 15)
                     }
                     Spacer()
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(maxHeight: 70)
+            .frame(maxHeight: 25)
             .background(Color.black)
         }
     }
-}
-
-#Preview {
-    CustomTabBar(activeTab: .constant(.homeView))
 }

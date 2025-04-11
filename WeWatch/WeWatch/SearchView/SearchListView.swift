@@ -45,7 +45,6 @@ internal struct SearchListView: View {
     
     private var movieCardButton: some View {
         LazyVGrid(columns: columns) {
-            
             ForEach(dataForAllMovies.indices, id: \.self) { index in
                 let movie = dataForAllMovies[index]
                 NavigationLink(destination: DetailsView(

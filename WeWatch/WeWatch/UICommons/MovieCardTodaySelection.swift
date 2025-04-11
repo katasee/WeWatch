@@ -68,7 +68,7 @@ internal struct MovieCardTodaySelection: View {
     
     private var filmTitle: some View {
         Text(movie.title)
-            .font(.poppinsBold20px)
+            .font(.poppinsBold18px)
             .foregroundColor(.whiteColor)
     }
 }

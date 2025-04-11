@@ -20,7 +20,7 @@ internal struct SearchView: View {
             ZStack {
                 Color.blackColor
                     .ignoresSafeArea()
-                VStack(spacing: 20) {
+                VStack(spacing: 5) {
                     title
                     searchBar
                         ScrollView {
@@ -74,10 +74,10 @@ internal struct SearchView: View {
         HStack {
             Text("search.title")
                 .foregroundColor(.whiteColor)
-                .font(.poppinsBold30px)
+                .font(.poppinsBold24px)
             + Text(".")
                 .foregroundColor(.fieryRed)
-                .font(.poppinsBold30px)
+                .font(.poppinsBold24px)
             Spacer()
         }
     }

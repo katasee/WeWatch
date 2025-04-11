@@ -20,6 +20,7 @@ internal struct HomeView: View {
             ZStack {
                 Color.blackColor
                     .ignoresSafeArea()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 VStack {
                     ScrollView {
                         todaySelection
@@ -30,7 +31,7 @@ internal struct HomeView: View {
                             await viewModel.fetchData()
                         }
                     }
-                    .padding(16)
+                    .padding(7)
                 }
                 .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
                     Task {

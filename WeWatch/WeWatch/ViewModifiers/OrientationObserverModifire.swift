@@ -7,12 +7,22 @@
 
 import SwiftUI
 
-struct OrientationObserverModifire: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct OrientationObserver: ViewModifier {
+    let perform: (UIDeviceOrientation) -> Void
+    
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                self.perform(UIDevice.current.orientation)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                self.perform(UIDevice.current.orientation)
+            }
     }
 }
 
-#Preview {
-    OrientationObserverModifire()
+extension View {
+    func onRotate(perform action: @escaping (UIDeviceOrientation) -> Void) -> some View {
+        return modifier(OrientationObserver(perform: action))
+    }
 }

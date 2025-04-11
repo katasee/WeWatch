@@ -49,10 +49,12 @@ internal struct DiscoveryListView: View {
                     destination: DetailsView(
                         viewModel: DetailsViewModel(movieId: movie.id))
                 ) {
+                    Spacer()
                     MovieCardDiscover(
                         refreshBookmark: refreshBookmark,
                         movie: movie
                     )
+                    Spacer()
                 }
                 .onAppear {
                     if index == dataForAllMovies.count - 1 {

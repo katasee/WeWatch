@@ -24,8 +24,10 @@ internal struct SearchBar: View {
                 }
                 textField
             }
-            .frame(maxWidth: .infinity, maxHeight: 48)
+            .frame(maxWidth: .infinity, maxHeight: 38)
         }
+       
+
         .foregroundColor(searchText.count > 0 ? .whiteColor : .lightGreyColor)
         .background(RoundedRectangle(cornerRadius: 10.0).fill(Color.darkGreyColor))
         .font(.poppinsRegular16px)
@@ -36,9 +38,8 @@ internal struct SearchBar: View {
         Image("search-inactive-icon")
             .renderingMode(.template)
             .resizable()
-            .frame(width: 20.0, height: 20.0)
+            .frame(width: 15.0, height: 15.0)
             .padding(.leading, 16)
-            .padding(.vertical, 14)
     }
     
     private var textField: some View {

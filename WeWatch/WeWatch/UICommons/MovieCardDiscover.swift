@@ -44,7 +44,7 @@ internal struct MovieCardDiscover: View {
             }
         }
         .foregroundColor(.whiteColor)
-        .frame(maxWidth: 182)
+        .frame(maxWidth: .infinity)
     }
     
     private var filmRanking: some View {

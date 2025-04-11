@@ -37,5 +37,6 @@ internal struct MovieCategoryView: View {
                 }
             }
         }
+        .padding(7)
     }
 }

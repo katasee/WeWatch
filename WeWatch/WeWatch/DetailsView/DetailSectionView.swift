@@ -12,20 +12,29 @@ internal struct DetailSectionView: View {
     
     internal var movie: Movie
     
+    @State private var isLandscape: Bool = false
+    
+    
     internal var body: some View {
-        ZStack(alignment: .leading) {
-            poster
-            VStack(alignment: .leading) {
-                title
-                rating
-                genres
-                readMoreButton
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                poster(for: UIScreen.main.bounds.size)
+                VStack(alignment: .leading, spacing: 8) {
+                    title
+                    rating
+                    genres
+                    readMoreButton
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 24)
             }
-            .padding(16)
+            .onRotate { newOrientation in
+                self.isLandscape = newOrientation.isLandscape
+            }
         }
     }
     
-    private var poster: some View {
+    private func poster(for size: CGSize) -> some View {
         KFImage(URL(string: movie.posterUrl))
             .resizable()
             .placeholder({
@@ -35,21 +44,17 @@ internal struct DetailSectionView: View {
                 }
             })
             .aspectRatio(contentMode: .fill)
-            .frame(minHeight: 932)
+            .frame(maxHeight: isLandscape ? 200 : 900)
+            .clipped()
             .overlay(
                 LinearGradient(
-                    gradient: Gradient(
-                        colors: [
-                            Color.clear,
-                            Color.darkColor,
-                            Color.darkColor
-                        ]
-                    ),
-                    startPoint: .top,
+                    gradient: Gradient(colors: [Color.clear, Color.black]),
+                    startPoint: .center,
                     endPoint: .bottom
                 )
             )
     }
+    
     
     private var title: some View {
         Text(movie.title)

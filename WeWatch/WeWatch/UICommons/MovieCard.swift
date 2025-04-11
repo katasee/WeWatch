@@ -49,15 +49,16 @@ internal struct MovieCard: View {
     
     private var filmImage: some View {
         KFImage(URL(string: movie.posterUrl))
-            .resizable()
             .placeholder({
                 ZStack {
                     Rectangle()
                         .loadingIndicator()
                 }
             })
+            .resizable()
+            .frame(maxWidth: 152, maxHeight: 243)
+            .aspectRatio(contentMode: .fill)
             .cornerRadius(15)
-            .frame(maxWidth: 182, maxHeight: 273)
             .background(
                 RoundedRectangle(cornerRadius: 15)
                     .fill(Color.darkGreyColor)
@@ -66,7 +67,7 @@ internal struct MovieCard: View {
     
     private var filmTitle: some View {
         Text(movie.title)
-            .font(.poppinsBold20px)
+            .font(.poppinsBold18px)
             .foregroundColor(.whiteColor)
     }
     

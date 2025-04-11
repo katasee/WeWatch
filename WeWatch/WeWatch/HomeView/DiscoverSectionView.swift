@@ -30,7 +30,7 @@ internal struct DiscoverSectionView: View {
     }
     
     internal var body: some View {
-        VStack {
+        VStack(spacing: 5) {
             HStack {
                 title
                 Spacer()
@@ -47,10 +47,10 @@ internal struct DiscoverSectionView: View {
     private var title: some View {
         Text("home.title")
             .foregroundColor(.whiteColor)
-            .font(.poppinsBold30px)
+            .font(.poppinsBold24px)
         + Text(". ")
             .foregroundColor(.fieryRed)
-            .font(.poppinsBold30px)
+            .font(.poppinsBold24px)
     }
     
     private var seeMoreButton: some View {
@@ -69,7 +69,7 @@ internal struct DiscoverSectionView: View {
     ]
     
     private var movieCardButton: some View {
-        LazyVGrid(columns: columns) {
+        LazyVGrid(columns: columns, alignment: .leading) {
             ForEach(dataForAllMovies.indices, id: \.self) { index in
                 let movie = dataForAllMovies[index]
                 NavigationLink(
