@@ -41,4 +41,3 @@ internal struct BackButton: View {
             .font(.poppinsBold24px)
     }
 }
-

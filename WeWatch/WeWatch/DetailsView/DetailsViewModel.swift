@@ -51,7 +51,9 @@ internal final class DetailsViewModel: ObservableObject {
                 guard let movieId: String = details.id,
                       let title: String = details.name,
                       let overview: String = details.overview,
+                      let year: String = details.year,
                       let posterUrl: String = details.imageUrl,
+                      let country: String = details.country,
                       let genres = details.genres?.joined(separator: ", ")
                 else {
                     return nil
@@ -60,8 +62,9 @@ internal final class DetailsViewModel: ObservableObject {
                     id: movieId,
                     title: title,
                     overview: overview,
-                    rating: 3,
+                    year: year,
                     posterUrl: posterUrl,
+                    country: country,
                     genres: genres
                 )
             } ?? .init()

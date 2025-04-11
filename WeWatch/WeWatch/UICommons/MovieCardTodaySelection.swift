@@ -22,7 +22,7 @@ internal struct MovieCardTodaySelection: View {
     }
     
     internal var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     ZStack(alignment: .topTrailing) {
@@ -50,19 +50,16 @@ internal struct MovieCardTodaySelection: View {
                 }
                 filmTitle
             }
-            HStack {
-                filmRanking
-                RatingView(ranking: movie.rating)
-            }
+            movieYear
         }
         .frame(width: 300)
         .fixedSize(horizontal: true, vertical: false)
         .lineLimit(1)
     }
     
-    private var filmRanking: some View {
-        Text("\(movie.rating, specifier: "%.1f")")
-            .font(.poppinsRegular22px)
+    private var movieYear: some View {
+        Text("Release in: \(movie.year)")
+            .font(.poppinsRegular14px)
             .foregroundColor(.whiteColor)
     }
     

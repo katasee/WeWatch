@@ -31,8 +31,8 @@ internal struct CustomTabBar: View {
                     Spacer()
                 }
             }
+            .frame(maxHeight: 35)
             .frame(maxWidth: .infinity)
-            .frame(maxHeight: 25)
             .background(Color.black)
         }
     }

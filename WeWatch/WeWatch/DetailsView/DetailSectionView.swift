@@ -21,8 +21,9 @@ internal struct DetailSectionView: View {
                 poster(for: UIScreen.main.bounds.size)
                 VStack(alignment: .leading, spacing: 8) {
                     title
-                    rating
                     genres
+                    movieYear
+                    produceCounty
                     readMoreButton
                 }
                 .padding(.horizontal, 16)
@@ -55,25 +56,21 @@ internal struct DetailSectionView: View {
             )
     }
     
-    
     private var title: some View {
         Text(movie.title)
             .foregroundColor(.whiteColor)
             .font(.poppinsBold30px)
     }
     
-    private var rating: some View {
-        HStack {
-            Text("\(movie.rating, specifier: "%.1f")")
-                .foregroundColor(Color.whiteColor)
-                .font(.poppinsBold16px)
-                .foregroundColor(.whiteColor)
-            RatingView(ranking: movie.rating)
-        }
+    private var movieYear: some View {
+        Text("movieCard.release.year \(movie.year)")
+            .foregroundColor(Color.whiteColor)
+            .font(.poppinsRegular14px)
+            .foregroundColor(.whiteColor)
     }
     
     private var genres: some View {
-        Text("\(movie.genres)")
+        Text(movie.genres)
             .foregroundColor(Color.whiteColor)
             .font(.poppinsRegular14px)
     }
@@ -81,5 +78,11 @@ internal struct DetailSectionView: View {
     private var readMoreButton: some View {
         ExpandableTextView(lineLimit: 2, movie: movie)
             .foregroundColor(Color.lightGreyColor)
+    }
+    
+    private var produceCounty: some View {
+        Text("Country \(movie.country)")
+            .foregroundColor(Color.whiteColor)
+            .font(.poppinsRegular14px)
     }
 }

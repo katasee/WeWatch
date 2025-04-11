@@ -64,6 +64,7 @@ internal struct DiscoverSectionView: View {
                 .foregroundColor(.fieryRed)
         }
     }
+    
     private let columns: Array<GridItem> = [
         GridItem(.flexible())
     ]

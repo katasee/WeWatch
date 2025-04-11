@@ -112,6 +112,7 @@ internal final class SearchViewModel: ObservableObject {
                 guard let movieId: String = details.id,
                       let title: String = details.name,
                       let overview: String = details.overview,
+                      let year = details.year,
                       let posterUrl: String = details.imageUrl,
                       let genres: String = details.genres?.joined(separator: ", ")
                 else {
@@ -121,8 +122,9 @@ internal final class SearchViewModel: ObservableObject {
                     id: movieId,
                     title: title,
                     overview: overview,
-                    rating: 3,
+                    year: year,
                     posterUrl: posterUrl,
+                    country: "",
                     genres: genres
                 )
             } ?? .init()

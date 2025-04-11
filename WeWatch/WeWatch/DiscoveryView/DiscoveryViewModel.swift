@@ -52,7 +52,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             await movieDataFromDatabase()
         }
         await MainActor.run { [weak self] in
-            self?.isLoading = false            
+            self?.isLoading = false
         }
     }
     
@@ -94,6 +94,7 @@ internal final class DiscoveryViewModel: ObservableObject {
                 guard let movieId: String = details.id,
                       let title: String = details.name,
                       let overview: String = details.overview,
+                      let year: String = details.year,
                       let posterUrl: String = details.imageUrl,
                       let genres = details.genres?.joined(separator: ", ")
                 else {
@@ -103,8 +104,9 @@ internal final class DiscoveryViewModel: ObservableObject {
                     id: movieId,
                     title: title,
                     overview: overview,
-                    rating: 3,
+                    year: year,
                     posterUrl: posterUrl,
+                    country: "",
                     genres: genres
                 )
             } ?? .init()
@@ -266,11 +268,3 @@ internal final class DiscoveryViewModel: ObservableObject {
         return chooseGenre
     }
 }
-
-
-
-
-
-
-
-

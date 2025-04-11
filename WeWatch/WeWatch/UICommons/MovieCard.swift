@@ -35,13 +35,10 @@ internal struct MovieCard: View {
                     .padding(16)
                 }
             }
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 5) {
                 filmTitle
-                HStack {
-                    filmRanking
-                    RatingView(ranking: movie.rating)
-                }
                 filmGenres
+                    filmRelease
                 storyLine
             }
         }
@@ -71,9 +68,9 @@ internal struct MovieCard: View {
             .foregroundColor(.whiteColor)
     }
     
-    private var filmRanking: some View {
-        Text("\(movie.rating, specifier: "%.1f")")
-            .font(.poppinsBold16px)
+    private var filmRelease: some View {
+        Text("movieCard.release.year \(movie.year)")
+            .font(.poppinsRegular14px)
             .foregroundColor(.whiteColor)
     }
     

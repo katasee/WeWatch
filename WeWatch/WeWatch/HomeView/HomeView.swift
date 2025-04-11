@@ -31,7 +31,6 @@ internal struct HomeView: View {
                             await viewModel.fetchData()
                         }
                     }
-                    .padding(7)
                 }
                 .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
                     Task {
