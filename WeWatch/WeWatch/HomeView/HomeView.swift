@@ -44,6 +44,7 @@ internal struct HomeView: View {
                     }
                 })
                 .fullScreenLoader(isLoading: viewModel.isLoading)
+                .padding(16)
             }
         }
     }

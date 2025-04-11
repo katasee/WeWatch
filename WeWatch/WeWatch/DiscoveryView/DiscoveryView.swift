@@ -39,6 +39,7 @@ internal struct DiscoveryView: View {
                     }
                 }
             }
+            .padding(16)
             .fullScreenLoader(isLoading: viewModel.isLoading)
             .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
                 Task {

@@ -37,7 +37,7 @@ internal struct DiscoveryListView: View {
     }
     
     private let columns: Array<GridItem> = [
-        GridItem(.flexible()),
+        GridItem(.flexible(), spacing: 20),
         GridItem(.flexible())
     ]
     
@@ -49,12 +49,11 @@ internal struct DiscoveryListView: View {
                     destination: DetailsView(
                         viewModel: DetailsViewModel(movieId: movie.id))
                 ) {
-                    Spacer()
+                    
                     MovieCardDiscover(
                         refreshBookmark: refreshBookmark,
                         movie: movie
                     )
-                    Spacer()
                 }
                 .onAppear {
                     if index == dataForAllMovies.count - 1 {
