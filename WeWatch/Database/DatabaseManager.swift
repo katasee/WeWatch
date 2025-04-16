@@ -8,126 +8,12 @@
 import Foundation
 import SQLite3
 
-internal enum DatabaseError: Error {
-    
-    case openDatabase(message: String)
-    case createTable(message: String)
-    case prepare(message: String)
-    case step(message: String)
-    case bind(message: String)
-    case missingId
-    case unknownError
-    case transactionError
-    case fetchError(message: String)
-}
-
 internal enum Constans {
     
     internal static let bookmarkList: String = "Bookmark"
     internal static let discoveryList: String = "DiscoverySection"
     internal static let todaySelectionList: String = "TodaySelection"
     internal static let refreshIntervalHours: Int = 24
-}
-
-internal enum DatabaseConfig {
-    
-    internal static let name: String = "WeWatch_v1.sqlite"
-}
-
-internal enum SQLStatements {
-    
-    internal static let createBookmarkIdsTableSQL: String = """
-     CREATE TABLE IF NOT EXISTS bookmark(
-     id TEXT PRIMARY KEY
-     );
-     """
-    internal static let selectedBookmarkIds: String = "SELECT * FROM bookmark;"
-    internal static let createMoviesTableSQL: String = """
-     CREATE TABLE IF NOT EXISTS movies(
-     id TEXT PRIMARY KEY,
-     title TEXT NOT NULL,
-     overview TEXT,
-     year TEXT,
-     posterUrl TEXT,
-     country TEXT,
-     genres TEXT
-     );
-     """
-    internal static let createListsTableSQL: String = """
-     CREATE TABLE IF NOT EXISTS lists(
-     id TEXT PRIMARY KEY,
-     title TEXT NOT NULL
-     );
-     """
-    internal static let createGenresTableSQL: String = """
-     CREATE TABLE IF NOT EXISTS genres(
-     id TEXT PRIMARY KEY,
-     title TEXT NOT NULL
-     );
-     """
-    internal static let createMovieGenreTableSQL: String = """
-     CREATE TABLE IF NOT EXISTS movie_genres (
-     movie_id TEXT NOT NULL,
-     genre_id TEXT NOT NULL,
-     PRIMARY KEY(movie_id, genre_id),
-     FOREIGN KEY(movie_id) REFERENCES movies(id) ON DELETE CASCADE,
-     FOREIGN KEY(genre_id) REFERENCES genres(id) ON DELETE CASCADE
-     );
-     """
-    internal static let createdListMovieTableSQL: String = """
-     CREATE TABLE IF NOT EXISTS list_movies (
-     list_id TEXT NOT NULL,
-     movie_id TEXT NOT NULL,
-     PRIMARY KEY(list_id, movie_id),
-     FOREIGN KEY(list_id) REFERENCES lists(id) ON DELETE CASCADE,
-     FOREIGN KEY(movie_id) REFERENCES movies(id) ON DELETE CASCADE
-     );
-     """
-    internal static let insertGenreMovies: String = "INSERT OR IGNORE INTO movie_genres (movie_id, genre_id) VALUES (?, ?);"
-    internal static let insertListMovies: String = "INSERT OR REPLACE INTO list_movies (list_id, movie_id) VALUES (?, ?);"
-    internal static let insertGenres: String = "INSERT OR REPLACE INTO genres (id, title) VALUES (?, ?);"
-    internal static let selectMovieByList: String = """
-     SELECT m.*
-     FROM movies m
-     JOIN list_movies lm ON lm.movie_id = m.id
-     WHERE lm.list_id = ?;
-     """
-    internal static let selectMovieByGenre: String = """
-     SELECT m.*
-     FROM movies m
-     JOIN movie_genres lm ON lm.movie_id = m.id
-     WHERE lm.genre_id = ?;
-     """
-    internal static let selectedMovieId: String = """
-     SELECT * FROM movies
-     WHERE id = ?;
-     """
-    internal static let selectMovieByTitle: String = """
-     SELECT * FROM movies
-     WHERE title = ?;
-     """
-    internal static let selectedGenres: String = "SELECT * FROM genres;"
-    internal static let beginTransaction: String = "BEGIN TRANSACTION;"
-    internal static let saveAllChanges: String = "COMMIT;"
-    internal static let undoesChanges: String = "ROLLBACK;"
-}
-
-internal protocol SQLTable {
-    
-    static var tableName: String { get }
-    static var createTableStatement: String { get }
-    
-    init(row: Dictionary<String, Any>) throws
-    func toDictionary() -> Dictionary<String, Any>
-}
-
-internal enum SQLiteConstants {
-    
-    internal static let sqliteTransient: sqlite3_destructor_type = unsafeBitCast(
-        OpaquePointer(
-            bitPattern: -1),
-        to: sqlite3_destructor_type.self
-    )
 }
 
 internal final actor DatabaseManager {

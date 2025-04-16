@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-extension AuthenticationError: LocalizedError {
+extension NetworkingError: LocalizedError {
+    
     var errorDescription: String? {
         switch self {
         case .invalidResponse:

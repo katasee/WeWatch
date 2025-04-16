@@ -21,10 +21,3 @@ internal struct OrientationObserver: ViewModifier {
             }
     }
 }
-
-extension View {
-    
-    internal func onRotate(perform action: @escaping (UIDeviceOrientation) -> Void) -> some View {
-        return modifier(OrientationObserver(perform: action))
-    }
-}

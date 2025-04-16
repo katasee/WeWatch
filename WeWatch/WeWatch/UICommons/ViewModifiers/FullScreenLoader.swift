@@ -41,9 +41,3 @@ struct FullScreenLoader: ViewModifier {
         .padding(.horizontal, 24)
     }
 }
-
-extension View {
-    func fullScreenLoader(isLoading: Bool) -> some View {
-        modifier(FullScreenLoader(isLoading: isLoading))
-    }
-}
