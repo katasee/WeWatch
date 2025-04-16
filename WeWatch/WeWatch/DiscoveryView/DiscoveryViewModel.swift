@@ -136,15 +136,13 @@ internal final class DiscoveryViewModel: ObservableObject {
                     genre: selectedGenre.title,
                     page: String(currentPage)
                 )
-                
-                await MainActor.run { [weak self] in
+                await MainActor.run {
                     self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
                     self?.isFetchingNextPage = false
-                    
                 }
             } catch {
                 appendDataError = true
-                await MainActor.run { [weak self] in
+                await MainActor.run {
                     self?.error = error
                     self?.isFetchingNextPage = false
                 }
