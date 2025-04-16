@@ -79,7 +79,7 @@ internal final class DetailsViewModel: ObservableObject {
             }
             detailsData.isBookmarked = bookmarkedMovieIds.contains(detailsData.id)
             let filtredMovie: Movie = detailsData
-            try await MainActor.run { [weak self] in
+            await MainActor.run { [weak self] in
                 self?.movieForDetailsView = detailsData
             }
         } catch {

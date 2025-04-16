@@ -32,7 +32,7 @@ internal struct HomeView: View {
                         }
                     }
                 }
-                .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                .fullScreenErrorPopup(error: $viewModel.error, onRetry: {
                     Task {
                         if viewModel.fetchDataError == true {
                             await viewModel.fetchData()

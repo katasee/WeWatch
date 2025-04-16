@@ -41,7 +41,7 @@ internal struct DiscoveryView: View {
             }
             .padding(16)
             .fullScreenLoader(isLoading: viewModel.isLoading)
-            .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+            .fullScreenErrorPopup(error: $viewModel.error, onRetry: {
                 Task {
                     if viewModel.fetchDataError {
                         await viewModel.fetchData()

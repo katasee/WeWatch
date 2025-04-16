@@ -257,8 +257,7 @@ internal final class SearchViewModel: ObservableObject {
             dataForSearchView.filter {
                 $0.title.localizedStandardContains(searchText) ||
                 $0.genres.localizedStandardContains(searchText) ||
-                $0.overview.localizedStandardContains(searchText) ||
-                $0.genres.localizedStandardContains(selectedGenre.title)
+                $0.overview.localizedStandardContains(searchText) 
             }
         }
     }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal enum JWTError: Error {
+internal enum JWTDecoderError: Error {
     
     case decodeFailure
     case decodePartError

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NetworkingError: Error {
+internal enum NetworkingError: Error {
     
     case invalidResponse
     case decodingError

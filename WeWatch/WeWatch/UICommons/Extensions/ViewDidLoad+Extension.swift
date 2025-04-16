@@ -1,5 +1,5 @@
 //
-//  ViewDidLoad + extension.swift
+//  ViewDidLoad+Extension.swift
 //  WeWatch
 //
 //  Created by Anton on 16/04/2025.

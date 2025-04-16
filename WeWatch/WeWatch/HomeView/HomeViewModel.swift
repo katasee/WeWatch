@@ -143,7 +143,7 @@ internal final class HomeViewModel: ObservableObject {
             currentPage = 0
             let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
             let filtredMovie: [Movie] = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
-            try await MainActor.run { [weak self] in
+             await MainActor.run { [weak self] in
                 self?.discoverySection = filtredMovie
             }
         } catch {
@@ -266,7 +266,7 @@ internal final class HomeViewModel: ObservableObject {
                 await updateBookmarks()
                 let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
                 let filtredMovie: [Movie] = todaySelectionData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
-                try await MainActor.run { [weak self] in
+                 await MainActor.run { [weak self] in
                     self?.todaySelection = filtredMovie
                 }
             } catch {

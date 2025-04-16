@@ -1,5 +1,5 @@
 //
-//  OrientationObserver + extension.swift
+//  OrientationObserver+Extension.swift
 //  WeWatch
 //
 //  Created by Anton on 16/04/2025.

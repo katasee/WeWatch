@@ -11,7 +11,7 @@ internal final class JWTDecoder {
     internal func decode(jwtoken: String) throws -> [String: Any] {
         let segments: [String] = jwtoken.components(separatedBy: ".")
         if segments.count != 3 {
-            throw JWTError.segmentError
+            throw JWTDecoderError.segmentError
         }
         return try decodeJWTPart(segments[1])
     }
@@ -32,7 +32,7 @@ internal final class JWTDecoder {
     
     private func decodeJWTPart(_ value: String) throws -> [String: Any] {
         guard let bodyData: Data = base64Decode(value) else {
-            throw JWTError.decodePartError
+            throw JWTDecoderError.decodePartError
         }
         do {
             let json: Any = try JSONSerialization.jsonObject(
@@ -40,12 +40,12 @@ internal final class JWTDecoder {
                 options: []
             )
             guard let payload: [String : Any] = json as? [String: Any] else {
-                throw JWTError.payloadError
+                throw JWTDecoderError.payloadError
             }
             return payload
             
         } catch {
-            throw JWTError.decodeFailure
+            throw JWTDecoderError.decodeFailure
         }
     }
 }
