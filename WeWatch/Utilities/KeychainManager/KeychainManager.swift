@@ -3,18 +3,6 @@ import Security
 
 internal final class KeychainManager {
     
-    internal enum KeychainError: Error {
-        
-        case duplicateItem
-        case unknown(OSStatus)
-        case itemNotFound
-        case unexpectedDataFormat
-    }
-    
-    internal enum KeychainKey {
-        static let token: String = "token"
-    }
-    
     internal static func store(
         data: String,
         key: String
@@ -106,4 +94,3 @@ internal final class KeychainManager {
         return status == errSecSuccess
     }
 }
-

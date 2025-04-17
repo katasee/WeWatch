@@ -38,7 +38,7 @@ internal final class SplashViewModel: ObservableObject {
                 token: nil
             )
             do {
-                let response: LoginResponse = try await Webservice().call(loginResource)
+                let response: LoginResponse = try await WebService().call(loginResource)
                 if let token: String = response.data?.token {
                     self.token = token
                     do {
@@ -57,7 +57,7 @@ internal final class SplashViewModel: ObservableObject {
     }
     
     internal func decodingJwtToken() throws -> [String: Any] {
-        let tokenData: Data? = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
+        let tokenData: Data? = try KeychainManager.getData(key: KeychainKey.token)
         let token: String = .init(decoding: tokenData ?? Data(), as: UTF8.self)
         let jwtDecoder: JWTDecoder = .init()
         let decodeToken: [String: Any] = try jwtDecoder.decode(jwtoken: token)

@@ -63,9 +63,3 @@ struct ErrorPopup: ViewModifier {
             }
     }
 }
-extension View {
-    func fullScreenErrorPopUp(error: Binding<(any Error)?>, onRetry:  @escaping () -> Void) -> some View {
-        modifier(ErrorPopup(error: error, onRetry: onRetry))
-    }
-}
-

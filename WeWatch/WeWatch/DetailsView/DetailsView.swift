@@ -31,7 +31,7 @@ internal struct DetailsView: View {
                 )
                 VStack {
                     DetailSectionView(movie: movie)
-                        .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                        .fullScreenErrorPopup(error: $viewModel.error, onRetry: {
                             Task {
                                 await viewModel.fetchData()
                             }

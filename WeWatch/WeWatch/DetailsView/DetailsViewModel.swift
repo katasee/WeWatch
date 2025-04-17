@@ -35,7 +35,7 @@ internal final class DetailsViewModel: ObservableObject {
     }
     
     internal func prepareDetailsFromEndpoint(id: String) async throws -> Array<Movie> {
-        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
+        let tokenData: Data = try KeychainManager.getData(key: KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let detailResource: Resource<SearchResponse> = .init(
             url: URL.SearchResponseURL,
@@ -45,7 +45,7 @@ internal final class DetailsViewModel: ObservableObject {
             ]),
             token: token
         )
-        let response: SearchResponse = try await Webservice().call(detailResource)
+        let response: SearchResponse = try await WebService().call(detailResource)
         let moviesForUI: Array<Movie> = response.data?
             .compactMap { details in
                 guard let movieId: String = details.id,
@@ -79,7 +79,7 @@ internal final class DetailsViewModel: ObservableObject {
             }
             detailsData.isBookmarked = bookmarkedMovieIds.contains(detailsData.id)
             let filtredMovie: Movie = detailsData
-            try await MainActor.run { [weak self] in
+            await MainActor.run { [weak self] in
                 self?.movieForDetailsView = detailsData
             }
         } catch {

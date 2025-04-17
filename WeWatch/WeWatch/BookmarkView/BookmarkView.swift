@@ -38,7 +38,7 @@ internal struct BookmarkView: View {
                         },
                         results: viewModel.dataForBookmarkView.count
                     )
-                    .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                    .fullScreenErrorPopup(error: $viewModel.error, onRetry: {
                         Task {
                             await viewModel.fetchData()
                         }

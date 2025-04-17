@@ -92,7 +92,7 @@ internal final class HomeViewModel: ObservableObject {
     }
     
     internal func prepareDataDiscoverySection(page: String) async throws -> Array<Movie> {
-        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
+        let tokenData: Data = try KeychainManager.getData(key: KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let listsResource: Resource<SearchResponse> = .init(
             url: URL.SearchResponseURL,
@@ -103,7 +103,7 @@ internal final class HomeViewModel: ObservableObject {
             ]),
             token: token
         )
-        let response: SearchResponse = try await Webservice().call(listsResource)
+        let response: SearchResponse = try await WebService().call(listsResource)
         let moviesForUI: Array<Movie> = response.data?
             .compactMap { movieDetails in
                 guard let id: String = movieDetails.id,
@@ -143,7 +143,7 @@ internal final class HomeViewModel: ObservableObject {
             currentPage = 0
             let discoveryMovieData: [Movie] = try await prepareDataDiscoverySection(page: String(currentPage))
             let filtredMovie: [Movie] = discoveryMovieData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
-            try await MainActor.run { [weak self] in
+            await MainActor.run { [weak self] in
                 self?.discoverySection = filtredMovie
             }
         } catch {
@@ -179,16 +179,16 @@ internal final class HomeViewModel: ObservableObject {
     internal func prepareDataTodaySelection(query: String) async throws -> Array<Movie> {
         var attempts: Int = 0
         let maxAttempts: Int = 5
-        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
+        let tokenData: Data = try KeychainManager.getData(key: KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let searchResource: Resource<SearchResponse> = .init(
             url: URL.SearchResponseURL,
             method: .get([.init(name: "query", value: "\(query)")]),
             token: token
         )
-        var response: SearchResponse = try await Webservice().call(searchResource)
+        var response: SearchResponse = try await WebService().call(searchResource)
         while (response.data?.count ?? 0) < 10 && attempts < maxAttempts {
-            response = try await Webservice().call(searchResource)
+            response = try await WebService().call(searchResource)
             attempts += 1
         }
         if (response.data?.count ?? 0) < 10 {
@@ -266,7 +266,7 @@ internal final class HomeViewModel: ObservableObject {
                 await updateBookmarks()
                 let todaySelectionData: [Movie] = try await prepareDataTodaySelection(query: randomData())
                 let filtredMovie: [Movie] = todaySelectionData.updateBookmarkedStatus(bookmarkedMovieIds: bookmarkedMovieIds)
-                try await MainActor.run { [weak self] in
+                await MainActor.run { [weak self] in
                     self?.todaySelection = filtredMovie
                 }
             } catch {

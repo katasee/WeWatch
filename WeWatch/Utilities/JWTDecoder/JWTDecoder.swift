@@ -8,17 +8,10 @@ import Foundation
 
 internal final class JWTDecoder {
     
-    internal enum jwtError: Error {
-        case decodeFailure
-        case decodePartError
-        case segmentError
-        case payloadError
-    }
-    
     internal func decode(jwtoken: String) throws -> [String: Any] {
         let segments: [String] = jwtoken.components(separatedBy: ".")
         if segments.count != 3 {
-            throw jwtError.segmentError
+            throw JWTDecoderError.segmentError
         }
         return try decodeJWTPart(segments[1])
     }
@@ -39,7 +32,7 @@ internal final class JWTDecoder {
     
     private func decodeJWTPart(_ value: String) throws -> [String: Any] {
         guard let bodyData: Data = base64Decode(value) else {
-            throw jwtError.decodePartError
+            throw JWTDecoderError.decodePartError
         }
         do {
             let json: Any = try JSONSerialization.jsonObject(
@@ -47,12 +40,12 @@ internal final class JWTDecoder {
                 options: []
             )
             guard let payload: [String : Any] = json as? [String: Any] else {
-                throw jwtError.payloadError
+                throw JWTDecoderError.payloadError
             }
             return payload
             
         } catch {
-            throw jwtError.decodeFailure
+            throw JWTDecoderError.decodeFailure
         }
     }
 }

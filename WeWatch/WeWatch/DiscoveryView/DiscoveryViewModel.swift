@@ -77,7 +77,7 @@ internal final class DiscoveryViewModel: ObservableObject {
         genre: String,
         page: String
     ) async throws -> Array<Movie> {
-        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
+        let tokenData: Data = try KeychainManager.getData(key: KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let listsResource: Resource<SearchResponse> = .init(
             url: URL.SearchResponseURL,
@@ -88,7 +88,7 @@ internal final class DiscoveryViewModel: ObservableObject {
             ]),
             token: token
         )
-        let response: SearchResponse = try await Webservice().call(listsResource)
+        let response: SearchResponse = try await WebService().call(listsResource)
         let moviesForUI: Array<Movie> = response.data?
             .compactMap { details in
                 guard let movieId: String = details.id,
@@ -136,15 +136,13 @@ internal final class DiscoveryViewModel: ObservableObject {
                     genre: selectedGenre.title,
                     page: String(currentPage)
                 )
-                
-                await MainActor.run { [weak self] in
+                await MainActor.run {
                     self?.dataForAllMovieTab.append(contentsOf: discoveryMovieData)
                     self?.isFetchingNextPage = false
-                    
                 }
             } catch {
                 appendDataError = true
-                await MainActor.run { [weak self] in
+                await MainActor.run {
                     self?.error = error
                     self?.isFetchingNextPage = false
                 }
@@ -204,14 +202,14 @@ internal final class DiscoveryViewModel: ObservableObject {
     }
     
     internal func prepareGenreForDiscoveryView() async throws -> Array<Genre> {
-        let tokenData: Data = try KeychainManager.getData(key: KeychainManager.KeychainKey.token)
+        let tokenData: Data = try KeychainManager.getData(key: KeychainKey.token)
         let token: String = .init(decoding: tokenData, as: UTF8.self)
         let listsResource: Resource<GenreResponse> = .init(
             url: URL.GenreResponseURL,
             method: .get([]),
             token: token
         )
-        let response: GenreResponse = try await Webservice().call(listsResource)
+        let response: GenreResponse = try await WebService().call(listsResource)
         var genreForUI: Array<Genre> = response.data?
             .compactMap { genre in
                 guard let genreId = genre.id,

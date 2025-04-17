@@ -44,20 +44,19 @@ internal struct SearchView: View {
                             await viewModel.fetchData()
                         }
                     }
-                    
                     .onChange(of: viewModel.selectedGenre) { change in
                         Task {
                             await viewModel.fetchData()
                         }
                     }
                 }
-                .fullScreenErrorPopUp(error: $viewModel.error, onRetry: {
+                .fullScreenErrorPopup(error: $viewModel.error, onRetry: {
                     Task {
                         if viewModel.fetchDataError == true {
                             await viewModel.fetchData()
                             viewModel.fetchDataError = false
                         } else if viewModel.appendDataError == true {
-                            try await viewModel.appendDataFromEndpoint()
+                            viewModel.appendDataFromEndpoint()
                             viewModel.appendDataError = false
                         }
                     }
@@ -93,7 +92,7 @@ internal struct SearchView: View {
             Text("search.result")
                 .font(.poppinsBold18px)
                 .foregroundColor(.whiteColor)
-            + Text(" \(viewModel.dataForSearchView.count)")
+            + Text(" \(viewModel.filteredMovie.count)")
                 .font(.poppinsBold18px)
                 .foregroundColor(.whiteColor)
         }

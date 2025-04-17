@@ -1,4 +1,4 @@
-//
+ //
 //  SearchResponse.swift
 //  WeWatch
 //
