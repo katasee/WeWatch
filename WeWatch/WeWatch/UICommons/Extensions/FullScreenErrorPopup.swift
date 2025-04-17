@@ -9,7 +9,7 @@ import SwiftUI
 
 extension View {
     
-    func fullScreenErrorPopup(error: Binding<(any Error)?>, onRetry:  @escaping () -> Void) -> some View {
+    internal func fullScreenErrorPopup(error: Binding<(any Error)?>, onRetry:  @escaping () -> Void) -> some View {
         modifier(ErrorPopup(error: error, onRetry: onRetry))
     }
 }

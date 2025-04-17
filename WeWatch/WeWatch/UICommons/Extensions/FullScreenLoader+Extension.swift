@@ -9,7 +9,7 @@ import SwiftUI
 
 extension View {
     
-    func fullScreenLoader(isLoading: Bool) -> some View {
+    internal func fullScreenLoader(isLoading: Bool) -> some View {
         modifier(FullScreenLoader(isLoading: isLoading))
     }
 }

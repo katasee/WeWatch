@@ -1,5 +1,5 @@
 //
-//  JWTDecoderErrors.swift
+//  JWTDecoderError.swift
 //  WeWatch
 //
 //  Created by Anton on 16/04/2025.

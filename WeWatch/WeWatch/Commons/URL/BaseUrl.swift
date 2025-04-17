@@ -9,15 +9,15 @@ import Foundation
 
 extension URL {
     
-    static var loginURL: URL {
+    internal static var loginURL: URL {
         return URL(string: "https://api4.thetvdb.com/v4/login")!
     }
     
-    static var SearchResponseURL: URL {
+    internal static var SearchResponseURL: URL {
         return URL(string: "https://api4.thetvdb.com/v4/search")!
     }
     
-    static var GenreResponseURL: URL {
+    internal static var GenreResponseURL: URL {
         return URL(string: "https://api4.thetvdb.com/v4/genres")!
     }
 }
